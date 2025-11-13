@@ -110,7 +110,7 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
                   class="time-blocks"
                   @click=${()=>this._config?.editable&&this._handleWeekdayClick(t)}
                 >
-                  ${e.map((i,s)=>{const o=this._isBlockActive(t,i);let r;if(this._config?.show_gradient){const t=s>0?e[s-1].temperature:null,o=s<e.length-1?e[s+1].temperature:null,n=function(t,e,i){const s=vt(t);if(null===e&&null===i)return s;if(null!==e&&null===i)return`linear-gradient(to bottom, ${vt(e)}, ${s})`;if(null===e&&null!==i)return`linear-gradient(to bottom, ${s}, ${vt(i)})`;if(null!==e&&null!==i)return`linear-gradient(to bottom, ${vt(e)}, ${s} 50%, ${vt(i)})`;return s}(i.temperature,t,o);r=`background: ${n};`}else r=`background-color: ${vt(i.temperature)};`;return W`
+                  ${e.map((i,s)=>{const o=this._isBlockActive(t,i);let r;if(this._config?.show_gradient){const t=s>0?e[s-1].temperature:null,o=s<e.length-1?e[s+1].temperature:null,n=function(t,e,i){const s=vt(t);if(null===e&&null===i)return s;if(null!==e&&null===i)return`linear-gradient(to bottom, ${vt(e)}, ${s})`;if(null===e&&null!==i)return`linear-gradient(to bottom, ${s}, ${vt(i)})`;return`linear-gradient(to bottom, ${vt(e)}, ${s} 50%, ${vt(i)})`}(i.temperature,t,o);r=`background: ${n};`}else r=`background-color: ${vt(i.temperature)};`;return W`
                       <div
                         class="time-block ${o?"active":""} ${this._pendingChanges.has(t)?"pending":""}"
                         style="
