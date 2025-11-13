@@ -10,3 +10,9 @@ coverage/
 .nyc_output/
 *.tgz
 /.claude
+
+# Legacy ESLint config (using flat config now)
+.eslintrc.js
+.eslintrc.json
+.eslintrc.yml
+.eslintrc.yaml
