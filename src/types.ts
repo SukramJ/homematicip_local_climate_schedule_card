@@ -8,6 +8,8 @@ export interface HomematicScheduleCardConfig {
   show_temperature?: boolean;
   temperature_unit?: string;
   hour_format?: "12" | "24";
+  language?: "en" | "de";
+  show_gradient?: boolean;
 }
 
 export interface ScheduleSlot {
@@ -58,6 +60,8 @@ export interface HomeAssistant {
     serviceData?: Record<string, unknown>,
   ) => Promise<void>;
   callWS: (message: Record<string, unknown>) => Promise<unknown>;
+  language?: string;
+  locale?: { language: string };
   // Add other HA properties as needed
 }
 

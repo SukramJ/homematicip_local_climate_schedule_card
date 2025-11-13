@@ -7,6 +7,145 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-11-13
+
+### Added
+
+- Loading indicator overlay with spinner during backend interactions
+- 10-second timeout for loading indicator when saving or pasting schedules
+- Visual feedback when data is being sent to backend via `set_schedule_profile_weekday`
+- Current time indicator line displayed horizontally across all weekdays
+- Real-time update of current time indicator (updates every minute)
+- Red dashed line with circular marker showing the current time of day
+- Active temperature block highlighting with pulsing glow effect
+- Visual feedback showing which temperature block is currently active based on current time and weekday
+- Automatic detection of current weekday and time to highlight the active schedule block
+- Undo/redo functionality for editing actions before saving
+- History stack maintaining up to 50 previous states of schedule edits
+- Undo and redo buttons in the editor interface with visual feedback for enabled/disabled states
+- Keyboard shortcuts: Ctrl+Z (or Cmd+Z on Mac) for undo, Ctrl+Y (or Cmd+Y/Ctrl+Shift+Z on Mac) for redo
+- Automatic state saving before add, remove, and update operations on time blocks
+- Comprehensive testing documentation (TESTING.md) describing feature validation procedures
+- Manual test cases for undo/redo, loading state, time tracking, and active block detection
+- Testing strategy documentation explaining automated and manual testing approaches
+- Internationalization (i18n) support with English and German translations
+- Automatic language detection from Home Assistant settings
+- `language` configuration option to manually set card language (en/de)
+- Translation system for all UI text: buttons, labels, error messages, and tooltips
+- Localized weekday labels for different languages
+- Dynamic language switching when Home Assistant language changes
+- View mode toggle button to switch between full view and compact view
+- Compact view mode with smaller day columns for better space utilization on smaller screens
+- Reduced gaps, font sizes, and hidden copy/paste actions in compact mode
+- Icon-based toggle button (⬜ for full view, ▭ for compact view) with localized tooltips
+- Temperature gradient visualization option with `show_gradient` configuration setting
+- Smooth gradient colors on temperature blocks based on temperature transitions between adjacent blocks
+- `getTemperatureGradient()` utility function to generate CSS linear-gradient strings
+- Conditional rendering: gradient mode creates smooth color transitions, solid mode keeps discrete colors
+- Real-time validation warnings in the schedule editor
+- Visual warning panel displaying issues with time blocks (gaps, backwards time, temperature out of range, etc.)
+- `validateTimeBlocks()` utility function for real-time validation of editing state
+- Automatic validation updates after any editing action (add, remove, update, undo, redo)
+- Localized warning messages in English and German
+- Warning panel with orange-tinted background and warning icon for visibility
+- Comprehensive tests for validation function covering all warning scenarios (37 total tests)
+- Mobile optimization with responsive layout and touch-friendly interface
+- Responsive CSS media queries for tablets (768px), phones (480px), and landscape orientation
+- Touch-optimized button sizes with 44px minimum touch targets following accessibility guidelines
+- Mobile-specific layout adjustments: stacked header controls, full-width editor buttons, responsive grid spacing
+- Touch event handling with `:active` states instead of `:hover` for better mobile feedback
+- Optimized font sizes and spacing for smaller screens (reduced padding, adjusted font sizes)
+- Landscape orientation support with adjusted heights for better space utilization
+- Touch-specific pointer detection using `@media (hover: none) and (pointer: coarse)` for native touch devices
+- Responsive time-block-editor grid that adapts column widths for mobile screens
+- Mobile-friendly tooltips that appear on tap/active state instead of hover
+- Export/Import functionality for schedule backup and sharing
+- Export button to download current schedule as JSON file with metadata (profile name, export date)
+- Import button to load schedule from JSON file with comprehensive validation
+- `validateProfileData()` utility function to validate imported schedule structure
+- Automatic validation of imported data: checks for all weekdays, valid time slots, and correct data format
+- Support for importing files with or without metadata wrapper
+- Visual feedback with success/error messages during export/import operations
+- Loading indicator during import process with 10-second timeout
+- Localized UI labels and error messages for export/import in English and German
+- Export file naming includes profile name and date (e.g., `schedule-P1-2025-11-13.json`)
+- Comprehensive tests for import validation (42 total tests including 5 new validateProfileData tests)
+- Drag-and-drop functionality for time block boundaries with visual adjustment of start/end times
+- Automatic snapping to 15-minute intervals (0, 15, 30, 45) during drag operations
+- Visual drag handles on time block boundaries with hover effects
+- Batch save mode: changes are not sent to backend immediately during drag operations
+- Pending changes banner displayed when unsaved changes exist
+- "Save all" button to commit all pending changes to backend in a single batch operation
+- "Discard" button to revert all pending changes without saving
+- Visual indication of blocks with pending changes (dashed outline)
+- Touch support for drag-and-drop on mobile devices
+- Localized UI labels for pending changes banner in English and German
+- Vertical drag-and-drop on time block centers to adjust temperature values
+- Drag up to decrease temperature, drag down to increase temperature
+- Automatic snapping to 0.5°C increments during temperature drag operations
+- Temperature constraints (5°C - 30.5°C) enforced during drag
+- Visual cursor feedback (ns-resize) when hovering over temperature drag areas
+- Hover effect on temperature drag areas for better discoverability
+- Temperature drag integrates with batch save mode (pending changes system)
+- Touch support for temperature adjustment on mobile devices
+- 50 pixels of vertical movement equals 1°C temperature change
+- Drag & drop mode toggle button to enable/disable drag-and-drop functionality
+- Drag handles and temperature drag areas only visible when drag & drop mode is enabled
+- Detail editor (click on day) is disabled when in drag & drop mode
+- Confirmation dialog when exiting drag & drop mode with unsaved changes
+- Users can choose to save or discard pending changes before exiting mode
+- Icon-based toggle button (✋ for disabled, 🔒 for enabled) with localized tooltips
+- Localized UI labels for drag & drop mode toggle in English and German
+- Time axis on the left side showing hours (00:00 - 24:00)
+- Enhanced tooltips on hover showing start time, end time, and temperature
+- Automatic sorting of time slots by end time in ascending order
+- Automatic renumbering of slot numbers after sorting (1, 2, 3, ...)
+- Validation of schedule data before saving to backend
+- UI constraints (min/max) for time input fields to prevent invalid entries
+- Backend format conversion with integer keys for aiohomematic compatibility
+- Tests for time block ordering and slot renumbering
+- Tests for backend format with sequential slot numbers
+
+### Performance
+
+- Optimized rendering performance with schedule block caching
+- Reduced redundant computations with memoized weekday label lookups
+- Implemented `shouldUpdate` lifecycle optimization to prevent unnecessary re-renders
+- Added parsed schedule cache with automatic invalidation on data changes
+- Cached weekday label map to avoid repeated object creation
+
+### Fixed
+
+- View now updates automatically after saving or pasting schedules
+- Added explicit `_updateFromEntity()` and `requestUpdate()` calls after successful backend operations
+- Ensures UI reflects latest data immediately without waiting for backend events
+- Editor dialog now displays translated and properly formatted weekday names instead of raw constants (e.g., "Mi bearbeiten" instead of "WEDNESDAY bearbeiten")
+
+### Changed
+
+- Upgraded ESLint from 8.x to 9.x with flat config format (eslint.config.mjs)
+- Updated TypeScript-ESLint packages to v8.16.0 for ESLint 9 compatibility
+- Last time block is automatically corrected to end at 24:00
+- Release workflow now uses tags without 'v' prefix (e.g., 0.2.0 instead of v0.2.0)
+- Release workflow permissions added for GITHUB_TOKEN
+- Replaced deprecated create-release action with action-gh-release@v2
+
+### Fixed
+
+- Time slots are now guaranteed to be in ascending chronological order
+- Slot numbers are always sequential (1-13) regardless of input order
+- Fixed deprecation warnings for `glob@7.2.3` and `inflight@1.0.6` by upgrading to `test-exclude@7.0.1`
+- Fixed release workflow permission errors
+- Schedule data now validated before transmission to prevent backend errors
+
+### Technical
+
+- Added `convertToBackendFormat()` function for integer key conversion
+- Added `validateWeekdayData()` call before saving schedules
+- Enhanced `timeBlocksToWeekdayData()` to sort and renumber slots
+- Time input fields now have dynamic min/max constraints based on adjacent blocks
+- Added override for `test-exclude` to use v7.0.1 (fixes deprecated dependencies)
+
 ## [0.1.0] - 2025-11-13
 
 ### Added
@@ -41,5 +180,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/YOUR_USERNAME/homematicip_local_climate_scheduler_card/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/YOUR_USERNAME/homematicip_local_climate_scheduler_card/releases/tag/v0.1.0
+[Unreleased]: https://github.com/YOUR_USERNAME/homematicip_local_climate_scheduler_card/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/YOUR_USERNAME/homematicip_local_climate_scheduler_card/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/YOUR_USERNAME/homematicip_local_climate_scheduler_card/releases/tag/0.1.0
