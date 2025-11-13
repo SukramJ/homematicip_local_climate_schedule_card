@@ -3,7 +3,10 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - '[0-9]+.[0-9]+.[0-9]+'
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -27,32 +30,11 @@ jobs:
       run: npm run build
 
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        files: |
+          homematicip-local-climate-scheduler-card.js
+          dist/homematicip-local-climate-scheduler-card.js.map
         draft: false
         prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./homematicip-local-climate-scheduler-card.js
-        asset_name: homematicip-local-climate-scheduler-card.js
-        asset_content_type: application/javascript
-
-    - name: Upload Release Asset (Source Map)
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/homematicip-local-climate-scheduler-card.js.map
-        asset_name: homematicip-local-climate-scheduler-card.js.map
-        asset_content_type: application/json
+        generate_release_notes: true
