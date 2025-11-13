@@ -5,9 +5,13 @@ import {
   timeBlocksToWeekdayData,
   convertToBackendFormat,
   validateWeekdayData,
+  validateTimeBlocks,
+  validateProfileData,
   getTemperatureColor,
+  getTemperatureGradient,
   roundTimeToQuarter,
   formatTemperature,
+  TimeBlock,
 } from "./utils";
 import { WeekdayData } from "./types";
 
@@ -140,6 +144,188 @@ describe("Utils", () => {
       expect(weekdayData["4"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 16 });
       expect(weekdayData["13"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 16 });
     });
+
+    it("should sort blocks by endMinutes in ascending order", () => {
+      // Blocks intentionally in wrong order
+      const blocks = [
+        {
+          startTime: "06:00",
+          startMinutes: 360,
+          endTime: "22:00",
+          endMinutes: 1320,
+          temperature: 21,
+          slot: 1,
+        },
+        {
+          startTime: "22:00",
+          startMinutes: 1320,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 18,
+          slot: 2,
+        },
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "06:00",
+          endMinutes: 360,
+          temperature: 18,
+          slot: 3,
+        },
+      ];
+
+      const weekdayData = timeBlocksToWeekdayData(blocks);
+
+      // Should be sorted: slot 1 (06:00), slot 2 (22:00), slot 3 (24:00)
+      expect(weekdayData["1"]).toEqual({ ENDTIME: "06:00", TEMPERATURE: 18 });
+      expect(weekdayData["2"]).toEqual({ ENDTIME: "22:00", TEMPERATURE: 21 });
+      expect(weekdayData["3"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 18 });
+    });
+
+    it("should renumber slot numbers sequentially after sorting", () => {
+      // Blocks with wrong slot numbers and in wrong order
+      const blocks = [
+        {
+          startTime: "12:00",
+          startMinutes: 720,
+          endTime: "18:00",
+          endMinutes: 1080,
+          temperature: 22,
+          slot: 5, // Wrong slot number
+        },
+        {
+          startTime: "18:00",
+          startMinutes: 1080,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 19,
+          slot: 7, // Wrong slot number
+        },
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "06:00",
+          endMinutes: 360,
+          temperature: 17,
+          slot: 10, // Wrong slot number
+        },
+        {
+          startTime: "06:00",
+          startMinutes: 360,
+          endTime: "12:00",
+          endMinutes: 720,
+          temperature: 20,
+          slot: 2, // Wrong slot number
+        },
+      ];
+
+      const weekdayData = timeBlocksToWeekdayData(blocks);
+
+      // After sorting and renumbering, should be:
+      // Slot 1: 00:00-06:00 (17°)
+      // Slot 2: 06:00-12:00 (20°)
+      // Slot 3: 12:00-18:00 (22°)
+      // Slot 4: 18:00-24:00 (19°)
+      expect(weekdayData["1"]).toEqual({ ENDTIME: "06:00", TEMPERATURE: 17 });
+      expect(weekdayData["2"]).toEqual({ ENDTIME: "12:00", TEMPERATURE: 20 });
+      expect(weekdayData["3"]).toEqual({ ENDTIME: "18:00", TEMPERATURE: 22 });
+      expect(weekdayData["4"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 19 });
+
+      // Remaining slots should be filled with 24:00
+      expect(weekdayData["5"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 16 });
+      expect(weekdayData["13"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 16 });
+    });
+
+    it("should fix the exact scenario from user report", () => {
+      // Real-world scenario: 18:00 comes after 19:00 in slot order
+      const blocks = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "10:00",
+          endMinutes: 600,
+          temperature: 15,
+          slot: 1,
+        },
+        {
+          startTime: "10:00",
+          startMinutes: 600,
+          endTime: "11:00",
+          endMinutes: 660,
+          temperature: 16,
+          slot: 2,
+        },
+        {
+          startTime: "11:00",
+          startMinutes: 660,
+          endTime: "12:00",
+          endMinutes: 720,
+          temperature: 22,
+          slot: 3,
+        },
+        {
+          startTime: "12:00",
+          startMinutes: 720,
+          endTime: "15:00",
+          endMinutes: 900,
+          temperature: 15,
+          slot: 4,
+        },
+        {
+          startTime: "15:00",
+          startMinutes: 900,
+          endTime: "19:00",
+          endMinutes: 1140,
+          temperature: 12,
+          slot: 5,
+        },
+        {
+          startTime: "19:00",
+          startMinutes: 1140,
+          endTime: "18:00", // ERROR: 18:00 after 19:00!
+          endMinutes: 1080,
+          temperature: 14,
+          slot: 6,
+        },
+      ];
+
+      const weekdayData = timeBlocksToWeekdayData(blocks);
+
+      // After sorting, 18:00 should come before 19:00
+      expect(weekdayData["1"]).toEqual({ ENDTIME: "10:00", TEMPERATURE: 15 });
+      expect(weekdayData["2"]).toEqual({ ENDTIME: "11:00", TEMPERATURE: 16 });
+      expect(weekdayData["3"]).toEqual({ ENDTIME: "12:00", TEMPERATURE: 22 });
+      expect(weekdayData["4"]).toEqual({ ENDTIME: "15:00", TEMPERATURE: 15 });
+      expect(weekdayData["5"]).toEqual({ ENDTIME: "18:00", TEMPERATURE: 14 }); // Fixed!
+      expect(weekdayData["6"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 12 }); // 19:00 -> 24:00
+      expect(weekdayData["7"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 16 });
+    });
+
+    it("should ensure last block ends at 24:00", () => {
+      const blocks = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "06:00",
+          endMinutes: 360,
+          temperature: 18,
+          slot: 1,
+        },
+        {
+          startTime: "06:00",
+          startMinutes: 360,
+          endTime: "22:00",
+          endMinutes: 1320,
+          temperature: 21,
+          slot: 2,
+        },
+      ];
+
+      const weekdayData = timeBlocksToWeekdayData(blocks);
+
+      // Last block should be corrected to end at 24:00
+      expect(weekdayData["2"]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 21 });
+    });
   });
 
   describe("convertToBackendFormat", () => {
@@ -173,6 +359,53 @@ describe("Utils", () => {
         expect(backendData[i]).toBeDefined();
         expect(backendData[i].ENDTIME).toBeDefined();
         expect(backendData[i].TEMPERATURE).toBeDefined();
+      }
+    });
+
+    it("should maintain sequential slot numbers in backend format", () => {
+      // Create unsorted blocks, convert to weekday data (which sorts and renumbers),
+      // then convert to backend format
+      const unsortedBlocks = [
+        {
+          startTime: "12:00",
+          startMinutes: 720,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 22,
+          slot: 99, // Intentionally wrong
+        },
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "06:00",
+          endMinutes: 360,
+          temperature: 17,
+          slot: 50, // Intentionally wrong
+        },
+        {
+          startTime: "06:00",
+          startMinutes: 360,
+          endTime: "12:00",
+          endMinutes: 720,
+          temperature: 20,
+          slot: 10, // Intentionally wrong
+        },
+      ];
+
+      const weekdayData = timeBlocksToWeekdayData(unsortedBlocks);
+      const backendData = convertToBackendFormat(weekdayData);
+
+      // Backend should have slots 1-13 with ascending times
+      // After sorting: slot 1 (06:00), slot 2 (12:00), slot 3 (24:00)
+      expect(backendData[1]).toEqual({ ENDTIME: "06:00", TEMPERATURE: 17 }); // Earliest
+      expect(backendData[2]).toEqual({ ENDTIME: "12:00", TEMPERATURE: 20 }); // Middle
+      expect(backendData[3]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 22 }); // Last active
+      expect(backendData[4]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 16 }); // Filled
+      expect(backendData[13]).toEqual({ ENDTIME: "24:00", TEMPERATURE: 16 }); // Filled
+
+      // Verify all 13 slots exist and are in correct order
+      for (let i = 1; i <= 13; i++) {
+        expect(backendData[i]).toBeDefined();
       }
     });
 
@@ -394,6 +627,102 @@ describe("Utils", () => {
     });
   });
 
+  describe("getTemperatureGradient", () => {
+    it("should return solid color when no adjacent blocks exist", () => {
+      const result = getTemperatureGradient(20, null, null);
+      expect(result).toBe("#e67e22"); // Solid color for 20°C (20-22 range)
+    });
+
+    it("should return solid color when no adjacent blocks exist (different temperature)", () => {
+      const result = getTemperatureGradient(15, null, null);
+      expect(result).toBe("#5dade2"); // Solid color for 15°C
+    });
+
+    it("should create gradient from previous to current when only previous block exists", () => {
+      const result = getTemperatureGradient(20, 15, null);
+      expect(result).toContain("linear-gradient");
+      expect(result).toContain("to bottom");
+      expect(result).toContain("#5dade2"); // Color for 15°C (prev)
+      expect(result).toContain("#e67e22"); // Color for 20°C (current)
+    });
+
+    it("should create gradient from previous to current with different temperatures", () => {
+      const result = getTemperatureGradient(22, 10, null);
+      expect(result).toContain("linear-gradient");
+      expect(result).toContain("to bottom");
+      expect(result).toContain("#3498db"); // Color for 10°C (prev)
+      expect(result).toContain("#e74c3c"); // Color for 22°C (current)
+    });
+
+    it("should create gradient from current to next when only next block exists", () => {
+      const result = getTemperatureGradient(20, null, 25);
+      expect(result).toContain("linear-gradient");
+      expect(result).toContain("to bottom");
+      expect(result).toContain("#e67e22"); // Color for 20°C (current)
+      expect(result).toContain("#e74c3c"); // Color for 25°C (next)
+    });
+
+    it("should create gradient from current to next with different temperatures", () => {
+      const result = getTemperatureGradient(15, null, 10);
+      expect(result).toContain("linear-gradient");
+      expect(result).toContain("to bottom");
+      expect(result).toContain("#5dade2"); // Color for 15°C (current)
+      expect(result).toContain("#3498db"); // Color for 10°C (next)
+    });
+
+    it("should create gradient through current when both adjacent blocks exist", () => {
+      const result = getTemperatureGradient(20, 15, 25);
+      expect(result).toContain("linear-gradient");
+      expect(result).toContain("to bottom");
+      expect(result).toContain("#5dade2"); // Color for 15°C (prev)
+      expect(result).toContain("#e67e22"); // Color for 20°C (current)
+      expect(result).toContain("50%"); // Current color at 50%
+      expect(result).toContain("#e74c3c"); // Color for 25°C (next)
+    });
+
+    it("should create gradient with all three colors when both adjacent blocks exist (different temps)", () => {
+      const result = getTemperatureGradient(19, 10, 23);
+      expect(result).toContain("linear-gradient");
+      expect(result).toContain("to bottom");
+      expect(result).toContain("#3498db"); // Color for 10°C (prev)
+      expect(result).toContain("#f39c12"); // Color for 19°C (current, 18-20 range)
+      expect(result).toContain("50%"); // Current color at 50%
+      expect(result).toContain("#e74c3c"); // Color for 23°C (next)
+    });
+
+    it("should handle edge case with same temperature for all blocks", () => {
+      const result = getTemperatureGradient(20, 20, 20);
+      expect(result).toContain("linear-gradient");
+      expect(result).toContain("#e67e22"); // All same color (20-22 range)
+    });
+
+    it("should handle edge case with very low temperature", () => {
+      const result = getTemperatureGradient(5, null, null);
+      expect(result).toBe("#3498db"); // Cold - Blue
+    });
+
+    it("should handle edge case with very high temperature", () => {
+      const result = getTemperatureGradient(30, null, null);
+      expect(result).toBe("#e74c3c"); // Hot - Red
+    });
+
+    it("should handle temperature boundaries correctly (11.9°C vs 12°C)", () => {
+      const color1 = getTemperatureColor(11.9);
+      const color2 = getTemperatureColor(12);
+      const gradient = getTemperatureGradient(12, 11.9, null);
+      expect(gradient).toContain(color1);
+      expect(gradient).toContain(color2);
+    });
+
+    it("should handle descending temperature gradient", () => {
+      const result = getTemperatureGradient(15, 25, 10);
+      expect(result).toContain("linear-gradient");
+      expect(result).toContain("#e74c3c"); // Color for 25°C (prev)
+      expect(result).toContain("#5dade2"); // Color for 15°C (current)
+      expect(result).toContain("#3498db"); // Color for 10°C (next)
+    });
+  });
+
   describe("roundTimeToQuarter", () => {
     it("should round time to nearest 15 minutes", () => {
       expect(roundTimeToQuarter(0)).toBe(0);
@@ -412,6 +741,594 @@ describe("Utils", () => {
       expect(formatTemperature(20.5)).toBe("20.5°C");
       expect(formatTemperature(18.0, "°F")).toBe("18.0°F");
       expect(formatTemperature(22.3)).toBe("22.3°C");
+    });
+  });
+
+  describe("validateTimeBlocks", () => {
+    it("should return no warnings for valid blocks", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "08:00",
+          endMinutes: 480,
+          temperature: 18.0,
+          slot: 1,
+        },
+        {
+          startTime: "08:00",
+          startMinutes: 480,
+          endTime: "22:00",
+          endMinutes: 1320,
+          temperature: 21.0,
+          slot: 2,
+        },
+        {
+          startTime: "22:00",
+          startMinutes: 1320,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 18.0,
+          slot: 3,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings).toHaveLength(0);
+    });
+
+    it("should warn when last block does not end at 24:00", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "23:00",
+          endMinutes: 1380,
+          temperature: 20.0,
+          slot: 1,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings).toContain("Last block must end at 24:00");
+    });
+
+    it("should warn when there is a gap between blocks", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "08:00",
+          endMinutes: 480,
+          temperature: 18.0,
+          slot: 1,
+        },
+        {
+          startTime: "09:00",
+          startMinutes: 540,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 21.0,
+          slot: 2,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings.some((w) => w.includes("Gap detected"))).toBe(true);
+    });
+
+    it("should warn when block has backwards time", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "12:00",
+          startMinutes: 720,
+          endTime: "10:00",
+          endMinutes: 600,
+          temperature: 20.0,
+          slot: 1,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings.some((w) => w.includes("End time is before start time"))).toBe(true);
+    });
+
+    it("should warn when middle block has backwards time", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "08:00",
+          endMinutes: 480,
+          temperature: 18.0,
+          slot: 1,
+        },
+        {
+          startTime: "08:00",
+          startMinutes: 480,
+          endTime: "06:00", // Backwards time in middle block
+          endMinutes: 360,
+          temperature: 20.0,
+          slot: 2,
+        },
+        {
+          startTime: "06:00",
+          startMinutes: 360,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 18.0,
+          slot: 3,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings.some((w) => w.includes("Block 2: End time is before start time"))).toBe(true);
+    });
+
+    it("should warn when block has zero duration", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "08:00",
+          startMinutes: 480,
+          endTime: "08:00",
+          endMinutes: 480,
+          temperature: 20.0,
+          slot: 1,
+        },
+        {
+          startTime: "08:00",
+          startMinutes: 480,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 21.0,
+          slot: 2,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings.some((w) => w.includes("zero duration"))).toBe(true);
+    });
+
+    it("should warn when temperature is out of range", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "12:00",
+          endMinutes: 720,
+          temperature: 3.0, // Too low
+          slot: 1,
+        },
+        {
+          startTime: "12:00",
+          startMinutes: 720,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 35.0, // Too high
+          slot: 2,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings.some((w) => w.includes("Temperature out of range"))).toBe(true);
+      expect(warnings.filter((w) => w.includes("Temperature out of range"))).toHaveLength(2);
+    });
+
+    it("should warn when blocks array is empty", () => {
+      const blocks: TimeBlock[] = [];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings).toContain("At least one time block is required");
+    });
+
+    it("should warn when time values are invalid", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: -10, // Invalid
+          endTime: "12:00",
+          endMinutes: 720,
+          temperature: 20.0,
+          slot: 1,
+        },
+        {
+          startTime: "12:00",
+          startMinutes: 720,
+          endTime: "25:00",
+          endMinutes: 1500, // Invalid (exceeds 1440)
+          temperature: 20.0,
+          slot: 2,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings.some((w) => w.includes("Invalid start time"))).toBe(true);
+      expect(warnings.some((w) => w.includes("Invalid end time"))).toBe(true);
+    });
+
+    it("should detect multiple warnings in one block set", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "08:00",
+          endMinutes: 480,
+          temperature: 35.0, // Out of range
+          slot: 1,
+        },
+        {
+          startTime: "09:00",
+          startMinutes: 540,
+          endTime: "23:00", // Gap + not ending at 24:00
+          endMinutes: 1380,
+          temperature: 20.0,
+          slot: 2,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings.length).toBeGreaterThan(1);
+      expect(warnings.some((w) => w.includes("Gap detected"))).toBe(true);
+      expect(warnings.some((w) => w.includes("Last block must end at 24:00"))).toBe(true);
+      expect(warnings.some((w) => w.includes("Temperature out of range"))).toBe(true);
+    });
+  });
+
+  describe("validateProfileData", () => {
+    it("should validate correct profile data", () => {
+      const profileData = {
+        MONDAY: {
+          "1": { ENDTIME: "08:00", TEMPERATURE: 18 },
+          "2": { ENDTIME: "22:00", TEMPERATURE: 21 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 18 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        TUESDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        WEDNESDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        THURSDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        FRIDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        SATURDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        SUNDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+      };
+
+      expect(validateProfileData(profileData)).toBeNull();
+    });
+
+    it("should reject non-object data", () => {
+      expect(validateProfileData(null)).toContain("must be an object");
+      expect(validateProfileData(undefined)).toContain("must be an object");
+      expect(validateProfileData("string")).toContain("must be an object");
+      expect(validateProfileData(123)).toContain("must be an object");
+    });
+
+    it("should reject missing weekdays", () => {
+      const profileData = {
+        MONDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        // Missing other weekdays
+      };
+
+      const error = validateProfileData(profileData);
+      expect(error).toContain("Missing weekday");
+    });
+
+    it("should reject invalid weekday data structure", () => {
+      const profileData = {
+        MONDAY: "invalid",
+        TUESDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        WEDNESDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        THURSDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        FRIDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        SATURDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        SUNDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+      };
+
+      const error = validateProfileData(profileData);
+      expect(error).toContain("Invalid data for MONDAY");
+    });
+
+    it("should reject invalid slot data within weekday", () => {
+      const profileData = {
+        MONDAY: {
+          "1": { ENDTIME: "08:00", TEMPERATURE: 18 },
+          "2": { ENDTIME: "06:00", TEMPERATURE: 21 }, // Time goes backwards
+          "3": { ENDTIME: "24:00", TEMPERATURE: 18 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        TUESDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        WEDNESDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        THURSDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        FRIDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        SATURDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+        SUNDAY: {
+          "1": { ENDTIME: "24:00", TEMPERATURE: 20 },
+          "2": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "3": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "4": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "5": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "6": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "7": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "8": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "9": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "10": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "11": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "12": { ENDTIME: "24:00", TEMPERATURE: 16 },
+          "13": { ENDTIME: "24:00", TEMPERATURE: 16 },
+        },
+      };
+
+      const error = validateProfileData(profileData);
+      expect(error).toContain("MONDAY");
+      expect(error).toContain("time goes backwards");
     });
   });
 });
