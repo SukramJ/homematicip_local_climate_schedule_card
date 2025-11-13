@@ -294,13 +294,10 @@ export function getTemperatureGradient(
   }
 
   // Both adjacent blocks exist - create gradient from prev through current to next
-  if (prevTemp !== null && nextTemp !== null) {
-    const prevColor = getTemperatureColor(prevTemp);
-    const nextColor = getTemperatureColor(nextTemp);
-    return `linear-gradient(to bottom, ${prevColor}, ${currentColor} 50%, ${nextColor})`;
-  }
-
-  return currentColor;
+  // This branch is guaranteed to execute since all other cases are handled above
+  const prevColor = getTemperatureColor(prevTemp!);
+  const nextColor = getTemperatureColor(nextTemp!);
+  return `linear-gradient(to bottom, ${prevColor}, ${currentColor} 50%, ${nextColor})`;
 }
 
 /**
