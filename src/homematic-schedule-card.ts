@@ -137,6 +137,10 @@ export class HomematicScheduleCard extends LitElement {
     this._updateLanguage();
   }
 
+  private _getPreferredLanguage(hassInstance?: HomeAssistant): string | undefined {
+    return hassInstance?.language || hassInstance?.locale?.language;
+  }
+
   private _updateLanguage(): void {
     let language = "en"; // Default to English
 
@@ -145,12 +149,11 @@ export class HomematicScheduleCard extends LitElement {
       language = this._config.language;
     }
     // Priority 2: Home Assistant language setting
-    else if (this.hass?.language) {
-      language = this.hass.language;
-    }
-    // Priority 3: Home Assistant locale setting
-    else if (this.hass?.locale?.language) {
-      language = this.hass.locale.language;
+    else {
+      const hassLanguage = this._getPreferredLanguage(this.hass);
+      if (hassLanguage) {
+        language = hassLanguage;
+      }
     }
 
     // Load translations for the detected language
@@ -441,15 +444,12 @@ export class HomematicScheduleCard extends LitElement {
     if (changedProps.has("hass") && this._config) {
       this._updateFromEntity();
 
-      // Update language if Home Assistant language changed
-      if (changedProps.get("hass")) {
-        const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
-        const newLanguage = this.hass?.language || this.hass?.locale?.language;
-        const oldLanguage = oldHass?.language || oldHass?.locale?.language;
+      const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
+      const newLanguage = this._getPreferredLanguage(this.hass);
+      const oldLanguage = this._getPreferredLanguage(oldHass);
 
-        if (newLanguage !== oldLanguage) {
-          this._updateLanguage();
-        }
+      if (newLanguage !== oldLanguage) {
+        this._updateLanguage();
       }
     }
   }
@@ -1625,7 +1625,7 @@ export class HomematicScheduleCard extends LitElement {
                   .value=${block.endTime}
                   min=${minTime}
                   max=${maxTime}
-                  step=${(this._config?.time_step_minutes || 15) * 60}
+                  step="${(this._config?.time_step_minutes || 15) * 60}"
                   @change=${(e: Event) =>
                     this._updateTimeBlock(index, {
                       endTime: (e.target as HTMLInputElement).value,

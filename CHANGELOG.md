@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-11-14
+
+### Fixed
+
+- Time input step attribute browser compatibility: `step` attribute is now properly set but may not be enforced by all browsers due to limited HTML5 time input support across different browsers (Chrome/Edge partially support it, Firefox/Safari ignore it)
+- Card automatically follows the Home Assistant UI language whenever no explicit `language` option is set
+
+### Note
+
+- The `time_step_minutes` configuration works correctly for drag & drop operations (15-minute snapping) and internal validation, but native browser time pickers may still allow minute-precise input due to browser limitations
+
 ## [0.3.0] - 2025-11-14
 
 ### Added
@@ -37,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validation warnings and error details shown in the editor/import flow now use localized translations instead of fixed English strings
 - Validation logic now returns structured message keys with parameters, ensuring any new locales automatically inherit consistent error formatting
 - Rollup build now runs in production mode without sourcemaps, tree-shakes side effects, and applies more aggressive terser compression to shrink the shipped bundle
+- Entity and profile dropdowns are now consistently sorted alphabetically for easier selection
 
 ## [0.2.1] - 2025-11-13
 
