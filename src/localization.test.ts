@@ -4,18 +4,25 @@ describe("localization", () => {
   describe("getTranslations", () => {
     it("should return English translations for 'en' language code", () => {
       const translations = getTranslations("en");
-      expect(translations.weekdays.monday).toBe("Mo");
+      expect(translations.weekdays.short.monday).toBe("Mo");
+      expect(translations.weekdays.long.monday).toBe("Monday");
       expect(translations.ui.schedule).toBe("Schedule");
       expect(translations.errors.failedToChangeProfile).toBe("Failed to change profile: {error}");
+      expect(translations.validationMessages.noBlocks).toBe("At least one time block is required");
     });
 
     it("should return German translations for 'de' language code", () => {
       const translations = getTranslations("de");
-      expect(translations.weekdays.monday).toBe("Mo");
-      expect(translations.weekdays.tuesday).toBe("Di");
+      expect(translations.weekdays.short.monday).toBe("Mo");
+      expect(translations.weekdays.short.tuesday).toBe("Di");
+      expect(translations.weekdays.long.monday).toBe("Montag");
+      expect(translations.weekdays.long.tuesday).toBe("Dienstag");
       expect(translations.ui.schedule).toBe("Zeitplan");
       expect(translations.errors.failedToChangeProfile).toBe(
         "Fehler beim Wechseln des Profils: {error}",
+      );
+      expect(translations.validationMessages.noBlocks).toBe(
+        "Mindestens ein Zeitblock ist erforderlich",
       );
     });
 
@@ -59,13 +66,22 @@ describe("localization", () => {
 
       // Check weekdays
       expect(translations.weekdays).toBeDefined();
-      expect(translations.weekdays.monday).toBeDefined();
-      expect(translations.weekdays.tuesday).toBeDefined();
-      expect(translations.weekdays.wednesday).toBeDefined();
-      expect(translations.weekdays.thursday).toBeDefined();
-      expect(translations.weekdays.friday).toBeDefined();
-      expect(translations.weekdays.saturday).toBeDefined();
-      expect(translations.weekdays.sunday).toBeDefined();
+      expect(translations.weekdays.short).toBeDefined();
+      expect(translations.weekdays.long).toBeDefined();
+      expect(translations.weekdays.short.monday).toBeDefined();
+      expect(translations.weekdays.short.tuesday).toBeDefined();
+      expect(translations.weekdays.short.wednesday).toBeDefined();
+      expect(translations.weekdays.short.thursday).toBeDefined();
+      expect(translations.weekdays.short.friday).toBeDefined();
+      expect(translations.weekdays.short.saturday).toBeDefined();
+      expect(translations.weekdays.short.sunday).toBeDefined();
+      expect(translations.weekdays.long.monday).toBeDefined();
+      expect(translations.weekdays.long.tuesday).toBeDefined();
+      expect(translations.weekdays.long.wednesday).toBeDefined();
+      expect(translations.weekdays.long.thursday).toBeDefined();
+      expect(translations.weekdays.long.friday).toBeDefined();
+      expect(translations.weekdays.long.saturday).toBeDefined();
+      expect(translations.weekdays.long.sunday).toBeDefined();
 
       // Check UI strings
       expect(translations.ui).toBeDefined();
@@ -114,6 +130,26 @@ describe("localization", () => {
       expect(translations.warnings).toBeDefined();
       expect(translations.warnings.title).toBeDefined();
       expect(translations.warnings.noWarnings).toBeDefined();
+
+      // Check validation messages
+      expect(translations.validationMessages).toBeDefined();
+      expect(translations.validationMessages.noBlocks).toBeDefined();
+      expect(translations.validationMessages.blockEndBeforeStart).toBeDefined();
+      expect(translations.validationMessages.blockZeroDuration).toBeDefined();
+      expect(translations.validationMessages.invalidStartTime).toBeDefined();
+      expect(translations.validationMessages.invalidEndTime).toBeDefined();
+      expect(translations.validationMessages.temperatureOutOfRange).toBeDefined();
+      expect(translations.validationMessages.invalidSlotCount).toBeDefined();
+      expect(translations.validationMessages.invalidSlotKey).toBeDefined();
+      expect(translations.validationMessages.missingSlot).toBeDefined();
+      expect(translations.validationMessages.slotMissingValues).toBeDefined();
+      expect(translations.validationMessages.slotTimeBackwards).toBeDefined();
+      expect(translations.validationMessages.slotTimeExceedsDay).toBeDefined();
+      expect(translations.validationMessages.lastSlotMustEnd).toBeDefined();
+      expect(translations.validationMessages.scheduleMustBeObject).toBeDefined();
+      expect(translations.validationMessages.missingWeekday).toBeDefined();
+      expect(translations.validationMessages.invalidWeekdayData).toBeDefined();
+      expect(translations.validationMessages.weekdayValidationError).toBeDefined();
     });
 
     it("should return all required translation keys for German", () => {
@@ -121,13 +157,20 @@ describe("localization", () => {
 
       // Check weekdays
       expect(translations.weekdays).toBeDefined();
-      expect(translations.weekdays.monday).toBe("Mo");
-      expect(translations.weekdays.tuesday).toBe("Di");
-      expect(translations.weekdays.wednesday).toBe("Mi");
-      expect(translations.weekdays.thursday).toBe("Do");
-      expect(translations.weekdays.friday).toBe("Fr");
-      expect(translations.weekdays.saturday).toBe("Sa");
-      expect(translations.weekdays.sunday).toBe("So");
+      expect(translations.weekdays.short.monday).toBe("Mo");
+      expect(translations.weekdays.short.tuesday).toBe("Di");
+      expect(translations.weekdays.short.wednesday).toBe("Mi");
+      expect(translations.weekdays.short.thursday).toBe("Do");
+      expect(translations.weekdays.short.friday).toBe("Fr");
+      expect(translations.weekdays.short.saturday).toBe("Sa");
+      expect(translations.weekdays.short.sunday).toBe("So");
+      expect(translations.weekdays.long.monday).toBe("Montag");
+      expect(translations.weekdays.long.tuesday).toBe("Dienstag");
+      expect(translations.weekdays.long.wednesday).toBe("Mittwoch");
+      expect(translations.weekdays.long.thursday).toBe("Donnerstag");
+      expect(translations.weekdays.long.friday).toBe("Freitag");
+      expect(translations.weekdays.long.saturday).toBe("Samstag");
+      expect(translations.weekdays.long.sunday).toBe("Sonntag");
 
       // Check UI strings
       expect(translations.ui.schedule).toBe("Zeitplan");
@@ -142,6 +185,14 @@ describe("localization", () => {
 
       // Check warnings
       expect(translations.warnings.title).toBe("Validierungswarnungen");
+
+      // Check validation messages
+      expect(translations.validationMessages.noBlocks).toBe(
+        "Mindestens ein Zeitblock ist erforderlich",
+      );
+      expect(translations.validationMessages.temperatureOutOfRange).toBe(
+        "Block {block}: Temperatur außerhalb des Bereichs ({min}-{max}°C)",
+      );
     });
   });
 
@@ -236,19 +287,23 @@ describe("localization", () => {
     it("should have correct structure for English translations", () => {
       const translations: Translations = getTranslations("en");
 
-      expect(typeof translations.weekdays.monday).toBe("string");
+      expect(typeof translations.weekdays.short.monday).toBe("string");
+      expect(typeof translations.weekdays.long.monday).toBe("string");
       expect(typeof translations.ui.schedule).toBe("string");
       expect(typeof translations.errors.failedToChangeProfile).toBe("string");
       expect(typeof translations.warnings.title).toBe("string");
+      expect(typeof translations.validationMessages.noBlocks).toBe("string");
     });
 
     it("should have correct structure for German translations", () => {
       const translations: Translations = getTranslations("de");
 
-      expect(typeof translations.weekdays.monday).toBe("string");
+      expect(typeof translations.weekdays.short.monday).toBe("string");
+      expect(typeof translations.weekdays.long.monday).toBe("string");
       expect(typeof translations.ui.schedule).toBe("string");
       expect(typeof translations.errors.failedToChangeProfile).toBe("string");
       expect(typeof translations.warnings.title).toBe("string");
+      expect(typeof translations.validationMessages.noBlocks).toBe("string");
     });
   });
 });
