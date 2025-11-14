@@ -3,6 +3,31 @@ import { WeekdayData, ScheduleSlot, BackendWeekdayData } from "./types";
 // Re-export types for use in this module
 export type { ScheduleSlot, BackendWeekdayData };
 
+export type ValidationMessageKey =
+  | "noBlocks"
+  | "blockEndBeforeStart"
+  | "blockZeroDuration"
+  | "invalidStartTime"
+  | "invalidEndTime"
+  | "temperatureOutOfRange"
+  | "invalidSlotCount"
+  | "invalidSlotKey"
+  | "missingSlot"
+  | "slotMissingValues"
+  | "slotTimeBackwards"
+  | "slotTimeExceedsDay"
+  | "lastSlotMustEnd"
+  | "scheduleMustBeObject"
+  | "missingWeekday"
+  | "invalidWeekdayData"
+  | "weekdayValidationError";
+
+export interface ValidationMessage {
+  key: ValidationMessageKey;
+  params?: Record<string, string>;
+  nested?: ValidationMessage;
+}
+
 /**
  * Convert time string (HH:MM) to minutes
  */
@@ -142,56 +167,57 @@ export function convertToBackendFormat(weekdayData: WeekdayData): BackendWeekday
 /**
  * Validate time blocks in the editor
  * Returns array of warning messages (empty if valid)
+ * @param blocks Time blocks to validate
+ * @param minTemp Minimum allowed temperature (default: 5)
+ * @param maxTemp Maximum allowed temperature (default: 30.5)
  */
-export function validateTimeBlocks(blocks: TimeBlock[]): string[] {
-  const warnings: string[] = [];
+export function validateTimeBlocks(
+  blocks: TimeBlock[],
+  minTemp: number = 5,
+  maxTemp: number = 30.5,
+): ValidationMessage[] {
+  const warnings: ValidationMessage[] = [];
 
   if (blocks.length === 0) {
-    warnings.push("At least one time block is required");
+    warnings.push({ key: "noBlocks" });
     return warnings;
   }
 
   // Check for time overlaps and gaps
   for (let i = 0; i < blocks.length - 1; i++) {
     const currentBlock = blocks[i];
-    const nextBlock = blocks[i + 1];
-
-    // Check if blocks are connected (no gaps)
-    if (currentBlock.endMinutes !== nextBlock.startMinutes) {
-      warnings.push(`Gap detected between block ${i + 1} and ${i + 2}`);
-    }
 
     // Check for backwards time
     if (currentBlock.endMinutes < currentBlock.startMinutes) {
-      warnings.push(`Block ${i + 1}: End time is before start time`);
+      warnings.push({ key: "blockEndBeforeStart", params: { block: `${i + 1}` } });
     }
 
     // Check if end time equals start time (zero duration)
     if (currentBlock.endMinutes === currentBlock.startMinutes) {
-      warnings.push(`Block ${i + 1}: Block has zero duration`);
+      warnings.push({ key: "blockZeroDuration", params: { block: `${i + 1}` } });
     }
   }
 
   // Check last block
   const lastBlock = blocks[blocks.length - 1];
-  if (lastBlock.endMinutes !== 1440) {
-    warnings.push("Last block must end at 24:00");
-  }
 
   if (lastBlock.endMinutes < lastBlock.startMinutes) {
-    warnings.push(`Block ${blocks.length}: End time is before start time`);
+    warnings.push({ key: "blockEndBeforeStart", params: { block: `${blocks.length}` } });
   }
 
   // Check for invalid time values
   blocks.forEach((block, index) => {
     if (block.startMinutes < 0 || block.startMinutes > 1440) {
-      warnings.push(`Block ${index + 1}: Invalid start time`);
+      warnings.push({ key: "invalidStartTime", params: { block: `${index + 1}` } });
     }
     if (block.endMinutes < 0 || block.endMinutes > 1440) {
-      warnings.push(`Block ${index + 1}: Invalid end time`);
+      warnings.push({ key: "invalidEndTime", params: { block: `${index + 1}` } });
     }
-    if (block.temperature < 5 || block.temperature > 30.5) {
-      warnings.push(`Block ${index + 1}: Temperature out of range (5-30.5°C)`);
+    if (block.temperature < minTemp || block.temperature > maxTemp) {
+      warnings.push({
+        key: "temperatureOutOfRange",
+        params: { block: `${index + 1}`, min: `${minTemp}`, max: `${maxTemp}` },
+      });
     }
   });
 
@@ -201,19 +227,19 @@ export function validateTimeBlocks(blocks: TimeBlock[]): string[] {
 /**
  * Validate schedule data
  */
-export function validateWeekdayData(weekdayData: WeekdayData): string | null {
+export function validateWeekdayData(weekdayData: WeekdayData): ValidationMessage | null {
   const slots = Object.keys(weekdayData);
 
   // Must have exactly 13 slots
   if (slots.length !== 13) {
-    return `Invalid number of slots: ${slots.length} (expected 13)`;
+    return { key: "invalidSlotCount", params: { count: `${slots.length}` } };
   }
 
   // Validate that all keys are numeric strings
   for (const key of slots) {
     const num = parseInt(key, 10);
     if (isNaN(num) || num < 1 || num > 13 || key !== num.toString()) {
-      return `Invalid slot key: ${key} (must be integer 1-13)`;
+      return { key: "invalidSlotKey", params: { key } };
     }
   }
 
@@ -223,21 +249,21 @@ export function validateWeekdayData(weekdayData: WeekdayData): string | null {
     const slot = weekdayData[i.toString()];
 
     if (!slot) {
-      return `Missing slot ${i}`;
+      return { key: "missingSlot", params: { slot: `${i}` } };
     }
 
     if (!slot.ENDTIME || slot.TEMPERATURE === undefined) {
-      return `Slot ${i} missing ENDTIME or TEMPERATURE`;
+      return { key: "slotMissingValues", params: { slot: `${i}` } };
     }
 
     const endMinutes = timeToMinutes(slot.ENDTIME);
 
     if (endMinutes < previousEndMinutes) {
-      return `Slot ${i} time goes backwards: ${slot.ENDTIME}`;
+      return { key: "slotTimeBackwards", params: { slot: `${i}`, time: slot.ENDTIME } };
     }
 
     if (endMinutes > 1440) {
-      return `Slot ${i} time exceeds 24:00: ${slot.ENDTIME}`;
+      return { key: "slotTimeExceedsDay", params: { slot: `${i}`, time: slot.ENDTIME } };
     }
 
     previousEndMinutes = endMinutes;
@@ -245,7 +271,7 @@ export function validateWeekdayData(weekdayData: WeekdayData): string | null {
 
   // Last slot must be 24:00
   if (weekdayData["13"].ENDTIME !== "24:00") {
-    return `Last slot must end at 24:00`;
+    return { key: "lastSlotMustEnd" };
   }
 
   return null;
@@ -318,9 +344,9 @@ export function formatTemperature(temperature: number, unit: string = "°C"): st
  * Validate imported ProfileData structure
  * Returns error message if invalid, null if valid
  */
-export function validateProfileData(data: unknown): string | null {
+export function validateProfileData(data: unknown): ValidationMessage | null {
   if (!data || typeof data !== "object") {
-    return "Schedule data must be an object";
+    return { key: "scheduleMustBeObject" };
   }
 
   const profileData = data as Record<string, unknown>;
@@ -337,18 +363,18 @@ export function validateProfileData(data: unknown): string | null {
   // Check if all required weekdays are present
   for (const weekday of validWeekdays) {
     if (!(weekday in profileData)) {
-      return `Missing weekday: ${weekday}`;
+      return { key: "missingWeekday", params: { weekday } };
     }
 
     const weekdayData = profileData[weekday];
     if (!weekdayData || typeof weekdayData !== "object") {
-      return `Invalid data for ${weekday}`;
+      return { key: "invalidWeekdayData", params: { weekday } };
     }
 
     // Validate weekday data structure
     const error = validateWeekdayData(weekdayData as WeekdayData);
     if (error) {
-      return `${weekday}: ${error}`;
+      return { key: "weekdayValidationError", params: { weekday }, nested: error };
     }
   }
 

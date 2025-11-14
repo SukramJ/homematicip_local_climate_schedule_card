@@ -10,6 +10,7 @@ export interface HomematicScheduleCardConfig {
   hour_format?: "12" | "24";
   language?: "en" | "de";
   show_gradient?: boolean;
+  time_step_minutes?: number;
 }
 
 export interface ScheduleSlot {
@@ -42,6 +43,9 @@ export interface ScheduleEntityAttributes {
   available_profiles: string[];
   schedule_data: ProfileData;
   friendly_name?: string;
+  min_temp?: number;
+  max_temp?: number;
+  target_temp_step?: number;
 }
 
 export interface HassEntity {

@@ -1,4 +1,5 @@
 import { LitElement, html, css, PropertyValues } from "lit";
+import { repeat } from "lit/directives/repeat.js";
 import { customElement, property, state } from "lit/decorators.js";
 import {
   HomematicScheduleCardConfig,
@@ -7,6 +8,7 @@ import {
   WEEKDAYS,
   ProfileData,
   Weekday,
+  WeekdayData,
 } from "./types";
 import {
   parseWeekdaySchedule,
@@ -15,6 +17,7 @@ import {
   validateWeekdayData,
   validateTimeBlocks,
   validateProfileData,
+  ValidationMessage,
   getTemperatureColor,
   getTemperatureGradient,
   formatTemperature,
@@ -58,12 +61,16 @@ export class HomematicScheduleCard extends LitElement {
   private _keyDownHandler: (e: KeyboardEvent) => void;
   @state() private _translations: Translations = getTranslations("en");
   @state() private _isCompactView: boolean = false;
-  @state() private _validationWarnings: string[] = [];
-  private _parsedScheduleCache: Map<string, TimeBlock[]> = new Map();
-  private _weekdayLabelMap?: Record<Weekday, string>;
+  @state() private _validationWarnings: ValidationMessage[] = [];
+  private _parsedScheduleCache: WeakMap<WeekdayData, TimeBlock[]> = new WeakMap();
+  private _weekdayShortLabelMap?: Record<Weekday, string>;
+  private _weekdayLongLabelMap?: Record<Weekday, string>;
   @state() private _pendingChanges: Map<Weekday, TimeBlock[]> = new Map();
   @state() private _isDragging: boolean = false;
   @state() private _isDragDropMode: boolean = false;
+  @state() private _minTemp: number = 5.0;
+  @state() private _maxTemp: number = 30.5;
+  @state() private _tempStep: number = 0.5;
   private _dragState?: {
     weekday: Weekday;
     blockIndex: number;
@@ -89,6 +96,7 @@ export class HomematicScheduleCard extends LitElement {
       show_temperature: true,
       temperature_unit: "°C",
       hour_format: "24",
+      time_step_minutes: 15,
       ...config,
     };
 
@@ -116,31 +124,62 @@ export class HomematicScheduleCard extends LitElement {
     this._translations = getTranslations(language);
 
     // Cache weekday label map to avoid recreating on every call
-    this._weekdayLabelMap = {
-      MONDAY: this._translations.weekdays.monday,
-      TUESDAY: this._translations.weekdays.tuesday,
-      WEDNESDAY: this._translations.weekdays.wednesday,
-      THURSDAY: this._translations.weekdays.thursday,
-      FRIDAY: this._translations.weekdays.friday,
-      SATURDAY: this._translations.weekdays.saturday,
-      SUNDAY: this._translations.weekdays.sunday,
+    this._weekdayShortLabelMap = this._createWeekdayLabelMap("short");
+    this._weekdayLongLabelMap = this._createWeekdayLabelMap("long");
+  }
+
+  private _createWeekdayLabelMap(format: "short" | "long"): Record<Weekday, string> {
+    const labels =
+      format === "short" ? this._translations.weekdays.short : this._translations.weekdays.long;
+    return {
+      MONDAY: labels.monday,
+      TUESDAY: labels.tuesday,
+      WEDNESDAY: labels.wednesday,
+      THURSDAY: labels.thursday,
+      FRIDAY: labels.friday,
+      SATURDAY: labels.saturday,
+      SUNDAY: labels.sunday,
     };
   }
 
-  private _getWeekdayLabel(weekday: Weekday): string {
-    // Use cached map instead of recreating on every call
-    if (!this._weekdayLabelMap) {
-      this._weekdayLabelMap = {
-        MONDAY: this._translations.weekdays.monday,
-        TUESDAY: this._translations.weekdays.tuesday,
-        WEDNESDAY: this._translations.weekdays.wednesday,
-        THURSDAY: this._translations.weekdays.thursday,
-        FRIDAY: this._translations.weekdays.friday,
-        SATURDAY: this._translations.weekdays.saturday,
-        SUNDAY: this._translations.weekdays.sunday,
-      };
+  private _getWeekdayLabel(weekday: Weekday, format: "short" | "long" = "short"): string {
+    if (format === "long") {
+      if (!this._weekdayLongLabelMap) {
+        this._weekdayLongLabelMap = this._createWeekdayLabelMap("long");
+      }
+      return this._weekdayLongLabelMap[weekday];
     }
-    return this._weekdayLabelMap[weekday];
+
+    if (!this._weekdayShortLabelMap) {
+      this._weekdayShortLabelMap = this._createWeekdayLabelMap("short");
+    }
+    return this._weekdayShortLabelMap[weekday];
+  }
+
+  private _formatValidationParams(params?: Record<string, string>): Record<string, string> {
+    if (!params) {
+      return {};
+    }
+    const formatted: Record<string, string> = {};
+    for (const [key, value] of Object.entries(params)) {
+      if (key === "weekday" && (WEEKDAYS as readonly Weekday[]).includes(value as Weekday)) {
+        formatted.weekday = this._getWeekdayLabel(value as Weekday, "long");
+      } else {
+        formatted[key] = value;
+      }
+    }
+    return formatted;
+  }
+
+  private _translateValidationMessage(message: ValidationMessage): string {
+    const template = this._translations.validationMessages[message.key] || message.key;
+    const params = this._formatValidationParams(message.params);
+
+    if (message.nested) {
+      params.details = this._translateValidationMessage(message.nested);
+    }
+
+    return formatString(template, params);
   }
 
   public getCardSize(): number {
@@ -368,8 +407,13 @@ export class HomematicScheduleCard extends LitElement {
     this._scheduleData = attrs.schedule_data;
     this._availableProfiles = attrs.available_profiles || [];
 
+    // Update temperature range from backend (with fallback to default values)
+    this._minTemp = attrs.min_temp ?? 5.0;
+    this._maxTemp = attrs.max_temp ?? 30.5;
+    this._tempStep = attrs.target_temp_step ?? 0.5;
+
     // Clear cache when schedule data changes
-    this._parsedScheduleCache.clear();
+    this._parsedScheduleCache = new WeakMap();
   }
 
   private _getParsedBlocks(weekday: Weekday): TimeBlock[] {
@@ -383,18 +427,13 @@ export class HomematicScheduleCard extends LitElement {
     const weekdayData = this._scheduleData[weekday];
     if (!weekdayData) return [];
 
-    // Create cache key from weekday and data hash
-    const cacheKey = `${weekday}-${JSON.stringify(weekdayData)}`;
-
-    // Return cached result if available
-    if (this._parsedScheduleCache.has(cacheKey)) {
-      return this._parsedScheduleCache.get(cacheKey)!;
+    const cachedBlocks = this._parsedScheduleCache.get(weekdayData);
+    if (cachedBlocks) {
+      return cachedBlocks;
     }
 
-    // Parse and cache the result
     const blocks = parseWeekdaySchedule(weekdayData);
-    this._parsedScheduleCache.set(cacheKey, blocks);
-
+    this._parsedScheduleCache.set(weekdayData, blocks);
     return blocks;
   }
 
@@ -422,7 +461,11 @@ export class HomematicScheduleCard extends LitElement {
       this._validationWarnings = [];
       return;
     }
-    this._validationWarnings = validateTimeBlocks(this._editingBlocks);
+    this._validationWarnings = validateTimeBlocks(
+      this._editingBlocks,
+      this._minTemp,
+      this._maxTemp,
+    );
   }
 
   private _handleWeekdayClick(weekday: Weekday): void {
@@ -521,12 +564,12 @@ export class HomematicScheduleCard extends LitElement {
       const pixelsPerDegree = 50;
       const deltaTemp = -deltaY / pixelsPerDegree; // Negative because down is positive Y
 
-      // Snap to 0.5°C increments
-      const tempChange = Math.round(deltaTemp * 2) / 2;
+      // Snap to temperature step increments (e.g., 0.5°C, 1°C, etc.)
+      const tempChange = Math.round(deltaTemp / this._tempStep) * this._tempStep;
       const newTemp = (this._dragState.initialTemperature || 20.0) + tempChange;
 
-      // Constrain temperature between 5°C and 30.5°C
-      const constrainedTemp = Math.max(5.0, Math.min(30.5, newTemp));
+      // Constrain temperature between min and max from backend
+      const constrainedTemp = Math.max(this._minTemp, Math.min(this._maxTemp, newTemp));
 
       // Update block temperature
       blocks[blockIndex] = {
@@ -635,7 +678,9 @@ export class HomematicScheduleCard extends LitElement {
         const validationError = validateWeekdayData(weekdayData);
 
         if (validationError) {
-          throw new Error(`${weekday}: ${validationError}`);
+          const localizedError = this._translateValidationMessage(validationError);
+          const weekdayLabel = this._getWeekdayLabel(weekday, "long");
+          throw new Error(`${weekdayLabel}: ${localizedError}`);
         }
 
         const backendData = convertToBackendFormat(weekdayData);
@@ -696,7 +741,8 @@ export class HomematicScheduleCard extends LitElement {
     // Validate schedule data before sending
     const validationError = validateWeekdayData(weekdayData);
     if (validationError) {
-      alert(formatString(this._translations.errors.invalidSchedule, { error: validationError }));
+      const localizedError = this._translateValidationMessage(validationError);
+      alert(formatString(this._translations.errors.invalidSchedule, { error: localizedError }));
       return;
     }
 
@@ -777,7 +823,8 @@ export class HomematicScheduleCard extends LitElement {
     // Validate schedule data
     const validationError = validateWeekdayData(weekdayData);
     if (validationError) {
-      alert(formatString(this._translations.errors.invalidSchedule, { error: validationError }));
+      const localizedError = this._translateValidationMessage(validationError);
+      alert(formatString(this._translations.errors.invalidSchedule, { error: localizedError }));
       return;
     }
 
@@ -909,8 +956,9 @@ export class HomematicScheduleCard extends LitElement {
         // Validate schedule data
         const validationError = validateProfileData(scheduleData);
         if (validationError) {
+          const localizedError = this._translateValidationMessage(validationError);
           alert(
-            formatString(this._translations.errors.invalidImportData, { error: validationError }),
+            formatString(this._translations.errors.invalidImportData, { error: localizedError }),
           );
           return;
         }
@@ -1162,7 +1210,9 @@ export class HomematicScheduleCard extends LitElement {
         <div class="time-axis">
           <div class="time-axis-header"></div>
           <div class="time-axis-labels">
-            ${TIME_LABELS.map(
+            ${repeat(
+              TIME_LABELS,
+              (time) => time.hour,
               (time) => html`
                 <div class="time-label" style="top: ${time.position}%">${time.label}</div>
               `,
@@ -1172,151 +1222,163 @@ export class HomematicScheduleCard extends LitElement {
 
         <!-- Schedule grid -->
         <div class="schedule-grid ${this._isCompactView ? "compact" : ""}">
-          ${WEEKDAYS.map((weekday) => {
-            const weekdayData = this._scheduleData![weekday];
-            if (!weekdayData) return html``;
+          ${repeat(
+            WEEKDAYS,
+            (weekday) => weekday,
+            (weekday) => {
+              const weekdayData = this._scheduleData![weekday];
+              if (!weekdayData) return html``;
 
-            const blocks = this._getParsedBlocks(weekday);
+              const blocks = this._getParsedBlocks(weekday);
 
-            const isCopiedSource = this._copiedSchedule?.weekday === weekday;
+              const isCopiedSource = this._copiedSchedule?.weekday === weekday;
 
-            return html`
-              <div class="weekday-column ${this._config?.editable ? "editable" : ""}">
-                <div class="weekday-header">
-                  <div class="weekday-label">${this._getWeekdayLabel(weekday)}</div>
-                  ${this._config?.editable
-                    ? html`
-                        <div class="weekday-actions">
-                          <button
-                            class="copy-btn ${isCopiedSource ? "active" : ""}"
-                            @click=${(e: Event) => {
-                              e.stopPropagation();
-                              this._copySchedule(weekday);
-                            }}
-                            title="${this._translations.ui.copySchedule}"
-                          >
-                            📋
-                          </button>
-                          <button
-                            class="paste-btn"
-                            @click=${(e: Event) => {
-                              e.stopPropagation();
-                              this._pasteSchedule(weekday);
-                            }}
-                            title="${this._translations.ui.pasteSchedule}"
-                            ?disabled=${!this._copiedSchedule}
-                          >
-                            📄
-                          </button>
-                        </div>
-                      `
-                    : ""}
-                </div>
-                <div
-                  class="time-blocks"
-                  @click=${() => this._config?.editable && this._handleWeekdayClick(weekday)}
-                >
-                  ${blocks.map((block, blockIndex) => {
-                    const isActive = this._isBlockActive(weekday, block);
-
-                    // Determine background style based on gradient config
-                    let backgroundStyle: string;
-                    if (this._config?.show_gradient) {
-                      const prevTemp = blockIndex > 0 ? blocks[blockIndex - 1].temperature : null;
-                      const nextTemp =
-                        blockIndex < blocks.length - 1 ? blocks[blockIndex + 1].temperature : null;
-                      const gradient = getTemperatureGradient(
-                        block.temperature,
-                        prevTemp,
-                        nextTemp,
-                      );
-                      backgroundStyle = `background: ${gradient};`;
-                    } else {
-                      backgroundStyle = `background-color: ${getTemperatureColor(block.temperature)};`;
-                    }
-
-                    return html`
-                      <div
-                        class="time-block ${isActive ? "active" : ""} ${this._pendingChanges.has(
-                          weekday,
-                        )
-                          ? "pending"
-                          : ""}"
-                        style="
-                            height: ${((block.endMinutes - block.startMinutes) / 1440) * 100}%;
-                            ${backgroundStyle}
-                          "
-                      >
-                        ${this._config?.editable && this._isDragDropMode && blockIndex > 0
-                          ? html`
-                              <div
-                                class="drag-handle drag-handle-top"
-                                @mousedown=${(e: MouseEvent) => {
-                                  e.stopPropagation();
-                                  this._startDrag(e, weekday, blockIndex, "start");
-                                }}
-                                @touchstart=${(e: TouchEvent) => {
-                                  e.stopPropagation();
-                                  this._startDrag(e, weekday, blockIndex, "start");
-                                }}
-                              ></div>
-                            `
-                          : ""}
-                        ${this._config?.editable && this._isDragDropMode
-                          ? html`
-                              <div
-                                class="temperature-drag-area"
-                                @mousedown=${(e: MouseEvent) => {
-                                  e.stopPropagation();
-                                  this._startDrag(e, weekday, blockIndex, "temperature");
-                                }}
-                                @touchstart=${(e: TouchEvent) => {
-                                  e.stopPropagation();
-                                  this._startDrag(e, weekday, blockIndex, "temperature");
-                                }}
-                              >
-                                ${this._config?.show_temperature
-                                  ? html`<span class="temperature"
-                                      >${block.temperature.toFixed(1)}°</span
-                                    >`
-                                  : ""}
-                              </div>
-                            `
-                          : this._config?.show_temperature
-                            ? html`<span class="temperature"
-                                >${block.temperature.toFixed(1)}°</span
-                              >`
-                            : ""}
-                        <div class="time-block-tooltip">
-                          <div class="tooltip-time">${block.startTime} - ${block.endTime}</div>
-                          <div class="tooltip-temp">
-                            ${formatTemperature(block.temperature, this._config?.temperature_unit)}
+              return html`
+                <div class="weekday-column ${this._config?.editable ? "editable" : ""}">
+                  <div class="weekday-header">
+                    <div class="weekday-label">${this._getWeekdayLabel(weekday, "short")}</div>
+                    ${this._config?.editable
+                      ? html`
+                          <div class="weekday-actions">
+                            <button
+                              class="copy-btn ${isCopiedSource ? "active" : ""}"
+                              @click=${(e: Event) => {
+                                e.stopPropagation();
+                                this._copySchedule(weekday);
+                              }}
+                              title="${this._translations.ui.copySchedule}"
+                            >
+                              📋
+                            </button>
+                            <button
+                              class="paste-btn"
+                              @click=${(e: Event) => {
+                                e.stopPropagation();
+                                this._pasteSchedule(weekday);
+                              }}
+                              title="${this._translations.ui.pasteSchedule}"
+                              ?disabled=${!this._copiedSchedule}
+                            >
+                              📄
+                            </button>
                           </div>
-                        </div>
-                        ${this._config?.editable &&
-                        this._isDragDropMode &&
-                        blockIndex < blocks.length - 1
-                          ? html`
-                              <div
-                                class="drag-handle drag-handle-bottom"
-                                @mousedown=${(e: MouseEvent) => {
-                                  e.stopPropagation();
-                                  this._startDrag(e, weekday, blockIndex, "end");
-                                }}
-                                @touchstart=${(e: TouchEvent) => {
-                                  e.stopPropagation();
-                                  this._startDrag(e, weekday, blockIndex, "end");
-                                }}
-                              ></div>
-                            `
-                          : ""}
-                      </div>
-                    `;
-                  })}
+                        `
+                      : ""}
+                  </div>
+                  <div
+                    class="time-blocks"
+                    @click=${() => this._config?.editable && this._handleWeekdayClick(weekday)}
+                  >
+                    ${repeat(
+                      blocks,
+                      (block) => block.slot,
+                      (block, blockIndex) => {
+                        const isActive = this._isBlockActive(weekday, block);
+
+                        // Determine background style based on gradient config
+                        let backgroundStyle: string;
+                        if (this._config?.show_gradient) {
+                          const prevTemp =
+                            blockIndex > 0 ? blocks[blockIndex - 1].temperature : null;
+                          const nextTemp =
+                            blockIndex < blocks.length - 1
+                              ? blocks[blockIndex + 1].temperature
+                              : null;
+                          const gradient = getTemperatureGradient(
+                            block.temperature,
+                            prevTemp,
+                            nextTemp,
+                          );
+                          backgroundStyle = `background: ${gradient};`;
+                        } else {
+                          backgroundStyle = `background-color: ${getTemperatureColor(block.temperature)};`;
+                        }
+
+                        return html`
+                          <div
+                            class="time-block ${isActive
+                              ? "active"
+                              : ""} ${this._pendingChanges.has(weekday) ? "pending" : ""}"
+                            style="
+                              height: ${((block.endMinutes - block.startMinutes) / 1440) * 100}%;
+                              ${backgroundStyle}
+                            "
+                          >
+                            ${this._config?.editable && this._isDragDropMode && blockIndex > 0
+                              ? html`
+                                  <div
+                                    class="drag-handle drag-handle-top"
+                                    @mousedown=${(e: MouseEvent) => {
+                                      e.stopPropagation();
+                                      this._startDrag(e, weekday, blockIndex, "start");
+                                    }}
+                                    @touchstart=${(e: TouchEvent) => {
+                                      e.stopPropagation();
+                                      this._startDrag(e, weekday, blockIndex, "start");
+                                    }}
+                                  ></div>
+                                `
+                              : ""}
+                            ${this._config?.editable && this._isDragDropMode
+                              ? html`
+                                  <div
+                                    class="temperature-drag-area"
+                                    @mousedown=${(e: MouseEvent) => {
+                                      e.stopPropagation();
+                                      this._startDrag(e, weekday, blockIndex, "temperature");
+                                    }}
+                                    @touchstart=${(e: TouchEvent) => {
+                                      e.stopPropagation();
+                                      this._startDrag(e, weekday, blockIndex, "temperature");
+                                    }}
+                                  >
+                                    ${this._config?.show_temperature
+                                      ? html`<span class="temperature"
+                                          >${block.temperature.toFixed(1)}°</span
+                                        >`
+                                      : ""}
+                                  </div>
+                                `
+                              : this._config?.show_temperature
+                                ? html`<span class="temperature"
+                                    >${block.temperature.toFixed(1)}°</span
+                                  >`
+                                : ""}
+                            <div class="time-block-tooltip">
+                              <div class="tooltip-time">${block.startTime} - ${block.endTime}</div>
+                              <div class="tooltip-temp">
+                                ${formatTemperature(
+                                  block.temperature,
+                                  this._config?.temperature_unit,
+                                )}
+                              </div>
+                            </div>
+                            ${this._config?.editable &&
+                            this._isDragDropMode &&
+                            blockIndex < blocks.length - 1
+                              ? html`
+                                  <div
+                                    class="drag-handle drag-handle-bottom"
+                                    @mousedown=${(e: MouseEvent) => {
+                                      e.stopPropagation();
+                                      this._startDrag(e, weekday, blockIndex, "end");
+                                    }}
+                                    @touchstart=${(e: TouchEvent) => {
+                                      e.stopPropagation();
+                                      this._startDrag(e, weekday, blockIndex, "end");
+                                    }}
+                                  ></div>
+                                `
+                              : ""}
+                          </div>
+                        `;
+                      },
+                    )}
+                  </div>
                 </div>
-              </div>
-            `;
-          })}
+              `;
+            },
+          )}
 
           <!-- Current time indicator line -->
           <div class="current-time-indicator" style="top: ${this._currentTimePercent}%"></div>
@@ -1355,7 +1417,7 @@ export class HomematicScheduleCard extends LitElement {
         <div class="editor-header">
           <h3>
             ${formatString(this._translations.ui.edit, {
-              weekday: this._getWeekdayLabel(this._editingWeekday),
+              weekday: this._getWeekdayLabel(this._editingWeekday, "long"),
             })}
           </h3>
           <div class="editor-actions">
@@ -1388,7 +1450,10 @@ export class HomematicScheduleCard extends LitElement {
                 </div>
                 <ul class="warnings-list">
                   ${this._validationWarnings.map(
-                    (warning) => html`<li class="warning-item">${warning}</li>`,
+                    (warning) =>
+                      html`<li class="warning-item">
+                        ${this._translateValidationMessage(warning)}
+                      </li>`,
                   )}
                 </ul>
               </div>
@@ -1413,6 +1478,7 @@ export class HomematicScheduleCard extends LitElement {
                   .value=${block.endTime}
                   min=${minTime}
                   max=${maxTime}
+                  step=${(this._config?.time_step_minutes || 15) * 60}
                   @change=${(e: Event) =>
                     this._updateTimeBlock(index, {
                       endTime: (e.target as HTMLInputElement).value,
@@ -1422,9 +1488,9 @@ export class HomematicScheduleCard extends LitElement {
                   type="number"
                   class="temp-input"
                   .value=${block.temperature.toString()}
-                  step="0.5"
-                  min="5"
-                  max="30.5"
+                  step=${this._tempStep}
+                  min=${this._minTemp}
+                  max=${this._maxTemp}
                   @change=${(e: Event) =>
                     this._updateTimeBlock(index, {
                       temperature: parseFloat((e.target as HTMLInputElement).value),

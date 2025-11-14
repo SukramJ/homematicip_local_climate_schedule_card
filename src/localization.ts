@@ -1,13 +1,20 @@
+import type { ValidationMessageKey } from "./utils";
+
+type WeekdayLabels = {
+  monday: string;
+  tuesday: string;
+  wednesday: string;
+  thursday: string;
+  friday: string;
+  saturday: string;
+  sunday: string;
+};
+
 export interface Translations {
   // Weekday labels
   weekdays: {
-    monday: string;
-    tuesday: string;
-    wednesday: string;
-    thursday: string;
-    friday: string;
-    saturday: string;
-    sunday: string;
+    short: WeekdayLabels;
+    long: WeekdayLabels;
   };
   // UI labels and messages
   ui: {
@@ -57,17 +64,29 @@ export interface Translations {
     title: string;
     noWarnings: string;
   };
+  validationMessages: Record<ValidationMessageKey, string>;
 }
 
 const en: Translations = {
   weekdays: {
-    monday: "Mo",
-    tuesday: "Tu",
-    wednesday: "We",
-    thursday: "Th",
-    friday: "Fr",
-    saturday: "Sa",
-    sunday: "Su",
+    short: {
+      monday: "Mo",
+      tuesday: "Tu",
+      wednesday: "We",
+      thursday: "Th",
+      friday: "Fr",
+      saturday: "Sa",
+      sunday: "Su",
+    },
+    long: {
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
+      sunday: "Sunday",
+    },
   },
   ui: {
     schedule: "Schedule",
@@ -114,17 +133,47 @@ const en: Translations = {
     title: "Validation Warnings",
     noWarnings: "No issues detected",
   },
+  validationMessages: {
+    noBlocks: "At least one time block is required",
+    blockEndBeforeStart: "Block {block}: End time is before start time",
+    blockZeroDuration: "Block {block}: Block has zero duration",
+    invalidStartTime: "Block {block}: Invalid start time",
+    invalidEndTime: "Block {block}: Invalid end time",
+    temperatureOutOfRange: "Block {block}: Temperature out of range ({min}-{max}°C)",
+    invalidSlotCount: "Invalid number of slots: {count} (expected 13)",
+    invalidSlotKey: "Invalid slot key: {key} (must be integer 1-13)",
+    missingSlot: "Missing slot {slot}",
+    slotMissingValues: "Slot {slot} missing ENDTIME or TEMPERATURE",
+    slotTimeBackwards: "Slot {slot} time goes backwards: {time}",
+    slotTimeExceedsDay: "Slot {slot} time exceeds 24:00: {time}",
+    lastSlotMustEnd: "Last slot must end at 24:00",
+    scheduleMustBeObject: "Schedule data must be an object",
+    missingWeekday: "Missing weekday: {weekday}",
+    invalidWeekdayData: "Invalid data for {weekday}",
+    weekdayValidationError: "{weekday}: {details}",
+  },
 };
 
 const de: Translations = {
   weekdays: {
-    monday: "Mo",
-    tuesday: "Di",
-    wednesday: "Mi",
-    thursday: "Do",
-    friday: "Fr",
-    saturday: "Sa",
-    sunday: "So",
+    short: {
+      monday: "Mo",
+      tuesday: "Di",
+      wednesday: "Mi",
+      thursday: "Do",
+      friday: "Fr",
+      saturday: "Sa",
+      sunday: "So",
+    },
+    long: {
+      monday: "Montag",
+      tuesday: "Dienstag",
+      wednesday: "Mittwoch",
+      thursday: "Donnerstag",
+      friday: "Freitag",
+      saturday: "Samstag",
+      sunday: "Sonntag",
+    },
   },
   ui: {
     schedule: "Zeitplan",
@@ -170,6 +219,25 @@ const de: Translations = {
   warnings: {
     title: "Validierungswarnungen",
     noWarnings: "Keine Probleme erkannt",
+  },
+  validationMessages: {
+    noBlocks: "Mindestens ein Zeitblock ist erforderlich",
+    blockEndBeforeStart: "Block {block}: Die Endzeit liegt vor der Startzeit",
+    blockZeroDuration: "Block {block}: Der Block hat keine Dauer",
+    invalidStartTime: "Block {block}: Ungültige Startzeit",
+    invalidEndTime: "Block {block}: Ungültige Endzeit",
+    temperatureOutOfRange: "Block {block}: Temperatur außerhalb des Bereichs ({min}-{max}°C)",
+    invalidSlotCount: "Ungültige Anzahl an Slots: {count} (erwartet 13)",
+    invalidSlotKey: "Ungültiger Slot-Schlüssel: {key} (muss eine Ganzzahl 1-13 sein)",
+    missingSlot: "Slot {slot} fehlt",
+    slotMissingValues: "Slot {slot} fehlt ENDTIME oder TEMPERATURE",
+    slotTimeBackwards: "Slot {slot}: Zeit läuft rückwärts: {time}",
+    slotTimeExceedsDay: "Slot {slot}: Zeit überschreitet 24:00: {time}",
+    lastSlotMustEnd: "Der letzte Slot muss um 24:00 enden",
+    scheduleMustBeObject: "Zeitplandaten müssen ein Objekt sein",
+    missingWeekday: "Fehlender Wochentag: {weekday}",
+    invalidWeekdayData: "Ungültige Daten für {weekday}",
+    weekdayValidationError: "{weekday}: {details}",
   },
 };
 

@@ -5,13 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.3.0] - 2025-11-14
+
+### Added
+
+- Dynamic temperature range support using `min_temp` and `max_temp` values from backend entity attributes
+- Temperature validation now uses device-specific limits instead of hardcoded 5-30.5°C range
+- Fallback to default range (5-30.5°C) when backend doesn't provide temperature limits
+- Input field constraints dynamically adjusted based on backend temperature range
+- Drag & drop temperature adjustment respects device-specific min/max values
+- 6 new tests for custom temperature range validation covering boundaries and edge cases
+- Dynamic temperature step support using `target_temp_step` value from backend entity attributes
+- Temperature step used for input field increment/decrement and drag & drop snapping
+- Fallback to default step (0.5°C) when backend doesn't provide temperature step
+- Configurable time step for time selection in detail editor via `time_step_minutes` configuration option
+- Time input field now uses step attribute to control minute increments (default: 15 minutes)
+- Support for custom time step values (e.g., 1, 5, 10, 15, 30 minutes) in editor time picker
+- Localized weekday labels now provide both short (Mo, Di, …) and long (Montag, Dienstag, …) forms for each language
+
+### Changed
+
+- `validateTimeBlocks()` function now accepts optional `minTemp` and `maxTemp` parameters (defaults to 5 and 30.5)
+- Temperature validation error messages now display actual min/max range (e.g., "10-28°C" instead of always "5-30.5°C")
+- `ScheduleEntityAttributes` interface extended with optional `min_temp`, `max_temp`, and `target_temp_step` fields
+- Editor input fields now use dynamic `min`, `max`, and `step` attributes from state instead of hardcoded values
+- Drag & drop temperature snapping now uses dynamic step size from backend instead of hardcoded 0.5°C increments
+- `HomematicScheduleCardConfig` interface extended with optional `time_step_minutes` field for configurable time picker step
+- Time input in editor now enforces configured step size instead of allowing minute-precise inputs
+- Schedule overview continues to show short weekday headers, while the detail editor now always displays the long, fully translated weekday name
+- Validation warnings and error details shown in the editor/import flow now use localized translations instead of fixed English strings
+- Validation logic now returns structured message keys with parameters, ensuring any new locales automatically inherit consistent error formatting
+- Rollup build now runs in production mode without sourcemaps, tree-shakes side effects, and applies more aggressive terser compression to shrink the shipped bundle
 
 ## [0.2.1] - 2025-11-13
 
 ### Changed
 
 - Disabled mouse hover effects (weekday column lift animation and time block tooltips) when drag & drop mode is active to prevent visual interference with drag operations
+- Removed unnecessary validation warnings from the editor: "Last block must end at 24:00" and "Gap detected between block X and Y" (backend automatically corrects these issues)
 
 ### Performance
 

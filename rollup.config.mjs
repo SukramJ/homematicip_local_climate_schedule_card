@@ -3,6 +3,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import resolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import json from "@rollup/plugin-json";
+import replace from "@rollup/plugin-replace";
 import { copyFileSync } from "fs";
 
 // Plugin to copy file to root after build (for HACS)
@@ -24,9 +25,16 @@ export default {
   output: {
     file: "dist/homematicip-local-climate-scheduler-card.js",
     format: "es",
-    sourcemap: true,
+    sourcemap: false,
+  },
+  treeshake: {
+    moduleSideEffects: false,
   },
   plugins: [
+    replace({
+      preventAssignment: true,
+      "process.env.NODE_ENV": JSON.stringify("production"),
+    }),
     resolve({
       browser: true,
     }),
@@ -37,9 +45,12 @@ export default {
     json(),
     terser({
       compress: {
-        drop_console: false,
+        drop_console: true,
+        passes: 2,
+        pure_getters: true,
       },
-      output: {
+      mangle: true,
+      format: {
         comments: false,
       },
     }),

@@ -12,8 +12,15 @@ import {
   roundTimeToQuarter,
   formatTemperature,
   TimeBlock,
+  ValidationMessage,
+  ValidationMessageKey,
 } from "./utils";
 import { WeekdayData } from "./types";
+
+const findMessage = (
+  messages: ValidationMessage[],
+  key: ValidationMessageKey,
+): ValidationMessage | undefined => messages.find((message) => message.key === key);
 
 describe("Utils", () => {
   describe("timeToMinutes", () => {
@@ -462,7 +469,8 @@ describe("Utils", () => {
       };
 
       const error = validateWeekdayData(weekdayData);
-      expect(error).toContain("Invalid number of slots");
+      expect(error?.key).toBe("invalidSlotCount");
+      expect(error?.params).toEqual({ count: "1" });
     });
 
     it("should reject incorrect number of slots (detected via count)", () => {
@@ -483,8 +491,8 @@ describe("Utils", () => {
       };
 
       const error = validateWeekdayData(weekdayData);
-      // Should detect incorrect number of slots (12 instead of 13)
-      expect(error).toContain("Invalid number of slots");
+      expect(error?.key).toBe("invalidSlotCount");
+      expect(error?.params).toEqual({ count: "12" });
     });
 
     it("should reject slot with null/undefined value", () => {
@@ -505,8 +513,8 @@ describe("Utils", () => {
       } as unknown as WeekdayData;
 
       const error = validateWeekdayData(weekdayData);
-      // Should detect missing slot during iteration
-      expect(error).toContain("Missing slot 8");
+      expect(error?.key).toBe("missingSlot");
+      expect(error?.params).toEqual({ slot: "8" });
     });
 
     it("should reject backwards time", () => {
@@ -527,7 +535,8 @@ describe("Utils", () => {
       };
 
       const error = validateWeekdayData(weekdayData);
-      expect(error).toContain("time goes backwards");
+      expect(error?.key).toBe("slotTimeBackwards");
+      expect(error?.params).toEqual({ slot: "2", time: "08:00" });
     });
 
     it("should reject last slot not ending at 24:00", () => {
@@ -548,7 +557,7 @@ describe("Utils", () => {
       };
 
       const error = validateWeekdayData(weekdayData);
-      expect(error).toContain("Last slot must end at 24:00");
+      expect(error?.key).toBe("lastSlotMustEnd");
     });
 
     it("should reject slot with missing ENDTIME", () => {
@@ -569,7 +578,8 @@ describe("Utils", () => {
       };
 
       const error = validateWeekdayData(weekdayData);
-      expect(error).toContain("missing ENDTIME or TEMPERATURE");
+      expect(error?.key).toBe("slotMissingValues");
+      expect(error?.params).toEqual({ slot: "2" });
     });
 
     it("should reject slot with time exceeding 24:00", () => {
@@ -590,7 +600,8 @@ describe("Utils", () => {
       };
 
       const error = validateWeekdayData(weekdayData);
-      expect(error).toContain("time exceeds 24:00");
+      expect(error?.key).toBe("slotTimeExceedsDay");
+      expect(error?.params).toEqual({ slot: "2", time: "25:00" });
     });
 
     it("should reject non-numeric slot keys", () => {
@@ -611,8 +622,8 @@ describe("Utils", () => {
       } as unknown as WeekdayData;
 
       const error = validateWeekdayData(weekdayData);
-      expect(error).toContain("Invalid slot key");
-      expect(error).toContain("must be integer 1-13");
+      expect(error?.key).toBe("invalidSlotKey");
+      expect(error?.params).toEqual({ key: "abc" });
     });
   });
 
@@ -777,46 +788,6 @@ describe("Utils", () => {
       expect(warnings).toHaveLength(0);
     });
 
-    it("should warn when last block does not end at 24:00", () => {
-      const blocks: TimeBlock[] = [
-        {
-          startTime: "00:00",
-          startMinutes: 0,
-          endTime: "23:00",
-          endMinutes: 1380,
-          temperature: 20.0,
-          slot: 1,
-        },
-      ];
-
-      const warnings = validateTimeBlocks(blocks);
-      expect(warnings).toContain("Last block must end at 24:00");
-    });
-
-    it("should warn when there is a gap between blocks", () => {
-      const blocks: TimeBlock[] = [
-        {
-          startTime: "00:00",
-          startMinutes: 0,
-          endTime: "08:00",
-          endMinutes: 480,
-          temperature: 18.0,
-          slot: 1,
-        },
-        {
-          startTime: "09:00",
-          startMinutes: 540,
-          endTime: "24:00",
-          endMinutes: 1440,
-          temperature: 21.0,
-          slot: 2,
-        },
-      ];
-
-      const warnings = validateTimeBlocks(blocks);
-      expect(warnings.some((w) => w.includes("Gap detected"))).toBe(true);
-    });
-
     it("should warn when block has backwards time", () => {
       const blocks: TimeBlock[] = [
         {
@@ -830,7 +801,8 @@ describe("Utils", () => {
       ];
 
       const warnings = validateTimeBlocks(blocks);
-      expect(warnings.some((w) => w.includes("End time is before start time"))).toBe(true);
+      const warning = findMessage(warnings, "blockEndBeforeStart");
+      expect(warning?.params?.block).toBe("1");
     });
 
     it("should warn when middle block has backwards time", () => {
@@ -862,7 +834,8 @@ describe("Utils", () => {
       ];
 
       const warnings = validateTimeBlocks(blocks);
-      expect(warnings.some((w) => w.includes("Block 2: End time is before start time"))).toBe(true);
+      const warning = findMessage(warnings, "blockEndBeforeStart");
+      expect(warning?.params?.block).toBe("2");
     });
 
     it("should warn when block has zero duration", () => {
@@ -886,7 +859,8 @@ describe("Utils", () => {
       ];
 
       const warnings = validateTimeBlocks(blocks);
-      expect(warnings.some((w) => w.includes("zero duration"))).toBe(true);
+      const warning = findMessage(warnings, "blockZeroDuration");
+      expect(warning?.params?.block).toBe("1");
     });
 
     it("should warn when temperature is out of range", () => {
@@ -910,15 +884,15 @@ describe("Utils", () => {
       ];
 
       const warnings = validateTimeBlocks(blocks);
-      expect(warnings.some((w) => w.includes("Temperature out of range"))).toBe(true);
-      expect(warnings.filter((w) => w.includes("Temperature out of range"))).toHaveLength(2);
+      const tempWarnings = warnings.filter((w) => w.key === "temperatureOutOfRange");
+      expect(tempWarnings).toHaveLength(2);
     });
 
     it("should warn when blocks array is empty", () => {
       const blocks: TimeBlock[] = [];
 
       const warnings = validateTimeBlocks(blocks);
-      expect(warnings).toContain("At least one time block is required");
+      expect(findMessage(warnings, "noBlocks")).toBeDefined();
     });
 
     it("should warn when time values are invalid", () => {
@@ -942,8 +916,8 @@ describe("Utils", () => {
       ];
 
       const warnings = validateTimeBlocks(blocks);
-      expect(warnings.some((w) => w.includes("Invalid start time"))).toBe(true);
-      expect(warnings.some((w) => w.includes("Invalid end time"))).toBe(true);
+      expect(findMessage(warnings, "invalidStartTime")?.params?.block).toBe("1");
+      expect(findMessage(warnings, "invalidEndTime")?.params?.block).toBe("2");
     });
 
     it("should detect multiple warnings in one block set", () => {
@@ -959,7 +933,7 @@ describe("Utils", () => {
         {
           startTime: "09:00",
           startMinutes: 540,
-          endTime: "23:00", // Gap + not ending at 24:00
+          endTime: "23:00",
           endMinutes: 1380,
           temperature: 20.0,
           slot: 2,
@@ -967,10 +941,117 @@ describe("Utils", () => {
       ];
 
       const warnings = validateTimeBlocks(blocks);
-      expect(warnings.length).toBeGreaterThan(1);
-      expect(warnings.some((w) => w.includes("Gap detected"))).toBe(true);
-      expect(warnings.some((w) => w.includes("Last block must end at 24:00"))).toBe(true);
-      expect(warnings.some((w) => w.includes("Temperature out of range"))).toBe(true);
+      expect(warnings.length).toBeGreaterThan(0);
+      expect(findMessage(warnings, "temperatureOutOfRange")).toBeDefined();
+    });
+
+    it("should use custom min/max temperature range", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "12:00",
+          endMinutes: 720,
+          temperature: 12.0,
+          slot: 1,
+        },
+        {
+          startTime: "12:00",
+          startMinutes: 720,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 25.0,
+          slot: 2,
+        },
+      ];
+
+      // Test with custom range 10-28°C
+      const warnings = validateTimeBlocks(blocks, 10, 28);
+      expect(warnings).toHaveLength(0);
+    });
+
+    it("should warn when temperature is below custom min", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 8.0, // Below custom min of 10
+          slot: 1,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks, 10, 28);
+      const warning = findMessage(warnings, "temperatureOutOfRange");
+      expect(warning).toBeDefined();
+      expect(warning?.params).toEqual({ block: "1", min: "10", max: "28" });
+    });
+
+    it("should warn when temperature is above custom max", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 30.0, // Above custom max of 28
+          slot: 1,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks, 10, 28);
+      const warning = findMessage(warnings, "temperatureOutOfRange");
+      expect(warning).toBeDefined();
+      expect(warning?.params).toEqual({ block: "1", min: "10", max: "28" });
+    });
+
+    it("should accept temperature at custom min boundary", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 10.0, // Exactly at custom min
+          slot: 1,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks, 10, 28);
+      expect(findMessage(warnings, "temperatureOutOfRange")).toBeUndefined();
+    });
+
+    it("should accept temperature at custom max boundary", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 28.0, // Exactly at custom max
+          slot: 1,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks, 10, 28);
+      expect(findMessage(warnings, "temperatureOutOfRange")).toBeUndefined();
+    });
+
+    it("should use default range when no parameters provided", () => {
+      const blocks: TimeBlock[] = [
+        {
+          startTime: "00:00",
+          startMinutes: 0,
+          endTime: "24:00",
+          endMinutes: 1440,
+          temperature: 20.0,
+          slot: 1,
+        },
+      ];
+
+      const warnings = validateTimeBlocks(blocks);
+      expect(warnings).toHaveLength(0);
     });
   });
 
@@ -1088,10 +1169,10 @@ describe("Utils", () => {
     });
 
     it("should reject non-object data", () => {
-      expect(validateProfileData(null)).toContain("must be an object");
-      expect(validateProfileData(undefined)).toContain("must be an object");
-      expect(validateProfileData("string")).toContain("must be an object");
-      expect(validateProfileData(123)).toContain("must be an object");
+      expect(validateProfileData(null)?.key).toBe("scheduleMustBeObject");
+      expect(validateProfileData(undefined)?.key).toBe("scheduleMustBeObject");
+      expect(validateProfileData("string")?.key).toBe("scheduleMustBeObject");
+      expect(validateProfileData(123)?.key).toBe("scheduleMustBeObject");
     });
 
     it("should reject missing weekdays", () => {
@@ -1115,7 +1196,8 @@ describe("Utils", () => {
       };
 
       const error = validateProfileData(profileData);
-      expect(error).toContain("Missing weekday");
+      expect(error?.key).toBe("missingWeekday");
+      expect(error?.params).toEqual({ weekday: "TUESDAY" });
     });
 
     it("should reject invalid weekday data structure", () => {
@@ -1214,7 +1296,8 @@ describe("Utils", () => {
       };
 
       const error = validateProfileData(profileData);
-      expect(error).toContain("Invalid data for MONDAY");
+      expect(error?.key).toBe("invalidWeekdayData");
+      expect(error?.params).toEqual({ weekday: "MONDAY" });
     });
 
     it("should reject invalid slot data within weekday", () => {
@@ -1327,8 +1410,9 @@ describe("Utils", () => {
       };
 
       const error = validateProfileData(profileData);
-      expect(error).toContain("MONDAY");
-      expect(error).toContain("time goes backwards");
+      expect(error?.key).toBe("weekdayValidationError");
+      expect(error?.params).toEqual({ weekday: "MONDAY" });
+      expect(error?.nested?.key).toBe("slotTimeBackwards");
     });
   });
 });
