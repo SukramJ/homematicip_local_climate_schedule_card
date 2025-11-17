@@ -51,6 +51,7 @@ homematicip_local_climate_scheduler_card/
 ### Main Card Component (`src/homematicip-local-climate-scheduler-card.ts`)
 
 The primary Lit custom element that:
+
 - Extends `LitElement`
 - Implements Home Assistant's custom card interface
 - Manages state for schedule viewing and editing
@@ -60,6 +61,7 @@ The primary Lit custom element that:
 ### Type Definitions (`src/types.ts`)
 
 Core TypeScript interfaces including:
+
 - Home Assistant specific types (`HomeAssistant`, `LovelaceCardConfig`)
 - Schedule data structures (`Schedule`, `TimeBlock`, `DaySchedule`)
 - Card configuration options
@@ -68,6 +70,7 @@ Core TypeScript interfaces including:
 ### Utilities (`src/utils.ts`)
 
 Helper functions for:
+
 - Temperature color mapping
 - Time formatting (12h/24h)
 - Schedule data manipulation
@@ -76,6 +79,7 @@ Helper functions for:
 ### Localization (`src/localization.ts`)
 
 Translation system that:
+
 - Follows Home Assistant language settings
 - Provides German and English translations
 - Includes day names, UI labels, and messages
@@ -118,11 +122,13 @@ npm run validate       # Run all checks + build
 ### Pre-commit Hooks
 
 Husky automatically runs on commit:
+
 1. **lint-staged**: ESLint + Prettier on staged `.ts` files
 2. **Jest tests**: Related tests for changed files
 3. Full pipeline includes type-check, test, and build
 
 To bypass (emergency only):
+
 ```bash
 git commit --no-verify -m "message"
 ```
@@ -134,6 +140,7 @@ See `PRE_COMMIT_HOOKS.md` for detailed documentation.
 ### Required Integration
 
 This card requires the **HomematicIP Local** integration:
+
 - GitHub: https://github.com/sukramj/homematicip_local
 - Provides climate entities with schedule attributes
 - Exposes necessary service calls
@@ -151,6 +158,7 @@ This card requires the **HomematicIP Local** integration:
 ### Entity Attributes Expected
 
 Climate entities should expose:
+
 - `schedule_profiles`: Available profile names
 - `active_schedule_profile`: Currently active profile
 - `schedule_data`: Week schedule with time blocks per day
@@ -176,18 +184,18 @@ entities:
 
 ### All Options
 
-| Option                  | Type     | Default        | Description                        |
-| ----------------------- | -------- | -------------- | ---------------------------------- |
-| `entity`                | string   | —              | Single entity ID                   |
-| `entities`              | string[] | —              | Multiple entities with dropdown    |
-| `name`                  | string   | Entity name    | Custom card title                  |
-| `profile`               | string   | Active profile | Force specific profile             |
-| `show_profile_selector` | boolean  | `true`         | Show profile dropdown              |
-| `editable`              | boolean  | `true`         | Enable editing                     |
-| `show_temperature`      | boolean  | `true`         | Show temps on blocks               |
-| `temperature_unit`      | string   | `°C`           | Temperature unit                   |
-| `hour_format`           | string   | `24`           | `12` or `24` hour format           |
-| `time_step_minutes`     | number   | `15`           | Time picker step size              |
+| Option                  | Type     | Default        | Description                     |
+| ----------------------- | -------- | -------------- | ------------------------------- |
+| `entity`                | string   | —              | Single entity ID                |
+| `entities`              | string[] | —              | Multiple entities with dropdown |
+| `name`                  | string   | Entity name    | Custom card title               |
+| `profile`               | string   | Active profile | Force specific profile          |
+| `show_profile_selector` | boolean  | `true`         | Show profile dropdown           |
+| `editable`              | boolean  | `true`         | Enable editing                  |
+| `show_temperature`      | boolean  | `true`         | Show temps on blocks            |
+| `temperature_unit`      | string   | `°C`           | Temperature unit                |
+| `hour_format`           | string   | `24`           | `12` or `24` hour format        |
+| `time_step_minutes`     | number   | `15`           | Time picker step size           |
 
 ## Common Development Tasks
 
@@ -216,6 +224,7 @@ entities:
 ### Updating Styles
 
 Styles are defined using Lit's `css` tagged template literals in the main component:
+
 - Use CSS custom properties for theming
 - Follow Home Assistant's design patterns
 - Test in both light and dark themes
@@ -257,6 +266,7 @@ npm test -- --testNamePattern="pattern"  # By name
 ### Rollup Configuration (`rollup.config.mjs`)
 
 The build pipeline:
+
 1. **TypeScript compilation**: `.ts` → `.js` with type checking
 2. **Module resolution**: Bundles dependencies
 3. **Terser minification**: Optimizes for production
@@ -271,6 +281,7 @@ The build pipeline:
 ## HACS Integration
 
 HACS (Home Assistant Community Store) compatibility:
+
 - **Type**: Lovelace (frontend plugin)
 - **Configuration**: `hacs.json`
 - **Assets**: Icons and logos in repository root
@@ -338,6 +349,7 @@ HACS (Home Assistant Community Store) compatibility:
 ### Commit Messages
 
 Follow conventional commits:
+
 ```
 type(scope): description
 
