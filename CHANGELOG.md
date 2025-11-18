@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.2] - 2025-11-18
+
+### Changed
+
+- Overview now always displays all seven weekdays in the schedule grid
+- Days without schedule slots now show a full-day block (00:00-24:00) with the base temperature
+- Added `_getBaseTemperature()` method to extract base temperature from simple schedule data
+
+### Fixed
+
+- Fixed issue where days with no schedule slots were not displayed in the overview
+- Ensures consistent visual layout with all weekdays always visible
+
 ## [0.4.1] - 2025-11-18
 
 ### Fixed
@@ -308,7 +321,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.1...HEAD
+[Unreleased]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.2...HEAD
+[0.4.2]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.1...0.4.2
 [0.4.1]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.0...0.4.1
 [0.4.0]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.3.2...0.4.0
 [0.3.2]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.3.1...0.3.2
