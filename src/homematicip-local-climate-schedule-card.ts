@@ -1453,11 +1453,9 @@ export class HomematicScheduleCard extends LitElement {
         </div>
 
         <div class="card-content">
-          ${this._editingWeekday
-            ? this._renderEditor()
-            : this._scheduleData
-              ? this._renderScheduleView()
-              : html`<div class="loading">${this._translations.ui.loading}</div>`}
+          ${this._scheduleData
+            ? this._renderScheduleView()
+            : html`<div class="loading">${this._translations.ui.loading}</div>`}
         </div>
 
         ${this._isLoading
@@ -1468,6 +1466,8 @@ export class HomematicScheduleCard extends LitElement {
             `
           : ""}
       </ha-card>
+
+      ${this._editingWeekday ? this._renderEditDialog() : ""}
     `;
   }
 
@@ -2197,6 +2197,42 @@ export class HomematicScheduleCard extends LitElement {
     this._editingBlocks = mergeConsecutiveBlocks(sortBlocksChronologically(newBlocks));
 
     this._updateValidationWarnings();
+  }
+
+  private async _saveAndClose(): Promise<void> {
+    await this._saveSchedule();
+    // Don't call _closeEditor here, the dialog will close automatically via dialogAction
+  }
+
+  private _renderEditDialog() {
+    if (!this._editingWeekday) return html``;
+
+    return html`
+      <ha-dialog
+        open
+        @closed=${this._closeEditor}
+        .heading=${formatString(this._translations.ui.edit, {
+          weekday: this._getWeekdayLabel(this._editingWeekday, "long"),
+        })}
+        scrimClickAction="close"
+        escapeKeyAction="close"
+      >
+        <div class="dialog-content">
+          <!-- Week overview in dialog -->
+          <div class="dialog-week-overview">${this._renderScheduleView()}</div>
+
+          <!-- Editor content in dialog -->
+          <div class="dialog-editor">${this._renderEditor()}</div>
+        </div>
+
+        <mwc-button slot="primaryAction" @click=${this._saveAndClose} dialogAction="close">
+          ${this._translations.ui.save}
+        </mwc-button>
+        <mwc-button slot="secondaryAction" @click=${this._closeEditor} dialogAction="close">
+          ${this._translations.ui.cancel}
+        </mwc-button>
+      </ha-dialog>
+    `;
   }
 
   static get styles() {
@@ -3419,6 +3455,55 @@ export class HomematicScheduleCard extends LitElement {
 
         .remove-btn:active {
           opacity: 0.5;
+        }
+      }
+
+      /* Dialog styles */
+      ha-dialog {
+        --mdc-dialog-max-width: 90vw;
+        --mdc-dialog-max-height: 90vh;
+      }
+
+      .dialog-content {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding: 16px;
+        overflow-y: auto;
+        max-height: calc(90vh - 200px);
+      }
+
+      .dialog-week-overview {
+        flex-shrink: 0;
+      }
+
+      .dialog-editor {
+        flex: 1;
+        min-height: 0;
+      }
+
+      .dialog-editor .editor {
+        box-shadow: none;
+        border: none;
+        padding: 0;
+      }
+
+      .dialog-editor .editor-header {
+        display: none;
+      }
+
+      .dialog-editor .editor-footer {
+        display: none;
+      }
+
+      @media (max-width: 768px) {
+        ha-dialog {
+          --mdc-dialog-max-width: 100vw;
+          --mdc-dialog-max-height: 100vh;
+        }
+
+        .dialog-content {
+          max-height: calc(100vh - 150px);
         }
       }
     `;
