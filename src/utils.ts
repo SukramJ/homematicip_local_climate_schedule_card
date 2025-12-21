@@ -352,6 +352,38 @@ export function formatTemperature(temperature: number, unit: string = "°C"): st
 }
 
 /**
+ * Format time for display based on hour format preference
+ * @param time Time string in HH:MM format (24h)
+ * @param hourFormat "12" or "24" hour format
+ * @returns Formatted time string
+ */
+export function formatTime(time: string, hourFormat: "12" | "24" = "24"): string {
+  if (hourFormat === "24") {
+    return time;
+  }
+
+  // Convert to 12h format
+  const [hoursStr, minutesStr] = time.split(":");
+  let hours = parseInt(hoursStr, 10);
+  const minutes = minutesStr || "00";
+
+  // Handle 24:00 as 12:00 AM (midnight end of day)
+  if (hours === 24) {
+    return "12:00 AM";
+  }
+
+  const period = hours >= 12 ? "PM" : "AM";
+
+  if (hours === 0) {
+    hours = 12;
+  } else if (hours > 12) {
+    hours = hours - 12;
+  }
+
+  return `${hours}:${minutes} ${period}`;
+}
+
+/**
  * Validate imported ProfileData structure
  * Returns error message if invalid, null if valid
  */

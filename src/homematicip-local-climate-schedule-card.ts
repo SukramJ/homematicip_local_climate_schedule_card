@@ -25,6 +25,7 @@ import {
   getTemperatureColor,
   getTemperatureGradient,
   formatTemperature,
+  formatTime,
   TimeBlock,
   minutesToTime,
   timeToMinutes,
@@ -34,19 +35,6 @@ import {
   sortBlocksChronologically,
 } from "./utils";
 import { getTranslations, formatString, Translations } from "./localization";
-
-// Static time labels for the schedule view (cached to avoid recreation)
-const TIME_LABELS = (() => {
-  const labels = [];
-  for (let hour = 0; hour <= 24; hour += 3) {
-    labels.push({
-      hour,
-      label: `${hour.toString().padStart(2, "0")}:00`,
-      position: (hour / 24) * 100,
-    });
-  }
-  return labels;
-})();
 
 @customElement("homematicip-local-climate-schedule-card")
 export class HomematicScheduleCard extends LitElement {
@@ -208,6 +196,25 @@ export class HomematicScheduleCard extends LitElement {
       this._weekdayShortLabelMap = this._createWeekdayLabelMap("short");
     }
     return this._weekdayShortLabelMap[weekday];
+  }
+
+  private _getTimeLabels(): { hour: number; label: string; position: number }[] {
+    const hourFormat = this._config?.hour_format || "24";
+    const labels = [];
+    for (let hour = 0; hour <= 24; hour += 3) {
+      const time24 = `${hour.toString().padStart(2, "0")}:00`;
+      labels.push({
+        hour,
+        label: formatTime(time24, hourFormat),
+        position: (hour / 24) * 100,
+      });
+    }
+    return labels;
+  }
+
+  private _formatTimeDisplay(time: string): string {
+    const hourFormat = this._config?.hour_format || "24";
+    return formatTime(time, hourFormat);
   }
 
   private _getEntityOptions(): string[] {
@@ -1046,17 +1053,15 @@ export class HomematicScheduleCard extends LitElement {
     const activeEntityId = this._getActiveEntityId();
     const entityState = activeEntityId ? this.hass.states?.[activeEntityId] : undefined;
 
-    const headerContent = multipleEntities
-      ? this._renderEntitySelector(entityOptions, activeEntityId)
-      : this._config.name ||
-        entityState?.attributes.friendly_name ||
-        this._translations.ui.schedule;
+    // Header shows: configured name > friendly_name > default
+    const headerTitle =
+      this._config.name || entityState?.attributes.friendly_name || this._translations.ui.schedule;
 
     if (!entityState) {
       return html`
         <ha-card>
           <div class="card-header">
-            <div class="name">${headerContent}</div>
+            <div class="name">${headerTitle}</div>
           </div>
           <div class="card-content">
             <div class="error">
@@ -1072,9 +1077,10 @@ export class HomematicScheduleCard extends LitElement {
     return html`
       <ha-card>
         <div class="card-header">
-          <div class="name">${headerContent}</div>
+          <div class="name">${headerTitle}</div>
         </div>
         <div class="header-controls">
+          ${multipleEntities ? this._renderEntitySelector(entityOptions, activeEntityId) : ""}
           ${this._config.show_profile_selector && this._availableProfiles.length > 0
             ? html`
                 <select
@@ -1138,7 +1144,7 @@ export class HomematicScheduleCard extends LitElement {
           <div class="time-axis-header"></div>
           <div class="time-axis-labels">
             ${repeat(
-              TIME_LABELS,
+              this._getTimeLabels(),
               (time) => time.hour,
               (time) => html`
                 <div class="time-label" style="top: ${time.position}%">${time.label}</div>
@@ -1251,7 +1257,10 @@ export class HomematicScheduleCard extends LitElement {
                                 >`
                               : ""}
                             <div class="time-block-tooltip">
-                              <div class="tooltip-time">${block.startTime} - ${block.endTime}</div>
+                              <div class="tooltip-time">
+                                ${this._formatTimeDisplay(block.startTime)} -
+                                ${this._formatTimeDisplay(block.endTime)}
+                              </div>
                               <div class="tooltip-temp">
                                 ${formatTemperature(
                                   block.temperature,
@@ -1661,8 +1670,8 @@ export class HomematicScheduleCard extends LitElement {
             // Display mode for this slot
             return html`
               <div class="time-block-editor ${isBaseTemp ? "base-temp-slot" : ""}">
-                <span class="time-display">${block.startTime}</span>
-                <span class="time-display">${block.endTime}</span>
+                <span class="time-display">${this._formatTimeDisplay(block.startTime)}</span>
+                <span class="time-display">${this._formatTimeDisplay(block.endTime)}</span>
                 <div class="temp-display-group">
                   <span class="temp-display">${block.temperature.toFixed(1)}</span>
                   <span class="temp-unit">${this._config?.temperature_unit || "°C"}</span>

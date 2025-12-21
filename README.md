@@ -78,16 +78,16 @@ hour_format: "24"
 
 ### Configuration Options
 
-| Option                  | Type     | Default        | Description                                                       |
-| ----------------------- | -------- | -------------- | ----------------------------------------------------------------- |
-| `entities`              | string[] | —              | List of climate entity IDs (required)                             |
-| `name`                  | string   | Entity name    | Custom name for the card (hidden when multi-entity selector used) |
-| `profile`               | string   | Active profile | Force display of a specific profile                               |
-| `show_profile_selector` | boolean  | `true`         | Show/hide the profile selector dropdown                           |
-| `editable`              | boolean  | `true`         | Enable/disable schedule editing                                   |
-| `show_temperature`      | boolean  | `true`         | Show/hide temperature values on blocks                            |
-| `temperature_unit`      | string   | `°C`           | Temperature unit to display                                       |
-| `hour_format`           | string   | `24`           | Time format: `12` or `24` hour                                    |
+| Option                  | Type     | Default        | Description                             |
+| ----------------------- | -------- | -------------- | --------------------------------------- |
+| `entities`              | string[] | —              | List of climate entity IDs (required)   |
+| `name`                  | string   | Entity name    | Custom name for the card header         |
+| `profile`               | string   | Active profile | Force display of a specific profile     |
+| `show_profile_selector` | boolean  | `true`         | Show/hide the profile selector dropdown |
+| `editable`              | boolean  | `true`         | Enable/disable schedule editing         |
+| `show_temperature`      | boolean  | `true`         | Show/hide temperature values on blocks  |
+| `temperature_unit`      | string   | `°C`           | Temperature unit to display             |
+| `hour_format`           | string   | `24`           | Time format: `12` or `24` hour          |
 
 ## Usage
 

@@ -16,6 +16,7 @@ import {
   getTemperatureGradient,
   roundTimeToQuarter,
   formatTemperature,
+  formatTime,
   mergeConsecutiveBlocks,
   insertBlockWithSplitting,
   fillGapsWithBaseTemperature,
@@ -49,6 +50,33 @@ describe("Utils", () => {
       expect(minutesToTime(750)).toBe("12:30");
       expect(minutesToTime(1439)).toBe("23:59");
       expect(minutesToTime(1440)).toBe("24:00");
+    });
+  });
+
+  describe("formatTime", () => {
+    it("should return time unchanged for 24h format", () => {
+      expect(formatTime("00:00", "24")).toBe("00:00");
+      expect(formatTime("12:30", "24")).toBe("12:30");
+      expect(formatTime("23:59", "24")).toBe("23:59");
+      expect(formatTime("24:00", "24")).toBe("24:00");
+    });
+
+    it("should convert to 12h format correctly", () => {
+      expect(formatTime("00:00", "12")).toBe("12:00 AM");
+      expect(formatTime("00:30", "12")).toBe("12:30 AM");
+      expect(formatTime("01:00", "12")).toBe("1:00 AM");
+      expect(formatTime("06:15", "12")).toBe("6:15 AM");
+      expect(formatTime("11:59", "12")).toBe("11:59 AM");
+      expect(formatTime("12:00", "12")).toBe("12:00 PM");
+      expect(formatTime("12:30", "12")).toBe("12:30 PM");
+      expect(formatTime("13:00", "12")).toBe("1:00 PM");
+      expect(formatTime("18:45", "12")).toBe("6:45 PM");
+      expect(formatTime("23:59", "12")).toBe("11:59 PM");
+      expect(formatTime("24:00", "12")).toBe("12:00 AM");
+    });
+
+    it("should default to 24h format", () => {
+      expect(formatTime("14:30")).toBe("14:30");
     });
   });
 
