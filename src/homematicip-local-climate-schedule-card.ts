@@ -78,9 +78,6 @@ export class HomematicScheduleCard extends LitElement {
   private _parsedScheduleCache: WeakMap<WeekdayData, TimeBlock[]> = new WeakMap();
   private _weekdayShortLabelMap?: Record<Weekday, string>;
   private _weekdayLongLabelMap?: Record<Weekday, string>;
-  @state() private _pendingChanges: Map<Weekday, TimeBlock[]> = new Map();
-  @state() private _isDragging: boolean = false;
-  @state() private _isDragDropMode: boolean = false;
   @state() private _minTemp: number = 5.0;
   @state() private _maxTemp: number = 30.5;
   @state() private _tempStep: number = 0.5;
@@ -89,15 +86,6 @@ export class HomematicScheduleCard extends LitElement {
     startTime: string;
     endTime: string;
     temperature: number;
-  };
-  private _dragState?: {
-    weekday: Weekday;
-    blockIndex: number;
-    boundary: "start" | "end" | "temperature";
-    initialY: number;
-    initialMinutes: number;
-    initialTemperature?: number;
-    originalBlocks: TimeBlock[];
   };
 
   constructor() {
@@ -145,7 +133,6 @@ export class HomematicScheduleCard extends LitElement {
     };
 
     this._activeEntityId = nextActiveEntity;
-    this._pendingChanges.clear();
     this._copiedSchedule = undefined;
     this._editingWeekday = undefined;
     this._editingBlocks = undefined;
@@ -390,23 +377,6 @@ export class HomematicScheduleCard extends LitElement {
     this._isCompactView = !this._isCompactView;
   }
 
-  private _toggleDragDropMode(): void {
-    // If trying to disable drag & drop mode with pending changes, confirm first
-    if (this._isDragDropMode && this._pendingChanges.size > 0) {
-      const message = this._translations.ui.confirmDiscardChanges;
-      if (confirm(message)) {
-        // Discard changes and exit mode
-        this._discardPendingChanges();
-        this._isDragDropMode = false;
-      }
-      // If user cancels, stay in drag & drop mode
-      return;
-    }
-
-    // Toggle drag & drop mode
-    this._isDragDropMode = !this._isDragDropMode;
-  }
-
   protected shouldUpdate(changedProps: PropertyValues): boolean {
     // Always update if config changed
     if (changedProps.has("_config")) {
@@ -480,7 +450,6 @@ export class HomematicScheduleCard extends LitElement {
       this._currentProfile = undefined;
       this._scheduleData = undefined;
       this._availableProfiles = [];
-      this._pendingChanges.clear();
       return;
     }
 
@@ -489,7 +458,6 @@ export class HomematicScheduleCard extends LitElement {
       this._currentProfile = undefined;
       this._scheduleData = undefined;
       this._availableProfiles = [];
-      this._pendingChanges.clear();
       return;
     }
 
@@ -524,11 +492,6 @@ export class HomematicScheduleCard extends LitElement {
   }
 
   private _getParsedBlocks(weekday: Weekday): TimeBlock[] {
-    // Check for pending changes first
-    if (this._pendingChanges.has(weekday)) {
-      return this._pendingChanges.get(weekday)!;
-    }
-
     if (this._scheduleData) {
       const weekdayData = this._scheduleData[weekday];
       if (!weekdayData) return [];
@@ -582,9 +545,6 @@ export class HomematicScheduleCard extends LitElement {
     if (!this._config?.editable) return;
     if (!this._scheduleData) return;
 
-    // Don't open editor when in drag & drop mode
-    if (this._isDragDropMode) return;
-
     this._editingWeekday = weekday;
     this._editingBlocks = this._getParsedBlocks(weekday);
 
@@ -615,260 +575,6 @@ export class HomematicScheduleCard extends LitElement {
     // Clear history stack
     this._historyStack = [];
     this._historyIndex = -1;
-  }
-
-  private _snapToQuarterHour(minutes: number): number {
-    // Snap to nearest 15-minute interval (0, 15, 30, 45)
-    return Math.round(minutes / 15) * 15;
-  }
-
-  private _startDrag(
-    e: MouseEvent | TouchEvent,
-    weekday: Weekday,
-    blockIndex: number,
-    boundary: "start" | "end" | "temperature",
-  ): void {
-    if (!this._config?.editable) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-
-    const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
-    const blocks = this._pendingChanges.get(weekday) || this._getParsedBlocks(weekday);
-
-    this._dragState = {
-      weekday,
-      blockIndex,
-      boundary,
-      initialY: clientY,
-      initialMinutes:
-        boundary === "start"
-          ? blocks[blockIndex].startMinutes
-          : boundary === "end"
-            ? blocks[blockIndex].endMinutes
-            : 0,
-      initialTemperature: boundary === "temperature" ? blocks[blockIndex].temperature : undefined,
-      originalBlocks: JSON.parse(JSON.stringify(blocks)),
-    };
-
-    this._isDragging = true;
-
-    // Add global event listeners
-    const moveHandler = (e: Event) => {
-      if (e instanceof MouseEvent || e instanceof TouchEvent) {
-        this._onDragMove(e);
-      }
-    };
-    const endHandler = () => this._endDrag(moveHandler, endHandler);
-
-    document.addEventListener("mousemove", moveHandler);
-    document.addEventListener("touchmove", moveHandler, { passive: false });
-    document.addEventListener("mouseup", endHandler);
-    document.addEventListener("touchend", endHandler);
-  }
-
-  private _onDragMove(e: MouseEvent | TouchEvent): void {
-    if (!this._dragState) return;
-
-    e.preventDefault();
-
-    const clientY = e instanceof MouseEvent ? e.clientY : e.touches[0].clientY;
-    const deltaY = clientY - this._dragState.initialY;
-
-    const { blockIndex, boundary, weekday } = this._dragState;
-    const blocks = [...this._dragState.originalBlocks];
-
-    if (boundary === "temperature") {
-      // Temperature adjustment mode
-      // Drag down = increase temperature, drag up = decrease temperature
-      // Convert pixels to temperature (e.g., 50 pixels = 1°C)
-      const pixelsPerDegree = 50;
-      const deltaTemp = -deltaY / pixelsPerDegree; // Negative because down is positive Y
-
-      // Snap to temperature step increments (e.g., 0.5°C, 1°C, etc.)
-      const tempChange = Math.round(deltaTemp / this._tempStep) * this._tempStep;
-      const newTemp = (this._dragState.initialTemperature || 20.0) + tempChange;
-
-      // Constrain temperature between min and max from backend
-      const constrainedTemp = Math.max(this._minTemp, Math.min(this._maxTemp, newTemp));
-
-      // Update block temperature
-      blocks[blockIndex] = {
-        ...blocks[blockIndex],
-        temperature: constrainedTemp,
-      };
-
-      // Store pending changes
-      this._pendingChanges.set(weekday, blocks);
-      this.requestUpdate();
-      return;
-    }
-
-    // Time boundary adjustment mode (existing logic)
-    const dayContainer = this.shadowRoot?.querySelector(".schedule-grid");
-    if (!dayContainer) return;
-
-    const containerHeight = dayContainer.clientHeight;
-    const minutesPerPixel = 1440 / containerHeight;
-    const deltaMinutes = deltaY * minutesPerPixel;
-
-    const newMinutes = this._snapToQuarterHour(this._dragState.initialMinutes + deltaMinutes);
-
-    if (boundary === "start") {
-      // Start time must be >= previous block's end time (or 0 for first block)
-      const minMinutes = blockIndex > 0 ? blocks[blockIndex - 1].endMinutes : 0;
-      // Start time must be < this block's end time
-      const maxMinutes = blocks[blockIndex].endMinutes - 15;
-
-      const constrainedMinutes = Math.max(minMinutes, Math.min(maxMinutes, newMinutes));
-
-      // Check if blocks are adjacent (no gap between them)
-      const blocksAreAdjacent =
-        blockIndex > 0 &&
-        this._dragState?.originalBlocks[blockIndex].startMinutes ===
-          this._dragState?.originalBlocks[blockIndex - 1].endMinutes;
-
-      // Update the previous block's end time only if blocks are adjacent
-      if (blocksAreAdjacent) {
-        blocks[blockIndex - 1] = {
-          ...blocks[blockIndex - 1],
-          endMinutes: constrainedMinutes,
-          endTime: minutesToTime(constrainedMinutes),
-        };
-      }
-
-      // Update current block's start time
-      blocks[blockIndex] = {
-        ...blocks[blockIndex],
-        startMinutes: constrainedMinutes,
-        startTime: minutesToTime(constrainedMinutes),
-      };
-    } else if (boundary === "end") {
-      // End time must be > this block's start time
-      const minMinutes = blocks[blockIndex].startMinutes + 15;
-      // End time must be <= next block's start time (or 1440 for last block)
-      const maxMinutes =
-        blockIndex < blocks.length - 1 ? blocks[blockIndex + 1].startMinutes : 1440;
-
-      const constrainedMinutes = Math.max(minMinutes, Math.min(maxMinutes, newMinutes));
-
-      // Update current block's end time
-      blocks[blockIndex] = {
-        ...blocks[blockIndex],
-        endMinutes: constrainedMinutes,
-        endTime: minutesToTime(constrainedMinutes),
-      };
-
-      // Check if blocks are adjacent (no gap between them)
-      const blocksAreAdjacent =
-        blockIndex < blocks.length - 1 &&
-        this._dragState?.originalBlocks[blockIndex].endMinutes ===
-          this._dragState?.originalBlocks[blockIndex + 1].startMinutes;
-
-      // Update next block's start time only if blocks are adjacent
-      if (blocksAreAdjacent) {
-        blocks[blockIndex + 1] = {
-          ...blocks[blockIndex + 1],
-          startMinutes: constrainedMinutes,
-          startTime: minutesToTime(constrainedMinutes),
-        };
-      }
-    }
-
-    // Store pending changes
-    this._pendingChanges.set(weekday, blocks);
-    this.requestUpdate();
-  }
-
-  private _endDrag(moveHandler: EventListener, endHandler: EventListener): void {
-    this._isDragging = false;
-    this._dragState = undefined;
-
-    // Remove global event listeners
-    document.removeEventListener("mousemove", moveHandler);
-    document.removeEventListener("touchmove", moveHandler);
-    document.removeEventListener("mouseup", endHandler);
-    document.removeEventListener("touchend", endHandler);
-
-    this.requestUpdate();
-  }
-
-  private async _savePendingChanges(): Promise<void> {
-    const entityId = this._getActiveEntityId();
-    if (
-      !this._config ||
-      !this.hass ||
-      !this._currentProfile ||
-      this._pendingChanges.size === 0 ||
-      !entityId
-    ) {
-      return;
-    }
-
-    // Set loading state
-    this._isLoading = true;
-    this._loadingTimeoutId = window.setTimeout(() => {
-      this._isLoading = false;
-      this._loadingTimeoutId = undefined;
-    }, 10000);
-
-    try {
-      // Save all pending changes sequentially using simple schedule format
-      for (const [weekday, blocks] of this._pendingChanges) {
-        // Get base temperature for this weekday
-        const baseTemperature = this._getBaseTemperature(weekday);
-
-        // Convert blocks to simple weekday data format
-        const simpleWeekdayData = timeBlocksToSimpleWeekdayData(blocks, baseTemperature);
-
-        // Validate
-        const validationError = validateSimpleWeekdayData(simpleWeekdayData);
-        if (validationError) {
-          const localizedError = this._translateValidationMessage(validationError);
-          const weekdayLabel = this._getWeekdayLabel(weekday, "long");
-          throw new Error(`${weekdayLabel}: ${localizedError}`);
-        }
-
-        // Call the simple schedule service
-        const { base_temperature: baseTemp, periods } = simpleWeekdayData;
-        await this.hass.callService("homematicip_local", "set_schedule_simple_weekday", {
-          entity_id: entityId,
-          profile: this._currentProfile,
-          weekday: weekday,
-          base_temperature: baseTemp,
-          simple_weekday_list: periods,
-        });
-
-        // Update local state
-        if (this._scheduleData) {
-          this._scheduleData = {
-            ...this._scheduleData,
-            [weekday]: simpleWeekdayData,
-          };
-        }
-      }
-
-      // Clear pending changes
-      this._pendingChanges.clear();
-
-      // Force update from entity
-      this._updateFromEntity();
-      this.requestUpdate();
-    } catch (err) {
-      console.error("Failed to save pending changes:", err);
-      alert(formatString(this._translations.errors.failedToSaveSchedule, { error: String(err) }));
-    } finally {
-      if (this._loadingTimeoutId !== undefined) {
-        clearTimeout(this._loadingTimeoutId);
-        this._loadingTimeoutId = undefined;
-      }
-      this._isLoading = false;
-    }
-  }
-
-  private _discardPendingChanges(): void {
-    this._pendingChanges.clear();
-    this.requestUpdate();
   }
 
   private async _saveSchedule(): Promise<void> {
@@ -1377,19 +1083,6 @@ export class HomematicScheduleCard extends LitElement {
                 </select>
               `
             : ""}
-          ${this._config?.editable
-            ? html`
-                <button
-                  class="dragdrop-toggle-btn ${this._isDragDropMode ? "active" : ""}"
-                  @click=${this._toggleDragDropMode}
-                  title="${this._isDragDropMode
-                    ? this._translations.ui.disableDragDrop
-                    : this._translations.ui.enableDragDrop}"
-                >
-                  ${this._isDragDropMode ? "🔒" : "✋"}
-                </button>
-              `
-            : ""}
           <button
             class="view-toggle-btn"
             @click=${this._toggleViewMode}
@@ -1439,11 +1132,7 @@ export class HomematicScheduleCard extends LitElement {
     if (!this._scheduleData) return html``;
 
     return html`
-      <div
-        class="schedule-container ${this._isCompactView ? "compact" : ""} ${this._isDragDropMode
-          ? "drag-drop-mode"
-          : ""}"
-      >
+      <div class="schedule-container ${this._isCompactView ? "compact" : ""}">
         <!-- Time axis on the left -->
         <div class="time-axis">
           <div class="time-axis-header"></div>
@@ -1548,79 +1237,19 @@ export class HomematicScheduleCard extends LitElement {
 
                         return html`
                           <div
-                            class="time-block ${isActive
-                              ? "active"
-                              : ""} ${this._pendingChanges.has(weekday)
-                              ? "pending"
-                              : ""} ${isBaseTempBlock ? "base-temp-block" : ""}"
+                            class="time-block ${isActive ? "active" : ""} ${isBaseTempBlock
+                              ? "base-temp-block"
+                              : ""}"
                             style="
                               height: ${((block.endMinutes - block.startMinutes) / 1440) * 100}%;
                               ${backgroundStyle}
                             "
                           >
-                            ${(() => {
-                              // Find actual index in rawBlocks for drag handle
-                              const rawIndex = rawBlocks.findIndex(
-                                (b) =>
-                                  b.startMinutes === block.startMinutes &&
-                                  b.endMinutes === block.endMinutes,
-                              );
-                              // Show top drag handle if block can be extended upward (not starting at midnight)
-                              const canExtendUp = rawIndex >= 0 && block.startMinutes > 0;
-                              return this._config?.editable &&
-                                this._isDragDropMode &&
-                                !isBaseTempBlock &&
-                                canExtendUp
-                                ? html`
-                                    <div
-                                      class="drag-handle drag-handle-top"
-                                      @mousedown=${(e: MouseEvent) => {
-                                        e.stopPropagation();
-                                        this._startDrag(e, weekday, rawIndex, "start");
-                                      }}
-                                      @touchstart=${(e: TouchEvent) => {
-                                        e.stopPropagation();
-                                        this._startDrag(e, weekday, rawIndex, "start");
-                                      }}
-                                    ></div>
-                                  `
-                                : "";
-                            })()}
-                            ${(() => {
-                              const rawIndex = rawBlocks.findIndex(
-                                (b) =>
-                                  b.startMinutes === block.startMinutes &&
-                                  b.endMinutes === block.endMinutes,
-                              );
-                              return this._config?.editable &&
-                                this._isDragDropMode &&
-                                !isBaseTempBlock &&
-                                rawIndex >= 0
-                                ? html`
-                                    <div
-                                      class="temperature-drag-area"
-                                      @mousedown=${(e: MouseEvent) => {
-                                        e.stopPropagation();
-                                        this._startDrag(e, weekday, rawIndex, "temperature");
-                                      }}
-                                      @touchstart=${(e: TouchEvent) => {
-                                        e.stopPropagation();
-                                        this._startDrag(e, weekday, rawIndex, "temperature");
-                                      }}
-                                    >
-                                      ${this._config?.show_temperature
-                                        ? html`<span class="temperature"
-                                            >${block.temperature.toFixed(1)}°</span
-                                          >`
-                                        : ""}
-                                    </div>
-                                  `
-                                : this._config?.show_temperature
-                                  ? html`<span class="temperature"
-                                      >${block.temperature.toFixed(1)}°</span
-                                    >`
-                                  : "";
-                            })()}
+                            ${this._config?.show_temperature
+                              ? html`<span class="temperature"
+                                  >${block.temperature.toFixed(1)}°</span
+                                >`
+                              : ""}
                             <div class="time-block-tooltip">
                               <div class="tooltip-time">${block.startTime} - ${block.endTime}</div>
                               <div class="tooltip-temp">
@@ -1630,33 +1259,6 @@ export class HomematicScheduleCard extends LitElement {
                                 )}
                               </div>
                             </div>
-                            ${(() => {
-                              const rawIndex = rawBlocks.findIndex(
-                                (b) =>
-                                  b.startMinutes === block.startMinutes &&
-                                  b.endMinutes === block.endMinutes,
-                              );
-                              // Show bottom drag handle if block can be extended downward (not ending at midnight)
-                              const canExtendDown = rawIndex >= 0 && block.endMinutes < 1440;
-                              return this._config?.editable &&
-                                this._isDragDropMode &&
-                                !isBaseTempBlock &&
-                                canExtendDown
-                                ? html`
-                                    <div
-                                      class="drag-handle drag-handle-bottom"
-                                      @mousedown=${(e: MouseEvent) => {
-                                        e.stopPropagation();
-                                        this._startDrag(e, weekday, rawIndex, "end");
-                                      }}
-                                      @touchstart=${(e: TouchEvent) => {
-                                        e.stopPropagation();
-                                        this._startDrag(e, weekday, rawIndex, "end");
-                                      }}
-                                    ></div>
-                                  `
-                                : "";
-                            })()}
                           </div>
                         `;
                       },
@@ -1672,25 +1274,7 @@ export class HomematicScheduleCard extends LitElement {
         </div>
       </div>
 
-      ${this._pendingChanges.size > 0
-        ? html`
-            <div class="pending-changes-banner">
-              <div class="pending-changes-info">
-                <span class="pending-icon">⚠️</span>
-                <span class="pending-text">${this._translations.ui.unsavedChanges}</span>
-              </div>
-              <div class="pending-changes-actions">
-                <button class="discard-btn" @click=${this._discardPendingChanges}>
-                  ${this._translations.ui.discard}
-                </button>
-                <button class="save-all-btn" @click=${this._savePendingChanges}>
-                  ${this._translations.ui.saveAll}
-                </button>
-              </div>
-            </div>
-          `
-        : ""}
-      ${this._config?.editable && this._pendingChanges.size === 0
+      ${this._config?.editable
         ? html`<div class="hint">${this._translations.ui.clickToEdit}</div>`
         : ""}
     `;
@@ -1723,14 +1307,10 @@ export class HomematicScheduleCard extends LitElement {
     }
 
     this._activeEntityId = entityId;
-    this._pendingChanges.clear();
     this._editingWeekday = undefined;
     this._editingBlocks = undefined;
     this._copiedSchedule = undefined;
     this._validationWarnings = [];
-    this._isDragDropMode = false;
-    this._isDragging = false;
-    this._dragState = undefined;
     this._parsedScheduleCache = new WeakMap();
     this._updateFromEntity();
   }
@@ -2167,6 +1747,30 @@ export class HomematicScheduleCard extends LitElement {
     // Don't call _closeEditor here, the dialog will close automatically via dialogAction
   }
 
+  private _switchToWeekday(weekday: Weekday): void {
+    if (weekday === this._editingWeekday) return;
+
+    // Switch to the new weekday
+    this._editingWeekday = weekday;
+    this._editingBlocks = this._getParsedBlocks(weekday);
+
+    // Extract base temperature from schedule data
+    const weekdayData = this._scheduleData?.[weekday];
+    if (weekdayData) {
+      const { baseTemperature } = parseSimpleWeekdaySchedule(weekdayData);
+      this._editingBaseTemperature = baseTemperature;
+    } else {
+      this._editingBaseTemperature = 20.0;
+    }
+
+    // Reset history for the new weekday
+    this._historyStack = [JSON.parse(JSON.stringify(this._editingBlocks)) as TimeBlock[]];
+    this._historyIndex = 0;
+
+    // Update validation warnings
+    this._updateValidationWarnings();
+  }
+
   private _renderEditDialog() {
     if (!this._editingWeekday) return html``;
 
@@ -2181,8 +1785,19 @@ export class HomematicScheduleCard extends LitElement {
         escapeKeyAction="close"
       >
         <div class="dialog-content">
-          <!-- Week overview in dialog -->
-          <div class="dialog-week-overview">${this._renderScheduleView()}</div>
+          <!-- Weekday selector tabs -->
+          <div class="weekday-tabs">
+            ${WEEKDAYS.map(
+              (weekday) => html`
+                <button
+                  class="weekday-tab ${weekday === this._editingWeekday ? "active" : ""}"
+                  @click=${() => this._switchToWeekday(weekday)}
+                >
+                  ${this._getWeekdayLabel(weekday, "short")}
+                </button>
+              `,
+            )}
+          </div>
 
           <!-- Editor content in dialog -->
           <div class="dialog-editor">${this._renderEditor()}</div>
@@ -2416,12 +2031,6 @@ export class HomematicScheduleCard extends LitElement {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
 
-      /* Disable hover effects when in drag & drop mode */
-      .schedule-container.drag-drop-mode .weekday-column.editable:hover {
-        transform: none;
-        box-shadow: none;
-      }
-
       .weekday-header {
         padding: 4px 8px;
         display: flex;
@@ -2522,16 +2131,6 @@ export class HomematicScheduleCard extends LitElement {
         visibility: visible;
       }
 
-      /* Disable hover effects when in drag & drop mode */
-      .schedule-container.drag-drop-mode .time-block:hover {
-        opacity: 1;
-      }
-
-      .schedule-container.drag-drop-mode .time-block:hover .time-block-tooltip {
-        opacity: 0;
-        visibility: hidden;
-      }
-
       .temperature {
         user-select: none;
         position: relative;
@@ -2601,131 +2200,6 @@ export class HomematicScheduleCard extends LitElement {
         font-size: 11px;
         font-weight: 600;
         line-height: 1.2;
-      }
-
-      /* Drag and Drop Styles */
-      .time-block.pending {
-        outline: 2px dashed var(--warning-color, #ff9800);
-        outline-offset: -2px;
-      }
-
-      .drag-handle {
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: 8px;
-        cursor: ns-resize;
-        z-index: 20;
-        background: rgba(255, 255, 255, 0);
-        transition: background 0.2s;
-      }
-
-      .drag-handle:hover {
-        background: rgba(255, 255, 255, 0.3);
-      }
-
-      .drag-handle-top {
-        top: 0;
-        border-top: 2px solid rgba(255, 255, 255, 0);
-      }
-
-      .drag-handle-top:hover {
-        border-top: 2px solid rgba(255, 255, 255, 0.8);
-      }
-
-      .drag-handle-bottom {
-        bottom: 0;
-        border-bottom: 2px solid rgba(255, 255, 255, 0);
-      }
-
-      .drag-handle-bottom:hover {
-        border-bottom: 2px solid rgba(255, 255, 255, 0.8);
-      }
-
-      /* Temperature Drag Area */
-      .temperature-drag-area {
-        position: absolute;
-        top: 8px;
-        bottom: 8px;
-        left: 0;
-        right: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: ns-resize;
-        z-index: 10;
-        user-select: none;
-      }
-
-      .temperature-drag-area:hover {
-        background: rgba(255, 255, 255, 0.1);
-      }
-
-      .temperature-drag-area .temperature {
-        pointer-events: none;
-      }
-
-      /* Pending Changes Banner */
-      .pending-changes-banner {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 16px;
-        padding: 12px 16px;
-        background-color: var(--warning-color, #ff9800);
-        color: white;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-
-      .pending-changes-info {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .pending-icon {
-        font-size: 18px;
-      }
-
-      .pending-text {
-        font-weight: 500;
-        font-size: 14px;
-      }
-
-      .pending-changes-actions {
-        display: flex;
-        gap: 8px;
-      }
-
-      .discard-btn,
-      .save-all-btn {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .discard-btn {
-        background-color: rgba(255, 255, 255, 0.2);
-        color: white;
-      }
-
-      .discard-btn:hover {
-        background-color: rgba(255, 255, 255, 0.3);
-      }
-
-      .save-all-btn {
-        background-color: var(--primary-color);
-        color: var(--text-primary-color);
-      }
-
-      .save-all-btn:hover {
-        background-color: var(--primary-color);
-        filter: brightness(1.1);
       }
 
       .hint {
@@ -3430,14 +2904,42 @@ export class HomematicScheduleCard extends LitElement {
       .dialog-content {
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 16px;
         padding: 16px;
         overflow-y: auto;
         max-height: calc(90vh - 200px);
       }
 
-      .dialog-week-overview {
-        flex-shrink: 0;
+      .weekday-tabs {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .weekday-tab {
+        padding: 8px 12px;
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
+        background-color: var(--card-background-color);
+        color: var(--primary-text-color);
+        font-size: 14px;
+        cursor: pointer;
+        transition:
+          background-color 0.2s,
+          border-color 0.2s;
+        min-width: 40px;
+        text-align: center;
+      }
+
+      .weekday-tab:hover {
+        background-color: var(--divider-color);
+      }
+
+      .weekday-tab.active {
+        background-color: var(--primary-color);
+        color: var(--text-primary-color, #fff);
+        border-color: var(--primary-color);
       }
 
       .dialog-editor {

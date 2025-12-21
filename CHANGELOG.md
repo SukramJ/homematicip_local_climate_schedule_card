@@ -14,12 +14,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed `simple_schedule_data` attribute from type definitions
 - Simplified codebase by removing dual-format handling (simple vs legacy)
 - Export now always uses version "2.0" format
+- Editor dialog now shows weekday selector tabs instead of graphical week overview
+- Weekday tabs allow quick switching between days while editing
+
+### Removed
+
+- Drag and drop functionality for adjusting time blocks and temperatures
+- Pending changes banner and batch save mode
+- Drag handles and temperature drag areas from schedule view
 
 ### Technical
 
 - Removed `_simpleScheduleData` property from card component
 - `_scheduleData` now uses `SimpleProfileData` type directly
 - Legacy format import still supported for backward compatibility with old export files
+- Removed drag-related state properties (`_isDragging`, `_isDragDropMode`, `_pendingChanges`, `_dragState`)
+- Removed drag-related methods (`_startDrag`, `_onDragMove`, `_endDrag`, `_savePendingChanges`, `_discardPendingChanges`)
+- Added `_switchToWeekday()` method for weekday tab navigation
+- Simplified time block rendering without drag handles
 
 ## [0.4.2] - 2025-11-18
 
