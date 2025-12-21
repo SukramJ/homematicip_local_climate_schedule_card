@@ -94,14 +94,16 @@ time_step_minutes: 15
 
 ### Viewing Schedules
 
-The card displays your week schedule with color-coded temperature blocks:
+The card displays your week schedule with color-coded temperature blocks aligned with Home Assistant 2025.12.x climate state colors:
 
-- 🔵 **Blue** (< 12°C): Very cold
-- 💙 **Light Blue** (12-16°C): Cool
-- 💚 **Green** (16-18°C): Mild
-- 🟠 **Orange** (18-20°C): Warm
-- 🟠 **Dark Orange** (20-22°C): Warmer
-- 🔴 **Red** (≥ 22°C): Hot
+- 🔵 **Blue** (< 10°C): Cold (HA Cool Blue)
+- 💙 **Light Blue** (10-14°C): Cool
+- 🩵 **Cyan** (14-17°C): Mild Cool
+- 💚 **Green** (17-19°C): Comfort Low
+- 🟢 **Light Green** (19-21°C): Comfort
+- 🟠 **Light Orange** (21-23°C): Warm
+- 🟠 **Orange** (23-25°C): Warmer (HA Heat Orange)
+- 🔴 **Deep Orange** (≥ 25°C): Hot
 
 Hover over any block to see the exact time range and temperature.
 

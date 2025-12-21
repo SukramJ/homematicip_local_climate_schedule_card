@@ -21,12 +21,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Warm temperatures use HA Heat Orange (#ff8100)
   - Improved gradient from blue → cyan → green → orange for better visual distinction
 - Fixed base temperature block detection in editor (compare only time boundaries, not temperature)
+- Increased time input field width in editor to prevent minutes being cut off (min-width: 100px)
 
 ### Removed
 
 - Drag and drop functionality for adjusting time blocks and temperatures
 - Pending changes banner and batch save mode
 - Drag handles and temperature drag areas from schedule view
+- Compact view mode and view toggle button
+- Compact view CSS styles and translations
+
+### Fixed
+
+- Current time indicator (red bar) no longer overlaps the edit dialog (reduced z-index from 100 to 10)
 
 ### Technical
 
@@ -37,6 +44,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed drag-related methods (`_startDrag`, `_onDragMove`, `_endDrag`, `_savePendingChanges`, `_discardPendingChanges`)
 - Added `_switchToWeekday()` method for weekday tab navigation
 - Simplified time block rendering without drag handles
+- Removed `_isCompactView` state property and `_toggleViewMode()` method
+- Removed compact view related translations (`toggleCompactView`, `toggleFullView`, `enableDragDrop`, `disableDragDrop`)
 
 ## [0.4.2] - 2025-11-18
 

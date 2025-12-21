@@ -101,8 +101,6 @@ describe("localization", () => {
       expect(translations.ui.redo).toBeDefined();
       expect(translations.ui.undoShortcut).toBeDefined();
       expect(translations.ui.redoShortcut).toBeDefined();
-      expect(translations.ui.toggleCompactView).toBeDefined();
-      expect(translations.ui.toggleFullView).toBeDefined();
       expect(translations.ui.exportSchedule).toBeDefined();
       expect(translations.ui.importSchedule).toBeDefined();
       expect(translations.ui.exportTooltip).toBeDefined();
@@ -112,8 +110,6 @@ describe("localization", () => {
       expect(translations.ui.unsavedChanges).toBeDefined();
       expect(translations.ui.saveAll).toBeDefined();
       expect(translations.ui.discard).toBeDefined();
-      expect(translations.ui.enableDragDrop).toBeDefined();
-      expect(translations.ui.disableDragDrop).toBeDefined();
       expect(translations.ui.confirmDiscardChanges).toBeDefined();
 
       // Check error messages

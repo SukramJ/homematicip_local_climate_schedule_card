@@ -32,8 +32,6 @@ export interface Translations {
     redo: string;
     undoShortcut: string;
     redoShortcut: string;
-    toggleCompactView: string;
-    toggleFullView: string;
     exportSchedule: string;
     importSchedule: string;
     exportTooltip: string;
@@ -43,8 +41,6 @@ export interface Translations {
     unsavedChanges: string;
     saveAll: string;
     discard: string;
-    enableDragDrop: string;
-    disableDragDrop: string;
     confirmDiscardChanges: string;
     from: string;
     to: string;
@@ -111,8 +107,6 @@ const en: Translations = {
     redo: "Redo",
     undoShortcut: "Undo (Ctrl+Z)",
     redoShortcut: "Redo (Ctrl+Y)",
-    toggleCompactView: "Compact view",
-    toggleFullView: "Full view",
     exportSchedule: "Export",
     importSchedule: "Import",
     exportTooltip: "Export schedule to JSON file",
@@ -122,8 +116,6 @@ const en: Translations = {
     unsavedChanges: "Unsaved changes",
     saveAll: "Save all",
     discard: "Discard",
-    enableDragDrop: "Enable drag & drop mode",
-    disableDragDrop: "Disable drag & drop mode",
     confirmDiscardChanges: "You have unsaved changes. Do you want to discard them?",
     from: "From",
     to: "To",
@@ -205,8 +197,6 @@ const de: Translations = {
     redo: "Wiederholen",
     undoShortcut: "Rückgängig (Strg+Z)",
     redoShortcut: "Wiederholen (Strg+Y)",
-    toggleCompactView: "Kompaktansicht",
-    toggleFullView: "Vollansicht",
     exportSchedule: "Exportieren",
     importSchedule: "Importieren",
     exportTooltip: "Zeitplan als JSON-Datei exportieren",
@@ -216,8 +206,6 @@ const de: Translations = {
     unsavedChanges: "Ungespeicherte Änderungen",
     saveAll: "Alle speichern",
     discard: "Verwerfen",
-    enableDragDrop: "Drag & Drop Modus aktivieren",
-    disableDragDrop: "Drag & Drop Modus deaktivieren",
     confirmDiscardChanges: "Sie haben ungespeicherte Änderungen. Möchten Sie diese verwerfen?",
     from: "Von",
     to: "Bis",

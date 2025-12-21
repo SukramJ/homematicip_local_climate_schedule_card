@@ -73,7 +73,6 @@ export class HomematicScheduleCard extends LitElement {
   private _historyIndex: number = -1;
   private _keyDownHandler: (e: KeyboardEvent) => void;
   @state() private _translations: Translations = getTranslations("en");
-  @state() private _isCompactView: boolean = false;
   @state() private _validationWarnings: ValidationMessage[] = [];
   private _parsedScheduleCache: WeakMap<WeekdayData, TimeBlock[]> = new WeakMap();
   private _weekdayShortLabelMap?: Record<Weekday, string>;
@@ -371,10 +370,6 @@ export class HomematicScheduleCard extends LitElement {
 
   private _canRedo(): boolean {
     return this._historyIndex < this._historyStack.length - 1;
-  }
-
-  private _toggleViewMode(): void {
-    this._isCompactView = !this._isCompactView;
   }
 
   protected shouldUpdate(changedProps: PropertyValues): boolean {
@@ -1084,15 +1079,6 @@ export class HomematicScheduleCard extends LitElement {
               `
             : ""}
           <button
-            class="view-toggle-btn"
-            @click=${this._toggleViewMode}
-            title="${this._isCompactView
-              ? this._translations.ui.toggleFullView
-              : this._translations.ui.toggleCompactView}"
-          >
-            ${this._isCompactView ? "⬜" : "▭"}
-          </button>
-          <button
             class="export-btn"
             @click=${this._exportSchedule}
             title="${this._translations.ui.exportTooltip}"
@@ -1132,7 +1118,7 @@ export class HomematicScheduleCard extends LitElement {
     if (!this._scheduleData) return html``;
 
     return html`
-      <div class="schedule-container ${this._isCompactView ? "compact" : ""}">
+      <div class="schedule-container">
         <!-- Time axis on the left -->
         <div class="time-axis">
           <div class="time-axis-header"></div>
@@ -1148,7 +1134,7 @@ export class HomematicScheduleCard extends LitElement {
         </div>
 
         <!-- Schedule grid -->
-        <div class="schedule-grid ${this._isCompactView ? "compact" : ""}">
+        <div class="schedule-grid">
           ${repeat(
             WEEKDAYS,
             (weekday) => weekday,
@@ -1856,22 +1842,6 @@ export class HomematicScheduleCard extends LitElement {
         font-size: 16px;
       }
 
-      .view-toggle-btn {
-        padding: 8px 12px;
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-        background-color: var(--card-background-color);
-        color: var(--primary-text-color);
-        font-size: 18px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        line-height: 1;
-      }
-
-      .view-toggle-btn:hover {
-        background-color: var(--divider-color);
-      }
-
       .export-btn,
       .import-btn {
         padding: 8px 12px;
@@ -1951,36 +1921,6 @@ export class HomematicScheduleCard extends LitElement {
         position: relative;
       }
 
-      /* Compact view styles */
-      .schedule-container.compact {
-        gap: 4px;
-      }
-
-      .schedule-grid.compact {
-        gap: 4px;
-      }
-
-      .schedule-grid.compact .weekday-column {
-        min-width: 50px;
-      }
-
-      .schedule-grid.compact .weekday-header {
-        padding: 2px 4px;
-        font-size: 11px;
-      }
-
-      .schedule-grid.compact .weekday-label {
-        font-size: 11px;
-      }
-
-      .schedule-grid.compact .weekday-actions {
-        display: none;
-      }
-
-      .schedule-grid.compact .temperature {
-        font-size: 10px;
-      }
-
       .current-time-indicator {
         position: absolute;
         left: 0;
@@ -1989,7 +1929,7 @@ export class HomematicScheduleCard extends LitElement {
         background-color: var(--error-color, #ff0000);
         border-top: 2px dashed var(--error-color, #ff0000);
         pointer-events: none;
-        z-index: 100;
+        z-index: 10;
         transform: translateY(-50%);
         box-shadow: 0 0 4px rgba(255, 0, 0, 0.5);
         will-change: top;
@@ -2621,7 +2561,6 @@ export class HomematicScheduleCard extends LitElement {
         }
 
         .profile-selector,
-        .view-toggle-btn,
         .export-btn,
         .import-btn {
           min-height: 44px;
@@ -2855,7 +2794,6 @@ export class HomematicScheduleCard extends LitElement {
         .add-btn:hover,
         .cancel-btn:hover,
         .save-btn:hover,
-        .view-toggle-btn:hover,
         .export-btn:hover,
         .import-btn:hover,
         .remove-btn:hover {
@@ -2874,7 +2812,6 @@ export class HomematicScheduleCard extends LitElement {
           background-color: var(--divider-color);
         }
 
-        .view-toggle-btn:active,
         .export-btn:active:not(:disabled),
         .import-btn:active {
           background-color: var(--divider-color);

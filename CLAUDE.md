@@ -1,12 +1,12 @@
 # CLAUDE.md - AI Development Guide
 
-This document provides comprehensive context for AI assistants working with the HomematicIP Local Climate Scheduler Card codebase.
+This document provides comprehensive context for AI assistants working with the HomematicIP Local Climate Schedule Card codebase.
 
 ## Project Overview
 
-**Name**: HomematicIP Local Climate Scheduler Card
+**Name**: HomematicIP Local Climate Schedule Card
 **Type**: Custom Lovelace Card for Home Assistant
-**Version**: 0.3.2
+**Version**: 0.4.3
 **License**: MIT
 **Primary Language**: TypeScript
 **Framework**: Lit (Web Components)
@@ -147,9 +147,9 @@ This card requires the **HomematicIP Local** integration:
 
 ### Service Calls Used
 
-1. **`homematicip_local.set_schedule_profile_weekday`**
-   - Updates schedule for a specific day
-   - Parameters: `entity_id`, `profile`, `weekday`, `schedule_data`
+1. **`homematicip_local.set_schedule_simple_weekday`**
+   - Updates schedule for a specific day using simple format
+   - Parameters: `entity_id`, `profile`, `weekday`, `base_temperature`, `periods`
 
 2. **`homematicip_local.set_schedule_active_profile`**
    - Switches active profile (P1, P2, P3, etc.)
@@ -159,9 +159,9 @@ This card requires the **HomematicIP Local** integration:
 
 Climate entities should expose:
 
-- `schedule_profiles`: Available profile names
-- `active_schedule_profile`: Currently active profile
-- `schedule_data`: Week schedule with time blocks per day
+- `available_profiles`: Available profile names
+- `active_profile`: Currently active profile
+- `schedule_data`: Week schedule with base temperature and time periods per day (v2.0.0+ format)
 
 ## Card Configuration
 
@@ -362,8 +362,8 @@ docs(readme): update installation instructions
 
 1. Update version in `package.json`
 2. Update `CHANGELOG.md`
-3. Create git tag: `git tag -a v0.3.2 -m "Release 0.3.2"`
-4. Push tag: `git push origin v0.3.2`
+3. Create git tag: `git tag -a v0.4.3 -m "Release 0.4.3"`
+4. Push tag: `git push origin v0.4.3`
 5. GitHub releases automatically built
 
 ## Useful Resources
