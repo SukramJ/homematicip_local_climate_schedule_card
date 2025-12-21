@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.3] - 2025-12-21
 
+### Added
+
+- Visual configuration editor using Home Assistant's `ha-form` component
+  - Configure card directly in the UI without YAML
+  - Entity picker with climate domain filter
+  - All card options configurable via form
+  - Consistent UI with standard Home Assistant cards
+- `getConfigElement()` and `getStubConfig()` static methods for editor support
+
 ### Changed
 
 - Schedule data is now read from `schedule_data` attribute instead of `simple_schedule_data`
