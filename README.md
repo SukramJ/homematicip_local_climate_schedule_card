@@ -11,10 +11,11 @@ A custom Lovelace card for Home Assistant to display and edit Homematic thermost
 
 - 📅 **Visual Week Schedule Display**: See your entire week at a glance with color-coded temperature blocks
 - ✏️ **Interactive Editor**: Click any day to edit schedule with intuitive time and temperature controls
-- 🎨 **Temperature Visualization**: Color-coded blocks (blue for cold, red for hot)
+- 🎨 **Temperature Visualization**: Color-coded blocks aligned with Home Assistant climate state colors
 - 🔄 **Profile Switching**: Easy dropdown to switch between different schedule profiles
 - 📱 **Responsive Design**: Works perfectly on desktop and mobile devices
-- 🌍 **Integration Ready**: Seamlessly works with HomematicIP Local integration
+- 🌍 **Integration Ready**: Seamlessly works with HomematicIP Local integration v2.0.0+
+- ⚙️ **Visual Configuration**: Configure the card directly in the UI - no YAML required
 
 ## Installation
 

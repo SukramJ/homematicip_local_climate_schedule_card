@@ -11,6 +11,7 @@ import {
   WeekdayData,
   SimpleProfileData,
 } from "./types";
+import "./editor";
 import {
   convertToBackendFormat,
   validateTimeBlocks,
@@ -49,6 +50,20 @@ const TIME_LABELS = (() => {
 
 @customElement("homematicip-local-climate-schedule-card")
 export class HomematicScheduleCard extends LitElement {
+  // Visual editor support
+  static getConfigElement() {
+    return document.createElement("homematicip-local-climate-schedule-card-editor");
+  }
+
+  static getStubConfig(hass: HomeAssistant) {
+    // Find first climate entity as suggestion
+    const entities = Object.keys(hass.states).filter((eid) => eid.startsWith("climate."));
+    return {
+      type: "custom:homematicip-local-climate-schedule-card",
+      entity: entities[0] || "",
+    };
+  }
+
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private _config?: HomematicScheduleCardConfig;
   @state() private _currentProfile?: string;
