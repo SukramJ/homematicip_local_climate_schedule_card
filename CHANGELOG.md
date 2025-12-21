@@ -33,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Current time indicator (red bar) no longer overlaps the edit dialog (reduced z-index from 100 to 10)
+- Current time indicator (red bar) is now hidden when the edit dialog is open
 
 ### Technical
 

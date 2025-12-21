@@ -1255,8 +1255,13 @@ export class HomematicScheduleCard extends LitElement {
             },
           )}
 
-          <!-- Current time indicator line -->
-          <div class="current-time-indicator" style="top: ${this._currentTimePercent}%"></div>
+          <!-- Current time indicator line (hidden when editor is open) -->
+          ${!this._editingWeekday
+            ? html`<div
+                class="current-time-indicator"
+                style="top: ${this._currentTimePercent}%"
+              ></div>`
+            : ""}
         </div>
       </div>
 
