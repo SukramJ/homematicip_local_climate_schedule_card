@@ -2367,7 +2367,7 @@ export class HomematicScheduleCard extends LitElement {
 
       .time-block-header {
         display: grid;
-        grid-template-columns: 70px 70px 90px 1fr 24px;
+        grid-template-columns: 100px 100px 90px 1fr 24px;
         gap: 8px;
         align-items: center;
         padding: 8px;
@@ -2384,7 +2384,7 @@ export class HomematicScheduleCard extends LitElement {
 
       .time-block-editor {
         display: grid;
-        grid-template-columns: 70px 70px 90px 1fr 24px;
+        grid-template-columns: 100px 100px 90px 1fr 24px;
         gap: 8px;
         align-items: center;
         padding: 8px;
@@ -2483,7 +2483,8 @@ export class HomematicScheduleCard extends LitElement {
       }
 
       .time-input {
-        max-width: 70px;
+        min-width: 100px;
+        max-width: 120px;
       }
 
       .temp-input {
