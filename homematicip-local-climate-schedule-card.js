@@ -82,34 +82,39 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
           </div>
         </div>
 
-        <!-- Schedule grid -->
+        <!-- Schedule grid with separate header and content rows -->
         <div class="schedule-grid">
-          ${bt(wt,t=>t,t=>{const e=this._getParsedBlocks(t),i=this._getBaseTemperature(t),s=zt(e,i),o=this._copiedSchedule?.weekday===t;return j`
-                <div class="weekday-column ${this._config?.editable?"editable":""}">
-                  <div class="weekday-header">
-                    <div class="weekday-label">${this._getWeekdayLabel(t,"short")}</div>
-                    ${this._config?.editable?j`
-                          <div class="weekday-actions">
-                            <button
-                              class="copy-btn ${o?"active":""}"
-                              @click=${e=>{e.stopPropagation(),this._copySchedule(t)}}
-                              title="${this._translations.ui.copySchedule}"
-                            >
-                              📋
-                            </button>
-                            <button
-                              class="paste-btn"
-                              @click=${e=>{e.stopPropagation(),this._pasteSchedule(t)}}
-                              title="${this._translations.ui.pasteSchedule}"
-                              ?disabled=${!this._copiedSchedule}
-                            >
-                              📄
-                            </button>
-                          </div>
-                        `:""}
-                  </div>
+          <!-- Header row -->
+          ${bt(wt,t=>`header-${t}`,t=>{const e=this._copiedSchedule?.weekday===t;return j`
+                <div class="weekday-header">
+                  <div class="weekday-label">${this._getWeekdayLabel(t,"short")}</div>
+                  ${this._config?.editable?j`
+                        <div class="weekday-actions">
+                          <button
+                            class="copy-btn ${e?"active":""}"
+                            @click=${e=>{e.stopPropagation(),this._copySchedule(t)}}
+                            title="${this._translations.ui.copySchedule}"
+                          >
+                            📋
+                          </button>
+                          <button
+                            class="paste-btn"
+                            @click=${e=>{e.stopPropagation(),this._pasteSchedule(t)}}
+                            title="${this._translations.ui.pasteSchedule}"
+                            ?disabled=${!this._copiedSchedule}
+                          >
+                            📄
+                          </button>
+                        </div>
+                      `:""}
+                </div>
+              `})}
+
+          <!-- Time blocks content wrapper (for correct indicator positioning) -->
+          <div class="schedule-content">
+            ${bt(wt,t=>t,t=>{const e=this._getParsedBlocks(t),i=this._getBaseTemperature(t),s=zt(e,i);return j`
                   <div
-                    class="time-blocks"
+                    class="time-blocks ${this._config?.editable?"editable":""}"
                     @click=${()=>this._config?.editable&&this._handleWeekdayClick(t)}
                   >
                     ${bt(s,t=>`${t.slot}-${t.startMinutes}`,(o,r)=>{const n=this._isBlockActive(t,o),a=o.temperature===i&&!e.some(t=>t.startMinutes===o.startMinutes&&t.endMinutes===o.endMinutes);let l;if(a)l="background-color: var(--secondary-background-color, #e0e0e0);";else if(this._config?.show_gradient){l=`background: ${function(t,e,i){const s=Bt(t);return null===e&&null===i?s:null!==e&&null===i?`linear-gradient(to bottom, ${Bt(e)}, ${s})`:null===e&&null!==i?`linear-gradient(to bottom, ${s}, ${Bt(i)})`:`linear-gradient(to bottom, ${Bt(e)}, ${s} 50%, ${Bt(i)})`}(o.temperature,r>0?s[r-1].temperature:null,r<s.length-1?s[r+1].temperature:null)};`}else l=`background-color: ${Bt(o.temperature)};`;return j`
@@ -135,14 +140,14 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
                           </div>
                         `})}
                   </div>
-                </div>
-              `})}
+                `})}
 
-          <!-- Current time indicator line (hidden when editor is open) -->
-          ${this._editingWeekday?"":j`<div
-                class="current-time-indicator"
-                style="top: ${this._currentTimePercent}%"
-              ></div>`}
+            <!-- Current time indicator line (hidden when editor is open) -->
+            ${this._editingWeekday?"":j`<div
+                  class="current-time-indicator"
+                  style="top: ${this._currentTimePercent}%"
+                ></div>`}
+          </div>
         </div>
       </div>
 
@@ -465,11 +470,20 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
       .schedule-grid {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
+        grid-template-rows: auto 1fr;
         gap: 8px;
         flex: 1;
         min-width: 0;
         overflow: visible;
+      }
+
+      .schedule-content {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
         position: relative;
+        min-height: 300px;
       }
 
       .current-time-indicator {
@@ -499,27 +513,6 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         box-shadow: 0 0 4px rgba(255, 0, 0, 0.7);
       }
 
-      .weekday-column {
-        display: flex;
-        flex-direction: column;
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-        overflow: visible;
-      }
-
-      .weekday-column.editable .time-blocks {
-        cursor: pointer;
-      }
-
-      .weekday-column.editable {
-        will-change: transform, box-shadow;
-      }
-
-      .weekday-column.editable:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      }
-
       .weekday-header {
         padding: 4px 8px;
         display: flex;
@@ -528,6 +521,8 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         gap: 4px;
         background-color: var(--primary-color);
         color: var(--text-primary-color);
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
       }
 
       .weekday-label {
@@ -586,6 +581,18 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         flex-direction: column;
         position: relative;
         overflow: visible;
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
+      }
+
+      .time-blocks.editable {
+        cursor: pointer;
+        will-change: transform, box-shadow;
+      }
+
+      .time-blocks.editable:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
 
       .time-block {

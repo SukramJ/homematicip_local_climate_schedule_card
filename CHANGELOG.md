@@ -14,11 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Calls `reload_channel_config` service 5 seconds after save (CONFIG_PENDING doesn't work for BidCos-RF)
   - Extracts `device_address` and `channel_no` from entity `address` attribute
 
+### Fixed
+
+- Current time indicator (red line) now correctly aligns with the time axis
+  - Previously the indicator was offset by the header height
+  - Restructured schedule grid to separate headers from content area
+
 ### Technical
 
 - Added `interface_id` and `address` to `ScheduleEntityAttributes` type
 - Added `_isBidCosRF()` helper method to detect BidCos-RF devices
 - Added `_scheduleReloadChannelConfig()` method to trigger delayed reload
+- Restructured schedule grid HTML/CSS: headers in row 1, content wrapper with indicator in row 2
 
 ## [0.4.3] - 2025-12-21
 

@@ -1212,55 +1212,65 @@ export class HomematicScheduleCard extends LitElement {
           </div>
         </div>
 
-        <!-- Schedule grid -->
+        <!-- Schedule grid with separate header and content rows -->
         <div class="schedule-grid">
+          <!-- Header row -->
           ${repeat(
             WEEKDAYS,
-            (weekday) => weekday,
+            (weekday) => `header-${weekday}`,
             (weekday) => {
-              // Try to get blocks from either simple or legacy schedule
-              const rawBlocks = this._getParsedBlocks(weekday);
-              const baseTemp = this._getBaseTemperature(weekday);
-
-              // Fill gaps with base temperature to get complete day coverage
-              const blocks = fillGapsWithBaseTemperature(rawBlocks, baseTemp);
-
               const isCopiedSource = this._copiedSchedule?.weekday === weekday;
-
               return html`
-                <div class="weekday-column ${this._config?.editable ? "editable" : ""}">
-                  <div class="weekday-header">
-                    <div class="weekday-label">${this._getWeekdayLabel(weekday, "short")}</div>
-                    ${this._config?.editable
-                      ? html`
-                          <div class="weekday-actions">
-                            <button
-                              class="copy-btn ${isCopiedSource ? "active" : ""}"
-                              @click=${(e: Event) => {
-                                e.stopPropagation();
-                                this._copySchedule(weekday);
-                              }}
-                              title="${this._translations.ui.copySchedule}"
-                            >
-                              📋
-                            </button>
-                            <button
-                              class="paste-btn"
-                              @click=${(e: Event) => {
-                                e.stopPropagation();
-                                this._pasteSchedule(weekday);
-                              }}
-                              title="${this._translations.ui.pasteSchedule}"
-                              ?disabled=${!this._copiedSchedule}
-                            >
-                              📄
-                            </button>
-                          </div>
-                        `
-                      : ""}
-                  </div>
+                <div class="weekday-header">
+                  <div class="weekday-label">${this._getWeekdayLabel(weekday, "short")}</div>
+                  ${this._config?.editable
+                    ? html`
+                        <div class="weekday-actions">
+                          <button
+                            class="copy-btn ${isCopiedSource ? "active" : ""}"
+                            @click=${(e: Event) => {
+                              e.stopPropagation();
+                              this._copySchedule(weekday);
+                            }}
+                            title="${this._translations.ui.copySchedule}"
+                          >
+                            📋
+                          </button>
+                          <button
+                            class="paste-btn"
+                            @click=${(e: Event) => {
+                              e.stopPropagation();
+                              this._pasteSchedule(weekday);
+                            }}
+                            title="${this._translations.ui.pasteSchedule}"
+                            ?disabled=${!this._copiedSchedule}
+                          >
+                            📄
+                          </button>
+                        </div>
+                      `
+                    : ""}
+                </div>
+              `;
+            },
+          )}
+
+          <!-- Time blocks content wrapper (for correct indicator positioning) -->
+          <div class="schedule-content">
+            ${repeat(
+              WEEKDAYS,
+              (weekday) => weekday,
+              (weekday) => {
+                // Try to get blocks from either simple or legacy schedule
+                const rawBlocks = this._getParsedBlocks(weekday);
+                const baseTemp = this._getBaseTemperature(weekday);
+
+                // Fill gaps with base temperature to get complete day coverage
+                const blocks = fillGapsWithBaseTemperature(rawBlocks, baseTemp);
+
+                return html`
                   <div
-                    class="time-blocks"
+                    class="time-blocks ${this._config?.editable ? "editable" : ""}"
                     @click=${() => this._config?.editable && this._handleWeekdayClick(weekday)}
                   >
                     ${repeat(
@@ -1332,18 +1342,18 @@ export class HomematicScheduleCard extends LitElement {
                       },
                     )}
                   </div>
-                </div>
-              `;
-            },
-          )}
+                `;
+              },
+            )}
 
-          <!-- Current time indicator line (hidden when editor is open) -->
-          ${!this._editingWeekday
-            ? html`<div
-                class="current-time-indicator"
-                style="top: ${this._currentTimePercent}%"
-              ></div>`
-            : ""}
+            <!-- Current time indicator line (hidden when editor is open) -->
+            ${!this._editingWeekday
+              ? html`<div
+                  class="current-time-indicator"
+                  style="top: ${this._currentTimePercent}%"
+                ></div>`
+              : ""}
+          </div>
         </div>
       </div>
 
@@ -1999,11 +2009,20 @@ export class HomematicScheduleCard extends LitElement {
       .schedule-grid {
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
+        grid-template-rows: auto 1fr;
         gap: 8px;
         flex: 1;
         min-width: 0;
         overflow: visible;
+      }
+
+      .schedule-content {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+        gap: 8px;
         position: relative;
+        min-height: 300px;
       }
 
       .current-time-indicator {
@@ -2033,27 +2052,6 @@ export class HomematicScheduleCard extends LitElement {
         box-shadow: 0 0 4px rgba(255, 0, 0, 0.7);
       }
 
-      .weekday-column {
-        display: flex;
-        flex-direction: column;
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-        overflow: visible;
-      }
-
-      .weekday-column.editable .time-blocks {
-        cursor: pointer;
-      }
-
-      .weekday-column.editable {
-        will-change: transform, box-shadow;
-      }
-
-      .weekday-column.editable:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      }
-
       .weekday-header {
         padding: 4px 8px;
         display: flex;
@@ -2062,6 +2060,8 @@ export class HomematicScheduleCard extends LitElement {
         gap: 4px;
         background-color: var(--primary-color);
         color: var(--text-primary-color);
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
       }
 
       .weekday-label {
@@ -2120,6 +2120,18 @@ export class HomematicScheduleCard extends LitElement {
         flex-direction: column;
         position: relative;
         overflow: visible;
+        border: 1px solid var(--divider-color);
+        border-radius: 4px;
+      }
+
+      .time-blocks.editable {
+        cursor: pointer;
+        will-change: transform, box-shadow;
+      }
+
+      .time-blocks.editable:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
 
       .time-block {
