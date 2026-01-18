@@ -1198,162 +1198,158 @@ export class HomematicScheduleCard extends LitElement {
 
     return html`
       <div class="schedule-container">
-        <!-- Time axis on the left -->
-        <div class="time-axis">
-          <div class="time-axis-header"></div>
-          <div class="time-axis-labels">
-            ${repeat(
-              this._getTimeLabels(),
-              (time) => time.hour,
-              (time) => html`
-                <div class="time-label" style="top: ${time.position}%">${time.label}</div>
-              `,
-            )}
-          </div>
+        <!-- Empty cell for time-axis header alignment -->
+        <div class="time-axis-header"></div>
+
+        <!-- Weekday headers -->
+        ${repeat(
+          WEEKDAYS,
+          (weekday) => `header-${weekday}`,
+          (weekday) => {
+            const isCopiedSource = this._copiedSchedule?.weekday === weekday;
+            return html`
+              <div class="weekday-header">
+                <div class="weekday-label">${this._getWeekdayLabel(weekday, "short")}</div>
+                ${this._config?.editable
+                  ? html`
+                      <div class="weekday-actions">
+                        <button
+                          class="copy-btn ${isCopiedSource ? "active" : ""}"
+                          @click=${(e: Event) => {
+                            e.stopPropagation();
+                            this._copySchedule(weekday);
+                          }}
+                          title="${this._translations.ui.copySchedule}"
+                        >
+                          📋
+                        </button>
+                        <button
+                          class="paste-btn"
+                          @click=${(e: Event) => {
+                            e.stopPropagation();
+                            this._pasteSchedule(weekday);
+                          }}
+                          title="${this._translations.ui.pasteSchedule}"
+                          ?disabled=${!this._copiedSchedule}
+                        >
+                          📄
+                        </button>
+                      </div>
+                    `
+                  : ""}
+              </div>
+            `;
+          },
+        )}
+
+        <!-- Time axis labels -->
+        <div class="time-axis-labels">
+          ${repeat(
+            this._getTimeLabels(),
+            (time) => time.hour,
+            (time) => html`
+              <div class="time-label" style="top: ${time.position}%">${time.label}</div>
+            `,
+          )}
         </div>
 
-        <!-- Schedule grid with separate header and content rows -->
-        <div class="schedule-grid">
-          <!-- Header row -->
+        <!-- Time blocks content wrapper (for correct indicator positioning) -->
+        <div class="schedule-content">
           ${repeat(
             WEEKDAYS,
-            (weekday) => `header-${weekday}`,
+            (weekday) => weekday,
             (weekday) => {
-              const isCopiedSource = this._copiedSchedule?.weekday === weekday;
+              // Try to get blocks from either simple or legacy schedule
+              const rawBlocks = this._getParsedBlocks(weekday);
+              const baseTemp = this._getBaseTemperature(weekday);
+
+              // Fill gaps with base temperature to get complete day coverage
+              const blocks = fillGapsWithBaseTemperature(rawBlocks, baseTemp);
+
               return html`
-                <div class="weekday-header">
-                  <div class="weekday-label">${this._getWeekdayLabel(weekday, "short")}</div>
-                  ${this._config?.editable
-                    ? html`
-                        <div class="weekday-actions">
-                          <button
-                            class="copy-btn ${isCopiedSource ? "active" : ""}"
-                            @click=${(e: Event) => {
-                              e.stopPropagation();
-                              this._copySchedule(weekday);
-                            }}
-                            title="${this._translations.ui.copySchedule}"
-                          >
-                            📋
-                          </button>
-                          <button
-                            class="paste-btn"
-                            @click=${(e: Event) => {
-                              e.stopPropagation();
-                              this._pasteSchedule(weekday);
-                            }}
-                            title="${this._translations.ui.pasteSchedule}"
-                            ?disabled=${!this._copiedSchedule}
-                          >
-                            📄
-                          </button>
+                <div
+                  class="time-blocks ${this._config?.editable ? "editable" : ""}"
+                  @click=${() => this._config?.editable && this._handleWeekdayClick(weekday)}
+                >
+                  ${repeat(
+                    blocks,
+                    (block) => `${block.slot}-${block.startMinutes}`,
+                    (block, blockIndex) => {
+                      const isActive = this._isBlockActive(weekday, block);
+
+                      // Check if this is a base temperature block (not in raw blocks)
+                      const isBaseTempBlock =
+                        block.temperature === baseTemp &&
+                        !rawBlocks.some(
+                          (b) =>
+                            b.startMinutes === block.startMinutes &&
+                            b.endMinutes === block.endMinutes,
+                        );
+
+                      // Determine background style based on gradient config
+                      let backgroundStyle: string;
+                      if (isBaseTempBlock) {
+                        // Base temperature blocks get a light gray background
+                        backgroundStyle = `background-color: var(--secondary-background-color, #e0e0e0);`;
+                      } else if (this._config?.show_gradient) {
+                        const prevTemp = blockIndex > 0 ? blocks[blockIndex - 1].temperature : null;
+                        const nextTemp =
+                          blockIndex < blocks.length - 1
+                            ? blocks[blockIndex + 1].temperature
+                            : null;
+                        const gradient = getTemperatureGradient(
+                          block.temperature,
+                          prevTemp,
+                          nextTemp,
+                        );
+                        backgroundStyle = `background: ${gradient};`;
+                      } else {
+                        backgroundStyle = `background-color: ${getTemperatureColor(block.temperature)};`;
+                      }
+
+                      return html`
+                        <div
+                          class="time-block ${isActive ? "active" : ""} ${isBaseTempBlock
+                            ? "base-temp-block"
+                            : ""}"
+                          style="
+                              height: ${((block.endMinutes - block.startMinutes) / 1440) * 100}%;
+                              ${backgroundStyle}
+                            "
+                        >
+                          ${this._config?.show_temperature
+                            ? html`<span class="temperature"
+                                >${block.temperature.toFixed(1)}°</span
+                              >`
+                            : ""}
+                          <div class="time-block-tooltip">
+                            <div class="tooltip-time">
+                              ${this._formatTimeDisplay(block.startTime)} -
+                              ${this._formatTimeDisplay(block.endTime)}
+                            </div>
+                            <div class="tooltip-temp">
+                              ${formatTemperature(
+                                block.temperature,
+                                this._config?.temperature_unit,
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      `
-                    : ""}
+                      `;
+                    },
+                  )}
                 </div>
               `;
             },
           )}
 
-          <!-- Time blocks content wrapper (for correct indicator positioning) -->
-          <div class="schedule-content">
-            ${repeat(
-              WEEKDAYS,
-              (weekday) => weekday,
-              (weekday) => {
-                // Try to get blocks from either simple or legacy schedule
-                const rawBlocks = this._getParsedBlocks(weekday);
-                const baseTemp = this._getBaseTemperature(weekday);
-
-                // Fill gaps with base temperature to get complete day coverage
-                const blocks = fillGapsWithBaseTemperature(rawBlocks, baseTemp);
-
-                return html`
-                  <div
-                    class="time-blocks ${this._config?.editable ? "editable" : ""}"
-                    @click=${() => this._config?.editable && this._handleWeekdayClick(weekday)}
-                  >
-                    ${repeat(
-                      blocks,
-                      (block) => `${block.slot}-${block.startMinutes}`,
-                      (block, blockIndex) => {
-                        const isActive = this._isBlockActive(weekday, block);
-
-                        // Check if this is a base temperature block (not in raw blocks)
-                        const isBaseTempBlock =
-                          block.temperature === baseTemp &&
-                          !rawBlocks.some(
-                            (b) =>
-                              b.startMinutes === block.startMinutes &&
-                              b.endMinutes === block.endMinutes,
-                          );
-
-                        // Determine background style based on gradient config
-                        let backgroundStyle: string;
-                        if (isBaseTempBlock) {
-                          // Base temperature blocks get a light gray background
-                          backgroundStyle = `background-color: var(--secondary-background-color, #e0e0e0);`;
-                        } else if (this._config?.show_gradient) {
-                          const prevTemp =
-                            blockIndex > 0 ? blocks[blockIndex - 1].temperature : null;
-                          const nextTemp =
-                            blockIndex < blocks.length - 1
-                              ? blocks[blockIndex + 1].temperature
-                              : null;
-                          const gradient = getTemperatureGradient(
-                            block.temperature,
-                            prevTemp,
-                            nextTemp,
-                          );
-                          backgroundStyle = `background: ${gradient};`;
-                        } else {
-                          backgroundStyle = `background-color: ${getTemperatureColor(block.temperature)};`;
-                        }
-
-                        return html`
-                          <div
-                            class="time-block ${isActive ? "active" : ""} ${isBaseTempBlock
-                              ? "base-temp-block"
-                              : ""}"
-                            style="
-                              height: ${((block.endMinutes - block.startMinutes) / 1440) * 100}%;
-                              ${backgroundStyle}
-                            "
-                          >
-                            ${this._config?.show_temperature
-                              ? html`<span class="temperature"
-                                  >${block.temperature.toFixed(1)}°</span
-                                >`
-                              : ""}
-                            <div class="time-block-tooltip">
-                              <div class="tooltip-time">
-                                ${this._formatTimeDisplay(block.startTime)} -
-                                ${this._formatTimeDisplay(block.endTime)}
-                              </div>
-                              <div class="tooltip-temp">
-                                ${formatTemperature(
-                                  block.temperature,
-                                  this._config?.temperature_unit,
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        `;
-                      },
-                    )}
-                  </div>
-                `;
-              },
-            )}
-
-            <!-- Current time indicator line (hidden when editor is open) -->
-            ${!this._editingWeekday
-              ? html`<div
-                  class="current-time-indicator"
-                  style="top: ${this._currentTimePercent}%"
-                ></div>`
-              : ""}
-          </div>
+          <!-- Current time indicator line (hidden when editor is open) -->
+          ${!this._editingWeekday
+            ? html`<div
+                class="current-time-indicator"
+                style="top: ${this._currentTimePercent}%"
+              ></div>`
+            : ""}
         </div>
       </div>
 
@@ -1969,7 +1965,9 @@ export class HomematicScheduleCard extends LitElement {
       }
 
       .schedule-container {
-        display: flex;
+        display: grid;
+        grid-template-columns: auto repeat(7, minmax(0, 1fr));
+        grid-template-rows: auto 1fr;
         gap: 8px;
         min-height: 400px;
         overflow-x: auto;
@@ -1978,23 +1976,14 @@ export class HomematicScheduleCard extends LitElement {
         box-sizing: border-box;
       }
 
-      /* Time axis on the left */
-      .time-axis {
-        display: flex;
-        flex-direction: column;
-        min-width: 50px;
-        flex-shrink: 0;
-      }
-
       .time-axis-header {
-        height: 36px;
-        flex-shrink: 0;
+        /* Empty cell in row 1, col 1 - height matches weekday headers */
       }
 
       .time-axis-labels {
         position: relative;
-        flex: 1;
         border-right: 2px solid var(--divider-color);
+        min-width: 50px;
       }
 
       .time-label {
@@ -2006,18 +1995,8 @@ export class HomematicScheduleCard extends LitElement {
         white-space: nowrap;
       }
 
-      .schedule-grid {
-        display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        grid-template-rows: auto 1fr;
-        gap: 8px;
-        flex: 1;
-        min-width: 0;
-        overflow: visible;
-      }
-
       .schedule-content {
-        grid-column: 1 / -1;
+        grid-column: 2 / -1;
         display: grid;
         grid-template-columns: repeat(7, minmax(0, 1fr));
         gap: 8px;
@@ -2670,7 +2649,7 @@ export class HomematicScheduleCard extends LitElement {
           min-height: 350px;
         }
 
-        .time-axis {
+        .time-axis-labels {
           min-width: 40px;
         }
 
@@ -2679,7 +2658,7 @@ export class HomematicScheduleCard extends LitElement {
           right: 4px;
         }
 
-        .schedule-grid {
+        .schedule-content {
           gap: 4px;
         }
 
@@ -2809,7 +2788,7 @@ export class HomematicScheduleCard extends LitElement {
           min-height: 300px;
         }
 
-        .time-axis {
+        .time-axis-labels {
           min-width: 35px;
         }
 
@@ -2818,7 +2797,7 @@ export class HomematicScheduleCard extends LitElement {
           right: 2px;
         }
 
-        .schedule-grid {
+        .schedule-content {
           gap: 2px;
         }
 
