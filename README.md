@@ -17,15 +17,6 @@ A custom Lovelace card for Home Assistant to display and edit Homematic thermost
 - 🌍 **Integration Ready**: Seamlessly works with HomematicIP Local integration v2.0.0+
 - ⚙️ **Visual Configuration**: Configure the card directly in the UI - no YAML required
 
-## Tested with
-
-- HmIP-BWTH
-- HmIP-eTRV-2
-
-Should work with other HmIP devices too
-
-Users reported it is not working with classic HM thermostats
-
 ## Installation
 
 ### HACS (Recommended)
