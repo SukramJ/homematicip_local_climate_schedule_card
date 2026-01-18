@@ -110,42 +110,42 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
 
         <!-- Time blocks content wrapper (for correct indicator positioning) -->
         <div class="schedule-content">
-            ${vt(wt,t=>t,t=>{const e=this._getParsedBlocks(t),i=this._getBaseTemperature(t),s=Wt(e,i);return j`
-                  <div
-                    class="time-blocks ${this._config?.editable?"editable":""}"
-                    @click=${()=>this._config?.editable&&this._handleWeekdayClick(t)}
-                  >
-                    ${vt(s,t=>`${t.slot}-${t.startMinutes}`,(o,r)=>{const n=this._isBlockActive(t,o),a=o.temperature===i&&!e.some(t=>t.startMinutes===o.startMinutes&&t.endMinutes===o.endMinutes);let l;if(a)l="background-color: var(--secondary-background-color, #e0e0e0);";else if(this._config?.show_gradient){l=`background: ${function(t,e,i){const s=Bt(t);return null===e&&null===i?s:null!==e&&null===i?`linear-gradient(to bottom, ${Bt(e)}, ${s})`:null===e&&null!==i?`linear-gradient(to bottom, ${s}, ${Bt(i)})`:`linear-gradient(to bottom, ${Bt(e)}, ${s} 50%, ${Bt(i)})`}(o.temperature,r>0?s[r-1].temperature:null,r<s.length-1?s[r+1].temperature:null)};`}else l=`background-color: ${Bt(o.temperature)};`;return j`
-                          <div
-                            class="time-block ${n?"active":""} ${a?"base-temp-block":""}"
-                            style="
+          ${vt(wt,t=>t,t=>{const e=this._getParsedBlocks(t),i=this._getBaseTemperature(t),s=Wt(e,i);return j`
+                <div
+                  class="time-blocks ${this._config?.editable?"editable":""}"
+                  @click=${()=>this._config?.editable&&this._handleWeekdayClick(t)}
+                >
+                  ${vt(s,t=>`${t.slot}-${t.startMinutes}`,(o,r)=>{const n=this._isBlockActive(t,o),a=o.temperature===i&&!e.some(t=>t.startMinutes===o.startMinutes&&t.endMinutes===o.endMinutes);let l;if(a)l="background-color: var(--secondary-background-color, #e0e0e0);";else if(this._config?.show_gradient){l=`background: ${function(t,e,i){const s=Bt(t);return null===e&&null===i?s:null!==e&&null===i?`linear-gradient(to bottom, ${Bt(e)}, ${s})`:null===e&&null!==i?`linear-gradient(to bottom, ${s}, ${Bt(i)})`:`linear-gradient(to bottom, ${Bt(e)}, ${s} 50%, ${Bt(i)})`}(o.temperature,r>0?s[r-1].temperature:null,r<s.length-1?s[r+1].temperature:null)};`}else l=`background-color: ${Bt(o.temperature)};`;return j`
+                        <div
+                          class="time-block ${n?"active":""} ${a?"base-temp-block":""}"
+                          style="
                               height: ${(o.endMinutes-o.startMinutes)/1440*100}%;
                               ${l}
                             "
-                          >
-                            ${this._config?.show_temperature?j`<span class="temperature"
-                                  >${o.temperature.toFixed(1)}°</span
-                                >`:""}
-                            <div class="time-block-tooltip">
-                              <div class="tooltip-time">
-                                ${this._formatTimeDisplay(o.startTime)} -
-                                ${this._formatTimeDisplay(o.endTime)}
-                              </div>
-                              <div class="tooltip-temp">
-                                ${function(t,e="°C"){return`${t.toFixed(1)}${e}`}(o.temperature,this._config?.temperature_unit)}
-                              </div>
+                        >
+                          ${this._config?.show_temperature?j`<span class="temperature"
+                                >${o.temperature.toFixed(1)}°</span
+                              >`:""}
+                          <div class="time-block-tooltip">
+                            <div class="tooltip-time">
+                              ${this._formatTimeDisplay(o.startTime)} -
+                              ${this._formatTimeDisplay(o.endTime)}
+                            </div>
+                            <div class="tooltip-temp">
+                              ${function(t,e="°C"){return`${t.toFixed(1)}${e}`}(o.temperature,this._config?.temperature_unit)}
                             </div>
                           </div>
-                        `})}
-                  </div>
-                `})}
+                        </div>
+                      `})}
+                </div>
+              `})}
 
-            <!-- Current time indicator line (hidden when editor is open) -->
-            ${this._editingWeekday?"":j`<div
-                  class="current-time-indicator"
-                  style="top: ${this._currentTimePercent}%"
-                ></div>`}
-          </div>
+          <!-- Current time indicator line (hidden when editor is open) -->
+          ${this._editingWeekday?"":j`<div
+                class="current-time-indicator"
+                style="top: ${this._currentTimePercent}%"
+              ></div>`}
+        </div>
       </div>
 
       ${this._config?.editable?j`<div class="hint">${this._translations.ui.clickToEdit}</div>`:""}
