@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-01-18
+
+### Added
+
+- BidCos-RF device support: Automatic reload of channel configuration after schedule changes
+  - Detects BidCos-RF devices via `interface_id` attribute (ends with "BidCos-RF")
+  - Calls `reload_channel_config` service 5 seconds after save (CONFIG_PENDING doesn't work for BidCos-RF)
+  - Extracts `device_address` and `channel_no` from entity `address` attribute
+
+### Technical
+
+- Added `interface_id` and `address` to `ScheduleEntityAttributes` type
+- Added `_isBidCosRF()` helper method to detect BidCos-RF devices
+- Added `_scheduleReloadChannelConfig()` method to trigger delayed reload
+
 ## [0.4.3] - 2025-12-21
 
 ### Added
@@ -376,7 +391,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.3...HEAD
+[Unreleased]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.5.0...HEAD
+[0.5.0]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.3...0.5.0
 [0.4.3]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.2...0.4.3
 [0.4.2]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.1...0.4.2
 [0.4.1]: https://github.com/YOUR_USERNAME/homematicip_local_climate_schedule_card/compare/0.4.0...0.4.1

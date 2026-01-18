@@ -72,6 +72,8 @@ export interface ScheduleEntityAttributes {
   min_temp?: number;
   max_temp?: number;
   target_temp_step?: number;
+  interface_id?: string;
+  address?: string;
 }
 
 export interface HassEntity {
