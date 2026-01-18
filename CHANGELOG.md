@@ -9,10 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- BidCos-RF device support: Automatic reload of channel configuration after schedule changes
-  - Detects BidCos-RF devices via `interface_id` attribute (ends with "BidCos-RF")
-  - Calls `reload_channel_config` service 5 seconds after save (CONFIG_PENDING doesn't work for BidCos-RF)
-  - Extracts `device_address` and `channel_no` from entity `address` attribute
+- Automatic reload of device configuration after schedule changes
+  - Supports BidCos-RF, BidCos-Wired, and VirtualDevices interfaces
+  - Calls `reload_device_config` service 5 seconds after save (CONFIG_PENDING doesn't work reliably)
+  - Extracts `device_address` from entity `address` attribute
 
 ### Fixed
 
@@ -23,8 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Technical
 
 - Added `interface_id` and `address` to `ScheduleEntityAttributes` type
-- Added `_isBidCosRF()` helper method to detect BidCos-RF devices
-- Added `_scheduleReloadChannelConfig()` method to trigger delayed reload
+- Added `_needsManualReload()` helper method to detect devices requiring manual reload
+- Added `_scheduleReloadDeviceConfig()` method to trigger delayed reload
 - Restructured schedule grid HTML/CSS: headers in row 1, content wrapper with indicator in row 2
 
 ## [0.4.3] - 2025-12-21

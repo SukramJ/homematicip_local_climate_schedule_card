@@ -238,11 +238,16 @@ export class HomematicScheduleCard extends LitElement {
     return entities[0];
   }
 
-  private _isBidCosRF(entityId?: string): boolean {
+  private _needsManualReload(entityId?: string): boolean {
     if (!entityId || !this.hass) return false;
     const entity = this.hass.states[entityId];
     if (!entity?.attributes?.interface_id) return false;
-    return entity.attributes.interface_id.endsWith("BidCos-RF");
+    const interfaceId = entity.attributes.interface_id;
+    return (
+      interfaceId.endsWith("BidCos-RF") ||
+      interfaceId.endsWith("BidCos-Wired") ||
+      interfaceId.endsWith("VirtualDevices")
+    );
   }
 
   private _scheduleReloadDeviceConfig(entityId: string): void {
@@ -700,7 +705,7 @@ export class HomematicScheduleCard extends LitElement {
       this._closeEditor();
 
       // For BidCos-RF devices, schedule reload after delay (CONFIG_PENDING doesn't work)
-      if (this._isBidCosRF(entityId)) {
+      if (this._needsManualReload(entityId)) {
         this._scheduleReloadDeviceConfig(entityId);
       }
     } catch (err) {
@@ -806,7 +811,7 @@ export class HomematicScheduleCard extends LitElement {
       console.info(`Pasted schedule to ${weekday}`);
 
       // For BidCos-RF devices, schedule reload after delay (CONFIG_PENDING doesn't work)
-      if (this._isBidCosRF(entityId)) {
+      if (this._needsManualReload(entityId)) {
         this._scheduleReloadDeviceConfig(entityId);
       }
     } catch (err) {
@@ -995,7 +1000,7 @@ export class HomematicScheduleCard extends LitElement {
           alert(this._translations.ui.importSuccess);
 
           // For BidCos-RF devices, schedule reload after delay (CONFIG_PENDING doesn't work)
-          if (this._isBidCosRF(entityId)) {
+          if (this._needsManualReload(entityId)) {
             this._scheduleReloadDeviceConfig(entityId);
           }
         } catch (err) {
