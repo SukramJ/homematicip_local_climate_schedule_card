@@ -245,39 +245,33 @@ export class HomematicScheduleCard extends LitElement {
     return entity.attributes.interface_id.endsWith("BidCos-RF");
   }
 
-  private _scheduleReloadChannelConfig(entityId: string): void {
+  private _scheduleReloadDeviceConfig(entityId: string): void {
     if (!this.hass) return;
     const entity = this.hass.states[entityId];
     const address = entity?.attributes?.address;
     if (!address) {
-      console.warn("Cannot reload channel config: address attribute missing");
+      console.warn("Cannot reload device config: address attribute missing");
       return;
     }
 
     // Parse address format: "device_address:channel_no" (e.g., "000C9709AEF157:1")
     const parts = address.split(":");
     if (parts.length !== 2) {
-      console.warn("Cannot reload channel config: invalid address format", address);
+      console.warn("Cannot reload device config: invalid address format", address);
       return;
     }
 
-    const [deviceAddress, channelNo] = parts;
-    const channelNumber = parseInt(channelNo, 10);
-    if (isNaN(channelNumber)) {
-      console.warn("Cannot reload channel config: invalid channel number", channelNo);
-      return;
-    }
+    const [deviceAddress] = parts;
 
     // Schedule reload after 5 seconds delay
     setTimeout(async () => {
       try {
-        await this.hass.callService("homematicip_local", "reload_channel_config", {
+        await this.hass.callService("homematicip_local", "reload_device_config", {
           device_address: deviceAddress,
-          channel_no: channelNumber,
         });
-        console.info("Reloaded channel config for BidCos-RF device:", deviceAddress, channelNumber);
+        console.info("Reloaded device config for BidCos-RF device:", deviceAddress);
       } catch (err) {
-        console.error("Failed to reload channel config:", err);
+        console.error("Failed to reload device config:", err);
       }
     }, 5000);
   }
@@ -707,7 +701,7 @@ export class HomematicScheduleCard extends LitElement {
 
       // For BidCos-RF devices, schedule reload after delay (CONFIG_PENDING doesn't work)
       if (this._isBidCosRF(entityId)) {
-        this._scheduleReloadChannelConfig(entityId);
+        this._scheduleReloadDeviceConfig(entityId);
       }
     } catch (err) {
       console.error("Failed to save schedule:", err);
@@ -813,7 +807,7 @@ export class HomematicScheduleCard extends LitElement {
 
       // For BidCos-RF devices, schedule reload after delay (CONFIG_PENDING doesn't work)
       if (this._isBidCosRF(entityId)) {
-        this._scheduleReloadChannelConfig(entityId);
+        this._scheduleReloadDeviceConfig(entityId);
       }
     } catch (err) {
       console.error("Failed to paste schedule:", err);
@@ -1002,7 +996,7 @@ export class HomematicScheduleCard extends LitElement {
 
           // For BidCos-RF devices, schedule reload after delay (CONFIG_PENDING doesn't work)
           if (this._isBidCosRF(entityId)) {
-            this._scheduleReloadChannelConfig(entityId);
+            this._scheduleReloadDeviceConfig(entityId);
           }
         } catch (err) {
           console.error("Failed to import schedule:", err);
