@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.5.0] - 2026-01-30
+## [0.6.0] - 2026-01-30
 
 ### Added
 
@@ -26,6 +26,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `_needsManualReload()` helper method to detect devices requiring manual reload
 - Added `_scheduleReloadDeviceConfig()` method to trigger delayed reload
 - Restructured schedule grid HTML/CSS: headers in row 1, content wrapper with indicator in row 2
+
+## [0.5.0] - 2026-01-18
+
+- Skipped
 
 ## [0.4.3] - 2025-12-21
 
@@ -398,7 +402,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.5.0...HEAD
+[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.6.0...HEAD
+[0.6.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.4.3...0.5.0
 [0.4.3]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.4.2...0.4.3
 [0.4.2]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.4.1...0.4.2
