@@ -29,12 +29,33 @@ jobs:
     - name: Build
       run: npm run build
 
+    - name: Extract version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Extract changelog for version
+      id: changelog
+      run: |
+        VERSION=${{ steps.version.outputs.VERSION }}
+        # Extract the section for this version from CHANGELOG.md
+        # Matches from "## [VERSION]" until the next "## [" or end of file
+        CHANGELOG=$(awk -v ver="$VERSION" '
+          /^## \[/ {
+            if (found) exit
+            if ($0 ~ "\\[" ver "\\]") found=1
+          }
+          found { print }
+        ' CHANGELOG.md)
+        # Write to file to preserve newlines
+        echo "$CHANGELOG" > release_notes.md
+
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
+        name: v${{ steps.version.outputs.VERSION }}
+        body_path: release_notes.md
         files: |
           homematicip-local-climate-schedule-card.js
           dist/homematicip-local-climate-schedule-card.js.map
         draft: false
         prerelease: false
-        generate_release_notes: true
