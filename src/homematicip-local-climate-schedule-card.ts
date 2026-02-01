@@ -134,7 +134,7 @@ export class HomematicScheduleCard extends LitElement {
       hour_format: "24",
       ...config,
       entity: fallbackEntity,
-      entities: [...entityIds],
+      // Keep original entities config to preserve name and profile_names
     };
 
     this._activeEntityId = nextActiveEntity;
@@ -1150,9 +1150,11 @@ export class HomematicScheduleCard extends LitElement {
     const activeEntityId = this._getActiveEntityId();
     const entityState = activeEntityId ? this.hass.states?.[activeEntityId] : undefined;
 
-    // Header shows: configured name > friendly_name > default
+    // Header shows: card name > custom entity name > friendly_name > default
     const headerTitle =
-      this._config.name || entityState?.attributes.friendly_name || this._translations.ui.schedule;
+      this._config.name ||
+      (activeEntityId ? this._getEntityDisplayName(activeEntityId) : null) ||
+      this._translations.ui.schedule;
 
     if (!entityState) {
       return html`
