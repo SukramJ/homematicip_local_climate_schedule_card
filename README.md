@@ -155,6 +155,37 @@ Hover over any block to see the exact time range and temperature.
 
 If your thermostat supports multiple profiles (P1, P2, P3, etc.), use the dropdown in the card header to switch between them.
 
+### Understanding the Schedule Format
+
+The card uses the **Simple Format** from HomematicIP Local v2.0.0+, which consists of a **base temperature** and **temperature periods**.
+
+#### Base Temperature
+
+The base temperature is the default temperature that applies to all times not covered by an explicit period. Think of it as the "background" temperature for the day.
+
+**Example:** If your base temperature is 18°C and you have one period from 06:00-22:00 at 21°C:
+- 00:00-06:00: 18°C (base temperature)
+- 06:00-22:00: 21°C (explicit period)
+- 22:00-24:00: 18°C (base temperature)
+
+When you edit a schedule, the base temperature is shown at the top of the editor. You can adjust it to change the default temperature for all uncovered time periods.
+
+#### Automatic Block Merging
+
+The card automatically merges consecutive time blocks with the same temperature. This keeps your schedule clean and efficient.
+
+**Example:**
+- If you have 06:00-08:00 at 22°C followed by 08:00-10:00 at 22°C
+- The card will display and save this as a single block: 06:00-10:00 at 22°C
+
+This merging happens automatically when you save your schedule.
+
+#### Efficient Storage
+
+Only temperature periods that **differ from the base temperature** are stored. This means:
+- A simple schedule with one heating period uses only 1-2 entries
+- The thermostat fills gaps automatically with the base temperature
+
 ## Requirements
 
 - Home Assistant 2023.1 or newer
@@ -165,8 +196,8 @@ If your thermostat supports multiple profiles (P1, P2, P3, etc.), use the dropdo
 
 This card is specifically designed for the **HomematicIP Local** integration and requires:
 
-- Schedule entities exposed by the integration
-- Service calls: `homematicip_local.set_schedule_profile_weekday`
+- Schedule entities exposed by the integration (with `schedule_data` attribute)
+- Service calls: `homematicip_local.set_schedule_simple_weekday` (v2.0.0+)
 - Service calls: `homematicip_local.set_schedule_active_profile`
 
 ## Development

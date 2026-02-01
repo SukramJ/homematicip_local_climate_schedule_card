@@ -84,6 +84,126 @@ Translation system that:
 - Provides German and English translations
 - Includes day names, UI labels, and messages
 
+## Schedule Data Model (Simple Format)
+
+The card uses the **Simple Format** introduced in HomematicIP Local integration v2.0.0+. This format is more efficient than the legacy 13-slot format.
+
+### Data Structure
+
+```typescript
+interface SimpleWeekdayData {
+  base_temperature: number;    // Default temperature for uncovered time periods
+  periods: SimpleSchedulePeriod[];  // Temperature deviations from base
+}
+
+interface SimpleSchedulePeriod {
+  starttime: string;   // Format: "HH:MM"
+  endtime: string;     // Format: "HH:MM"
+  temperature: number; // Temperature in °C
+}
+```
+
+### Base Temperature
+
+The **base temperature** is the default temperature that applies to all time periods not explicitly covered by a period entry.
+
+**How it's determined:**
+
+1. **From backend**: When reading schedule data, `base_temperature` comes directly from the entity's `schedule_data` attribute
+2. **When editing**: If the user creates a new schedule, the base temperature is calculated as the temperature that covers the most total time in a day
+
+**Calculation algorithm** (`calculateBaseTemperature`):
+
+```
+1. For each time block, calculate its duration (endMinutes - startMinutes)
+2. Sum up total minutes for each unique temperature
+3. The temperature with the most total minutes becomes the base temperature
+4. Default: 20.0°C if no blocks exist
+```
+
+**Example:**
+
+```
+Blocks: 06:00-08:00 @ 22°C, 08:00-18:00 @ 20°C, 18:00-22:00 @ 22°C
+Duration: 22°C = 6 hours, 20°C = 10 hours
+→ Base temperature = 20°C (most time coverage)
+```
+
+### Block Merging
+
+The card automatically **merges consecutive time blocks** with the same temperature to simplify the schedule display and reduce data sent to the backend.
+
+**Merging algorithm** (`mergeConsecutiveBlocks`):
+
+```
+1. Sort blocks by start time
+2. For each pair of adjacent blocks:
+   - If block A ends exactly when block B starts (A.endTime == B.startTime)
+   - AND both have the same temperature
+   → Merge into single block: A.startTime to B.endTime
+3. Re-assign slot numbers (1, 2, 3, ...)
+```
+
+**Example:**
+
+```
+Before merging:
+  Block 1: 06:00-08:00 @ 22°C
+  Block 2: 08:00-10:00 @ 22°C  ← Same temp, consecutive
+  Block 3: 10:00-18:00 @ 20°C
+
+After merging:
+  Block 1: 06:00-10:00 @ 22°C  ← Merged
+  Block 2: 10:00-18:00 @ 20°C
+```
+
+### Display vs. Storage
+
+**Display (Card UI):**
+
+- Shows the full 24-hour day as continuous blocks
+- Gaps between periods are filled with base temperature blocks (visually)
+- Uses `fillGapsWithBaseTemperature()` for display purposes only
+
+**Storage (Backend):**
+
+- Only stores periods that **differ from base temperature**
+- Gaps are implicitly filled with `base_temperature`
+- More efficient storage: 3 periods instead of 13 slots
+
+**Example:**
+
+```
+Backend data:
+  base_temperature: 18°C
+  periods: [{06:00-22:00, 21°C}]
+
+Card displays:
+  00:00-06:00 @ 18°C (base, implicit)
+  06:00-22:00 @ 21°C (explicit period)
+  22:00-24:00 @ 18°C (base, implicit)
+```
+
+### Service Call Format
+
+When saving, the card calls `homematicip_local.set_schedule_simple_weekday`:
+
+```yaml
+service: homematicip_local.set_schedule_simple_weekday
+data:
+  entity_id: climate.living_room
+  profile: P1
+  weekday: MONDAY
+  base_temperature: 18.0
+  periods:
+    - starttime: "06:00"
+      endtime: "08:00"
+      temperature: 21.0
+    - starttime: "17:00"
+      endtime: "22:00"
+      temperature: 21.0
+```
+
 ## Development Workflow
 
 ### Initial Setup
