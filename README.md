@@ -62,6 +62,32 @@ entities:
 
 When only one entity is provided, the dropdown is hidden and the card shows the friendly name instead.
 
+### Custom Entity Names and Profile Names
+
+You can define custom display names for each entity and custom names for profiles:
+
+```yaml
+type: custom:homematicip-local-climate-schedule-card
+entities:
+  - entity: climate.living_room
+    name: "Living Room"
+    profile_names:
+      P1: "Comfort"
+      P2: "Eco"
+      P3: "Night"
+  - entity: climate.bedroom
+    name: "Bedroom"
+    profile_names:
+      P1: "Normal"
+      P2: "Away"
+  - climate.office # Without custom name - uses friendly_name
+```
+
+- **Entity name**: Displayed in the entity dropdown instead of the friendly_name
+- **Profile names**: Displayed as "P1 - Comfort", "P2 - Eco", etc. in the profile dropdown
+
+These settings can also be configured via the visual editor by clicking on an entity to expand its configuration.
+
 ### Full Configuration
 
 ```yaml
@@ -78,16 +104,26 @@ hour_format: "24"
 
 ### Configuration Options
 
-| Option                  | Type     | Default        | Description                             |
-| ----------------------- | -------- | -------------- | --------------------------------------- |
-| `entities`              | string[] | —              | List of climate entity IDs (required)   |
-| `name`                  | string   | Entity name    | Custom name for the card header         |
-| `profile`               | string   | Active profile | Force display of a specific profile     |
-| `show_profile_selector` | boolean  | `true`         | Show/hide the profile selector dropdown |
-| `editable`              | boolean  | `true`         | Enable/disable schedule editing         |
-| `show_temperature`      | boolean  | `true`         | Show/hide temperature values on blocks  |
-| `temperature_unit`      | string   | `°C`           | Temperature unit to display             |
-| `hour_format`           | string   | `24`           | Time format: `12` or `24` hour          |
+| Option                  | Type              | Default        | Description                             |
+| ----------------------- | ----------------- | -------------- | --------------------------------------- |
+| `entities`              | string[] or array | —              | List of climate entities (required)     |
+| `name`                  | string            | Entity name    | Custom name for the card header         |
+| `profile`               | string            | Active profile | Force display of a specific profile     |
+| `show_profile_selector` | boolean           | `true`         | Show/hide the profile selector dropdown |
+| `editable`              | boolean           | `true`         | Enable/disable schedule editing         |
+| `show_temperature`      | boolean           | `true`         | Show/hide temperature values on blocks  |
+| `temperature_unit`      | string            | `°C`           | Temperature unit to display             |
+| `hour_format`           | string            | `24`           | Time format: `12` or `24` hour          |
+
+#### Entity Configuration
+
+Each entity in the `entities` array can be either a simple string or an object:
+
+| Option          | Type             | Description                                       |
+| --------------- | ---------------- | ------------------------------------------------- |
+| `entity`        | string           | Climate entity ID (required)                      |
+| `name`          | string           | Custom display name for the entity dropdown       |
+| `profile_names` | Record\<string\> | Custom names for profiles (e.g., `P1: "Comfort"`) |
 
 ## Usage
 

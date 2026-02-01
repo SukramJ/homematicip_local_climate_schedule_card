@@ -1,7 +1,15 @@
+export interface EntityConfig {
+  entity: string;
+  name?: string;
+  profile_names?: Record<string, string>;
+}
+
+export type EntityConfigOrString = string | EntityConfig;
+
 export interface HomematicScheduleCardConfig {
   type: string;
   entity?: string;
-  entities?: string[];
+  entities?: EntityConfigOrString[];
   name?: string;
   profile?: string;
   show_profile_selector?: boolean;

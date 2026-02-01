@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-02-01
+
+### Added
+
+- Custom display names for entities in multi-entity configuration
+  - Configure via `name` property in entity object: `{ entity: climate.living_room, name: "Living Room" }`
+  - Displayed in entity dropdown instead of friendly_name
+- Custom profile names per entity
+  - Configure via `profile_names` property: `{ entity: ..., profile_names: { P1: "Comfort", P2: "Eco" } }`
+  - Displayed as "P1 - Comfort", "P2 - Eco" in profile dropdown
+  - Profile names are entity-specific, allowing different names for each thermostat
+- Improved visual editor with expandable entity sections
+  - Click on entity to expand configuration options
+  - Configure display name and profile names directly in UI
+  - Available profiles are automatically detected from entity attributes
+- Pre-release support in release workflow
+  - Supports alpha, beta, and release candidate tags (e.g., `1.0.0-beta.1`)
+  - Pre-releases are automatically marked in GitHub
+
+### Technical
+
+- Added `EntityConfig` interface with `entity`, `name`, and `profile_names` properties
+- Added `EntityConfigOrString` type for flexible entity configuration (string or object)
+- Added `_getEntityId()`, `_getEntityDisplayName()`, and `_getProfileDisplayName()` helper methods
+- Refactored visual editor with expandable accordion-style entity sections
+- Editor preserves entity customizations when entities are reordered or removed/re-added
+
 ### Changed
 
 - Updated dependencies:
@@ -417,7 +444,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.6.0...HEAD
+[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.7.0...HEAD
+[0.7.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.4.3...0.5.0
 [0.4.3]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.4.2...0.4.3
