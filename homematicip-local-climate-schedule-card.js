@@ -21,10 +21,7 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         <div class="section-header">Entity Configuration</div>
         ${t.map((t,e)=>{const i=this._getEntityId(t),s=this._getEntityName(t),o=this._getEntityProfileNames(t),r=this.hass?.states?.[i]?.attributes.friendly_name||i,n=this._getAvailableProfiles(i),a=this._expandedEntity===i;return j`
             <div class="entity-section">
-              <div
-                class="entity-header"
-                @click=${()=>this._toggleEntity(i)}
-              >
+              <div class="entity-header" @click=${()=>this._toggleEntity(i)}>
                 <span class="expand-icon">${a?"▼":"▶"}</span>
                 <span class="entity-title" title=${i}>${r}</span>
               </div>
@@ -57,9 +54,7 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
                                 `)}
                             </div>
                           `:j`
-                            <div class="no-profiles">
-                              No profiles available for this entity
-                            </div>
+                            <div class="no-profiles">No profiles available for this entity</div>
                           `}
                     </div>
                   `:""}
