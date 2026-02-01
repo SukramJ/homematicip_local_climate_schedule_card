@@ -6,7 +6,7 @@ This document provides comprehensive context for AI assistants working with the 
 
 **Name**: HomematicIP Local Climate Schedule Card
 **Type**: Custom Lovelace Card for Home Assistant
-**Version**: 0.6.0
+**Version**: 0.7.0
 **License**: MIT
 **Primary Language**: TypeScript
 **Framework**: Lit (Web Components)
@@ -182,19 +182,43 @@ entities:
   - climate.office
 ```
 
+### Advanced Entity Configuration
+
+```yaml
+type: custom:homematicip-local-climate-schedule-card
+entities:
+  - entity: climate.living_room
+    name: "Living Room"
+    profile_names:
+      P1: "Comfort"
+      P2: "Eco"
+      P3: "Night"
+  - entity: climate.bedroom
+    name: "Bedroom"
+  - climate.office # Simple string format still supported
+```
+
 ### All Options
 
-| Option                  | Type     | Default        | Description                     |
-| ----------------------- | -------- | -------------- | ------------------------------- |
-| `entity`                | string   | —              | Single entity ID                |
-| `entities`              | string[] | —              | Multiple entities with dropdown |
-| `name`                  | string   | Entity name    | Custom card title               |
-| `profile`               | string   | Active profile | Force specific profile          |
-| `show_profile_selector` | boolean  | `true`         | Show profile dropdown           |
-| `editable`              | boolean  | `true`         | Enable editing                  |
-| `show_temperature`      | boolean  | `true`         | Show temps on blocks            |
-| `temperature_unit`      | string   | `°C`           | Temperature unit                |
-| `hour_format`           | string   | `24`           | `12` or `24` hour format        |
+| Option                  | Type              | Default        | Description                     |
+| ----------------------- | ----------------- | -------------- | ------------------------------- |
+| `entity`                | string            | —              | Single entity ID                |
+| `entities`              | string[] or array | —              | Multiple entities with dropdown |
+| `name`                  | string            | Entity name    | Custom card title               |
+| `profile`               | string            | Active profile | Force specific profile          |
+| `show_profile_selector` | boolean           | `true`         | Show profile dropdown           |
+| `editable`              | boolean           | `true`         | Enable editing                  |
+| `show_temperature`      | boolean           | `true`         | Show temps on blocks            |
+| `temperature_unit`      | string            | `°C`           | Temperature unit                |
+| `hour_format`           | string            | `24`           | `12` or `24` hour format        |
+
+#### Entity Object Options
+
+| Option          | Type             | Description                                  |
+| --------------- | ---------------- | -------------------------------------------- |
+| `entity`        | string           | Climate entity ID (required)                 |
+| `name`          | string           | Custom display name for entity dropdown      |
+| `profile_names` | Record\<string\> | Custom profile names (e.g., `P1: "Comfort"`) |
 
 ## Common Development Tasks
 
@@ -361,8 +385,8 @@ docs(readme): update installation instructions
 
 1. Update version in `package.json`
 2. Update `CHANGELOG.md`
-3. Create git tag: `git tag -a v0.6.0 -m "Release 0.6.0"`
-4. Push tag: `git push origin v0.6.0`
+3. Create git tag: `git tag -a v0.7.0 -m "Release 0.7.0"`
+4. Push tag: `git push origin v0.7.0`
 5. GitHub releases automatically built
 
 ## Useful Resources

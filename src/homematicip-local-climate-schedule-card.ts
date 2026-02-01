@@ -10,6 +10,7 @@ import {
   Weekday,
   WeekdayData,
   SimpleProfileData,
+  EntityConfigOrString,
 } from "./types";
 import "./editor";
 import {
@@ -108,7 +109,10 @@ export class HomematicScheduleCard extends LitElement {
 
     addEntity(config.entity);
     if (Array.isArray(config.entities)) {
-      config.entities.forEach((entityId) => addEntity(entityId));
+      config.entities.forEach((entityConfig) => {
+        const entityId = typeof entityConfig === "string" ? entityConfig : entityConfig.entity;
+        addEntity(entityId);
+      });
     }
 
     if (entityIds.length === 0) {
@@ -217,14 +221,49 @@ export class HomematicScheduleCard extends LitElement {
     return formatTime(time, hourFormat);
   }
 
+  private _getEntityId(entityConfig: EntityConfigOrString): string {
+    return typeof entityConfig === "string" ? entityConfig : entityConfig.entity;
+  }
+
   private _getEntityOptions(): string[] {
     if (!this._config) {
       return [];
     }
     if (this._config.entities?.length) {
-      return [...this._config.entities].sort((a, b) => a.localeCompare(b));
+      return this._config.entities
+        .map((e) => this._getEntityId(e))
+        .sort((a, b) => a.localeCompare(b));
     }
     return this._config.entity ? [this._config.entity] : [];
+  }
+
+  private _getEntityDisplayName(entityId: string): string {
+    // First check for custom name in config
+    if (this._config?.entities?.length) {
+      const entityConfig = this._config.entities.find((e) => this._getEntityId(e) === entityId);
+      if (entityConfig && typeof entityConfig !== "string" && entityConfig.name) {
+        return entityConfig.name;
+      }
+    }
+    // Fall back to friendly_name or entity_id
+    return this.hass?.states?.[entityId]?.attributes.friendly_name || entityId;
+  }
+
+  private _getProfileDisplayName(profileId: string): string {
+    const activeEntityId = this._getActiveEntityId();
+    if (activeEntityId && this._config?.entities?.length) {
+      const entityConfig = this._config.entities.find(
+        (e) => this._getEntityId(e) === activeEntityId,
+      );
+      if (
+        entityConfig &&
+        typeof entityConfig !== "string" &&
+        entityConfig.profile_names?.[profileId]
+      ) {
+        return `${profileId} - ${entityConfig.profile_names[profileId]}`;
+      }
+    }
+    return profileId;
   }
 
   private _getActiveEntityId(): string | undefined {
@@ -1149,7 +1188,7 @@ export class HomematicScheduleCard extends LitElement {
                   ${this._availableProfiles.map(
                     (profile) => html`
                       <option value=${profile} ?selected=${profile === this._currentProfile}>
-                        ${profile}
+                        ${this._getProfileDisplayName(profile)}
                       </option>
                     `,
                   )}
@@ -1370,7 +1409,7 @@ export class HomematicScheduleCard extends LitElement {
         ${[...entityIds]
           .sort((a, b) => a.localeCompare(b))
           .map((entityId) => {
-            const label = this.hass?.states?.[entityId]?.attributes.friendly_name || entityId;
+            const label = this._getEntityDisplayName(entityId);
             return html`<option value=${entityId}>${label}</option>`;
           })}
       </select>
@@ -3011,7 +3050,7 @@ window.customCards.push({
 });
 
 console.info(
-  "%c HOMEMATICIP-LOCAL-CLIMATE-SCHEDULE-CARD %c v0.6.0 ",
+  "%c HOMEMATICIP-LOCAL-CLIMATE-SCHEDULE-CARD %c v0.7.0 ",
   "color: white; background: #3498db; font-weight: 700;",
   "color: #3498db; background: white; font-weight: 700;",
 );

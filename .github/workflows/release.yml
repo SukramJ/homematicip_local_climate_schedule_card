@@ -3,7 +3,10 @@ name: Release
 on:
   push:
     tags:
+      # Regular releases: 1.0.0, 0.6.0
       - '[0-9]+.[0-9]+.[0-9]+'
+      # Pre-releases: 1.0.0-alpha.1, 1.0.0-beta.2, 1.0.0-rc.1
+      - '[0-9]+.[0-9]+.[0-9]+-*'
 
 permissions:
   contents: write
@@ -31,15 +34,28 @@ jobs:
 
     - name: Extract version from tag
       id: version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/}
+        echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        # Check if this is a pre-release (contains hyphen after version)
+        if [[ "$VERSION" == *-* ]]; then
+          echo "PRERELEASE=true" >> $GITHUB_OUTPUT
+          # Extract base version (e.g., 0.7.0 from 0.7.0-b0)
+          BASE_VERSION=${VERSION%%-*}
+          echo "BASE_VERSION=$BASE_VERSION" >> $GITHUB_OUTPUT
+        else
+          echo "PRERELEASE=false" >> $GITHUB_OUTPUT
+          echo "BASE_VERSION=$VERSION" >> $GITHUB_OUTPUT
+        fi
 
     - name: Extract changelog for version
       id: changelog
       run: |
         VERSION=${{ steps.version.outputs.VERSION }}
-        # Extract the section for this version from CHANGELOG.md
-        # Matches from "## [VERSION]" until the next "## [" or end of file
-        CHANGELOG=$(awk -v ver="$VERSION" '
+        BASE_VERSION=${{ steps.version.outputs.BASE_VERSION }}
+        # For pre-releases, use base version to find changelog section
+        # e.g., for 0.7.0-b0, look for ## [0.7.0]
+        CHANGELOG=$(awk -v ver="$BASE_VERSION" '
           /^## \[/ {
             if (found) exit
             if ($0 ~ "\\[" ver "\\]") found=1
@@ -47,7 +63,20 @@ jobs:
           found { print }
         ' CHANGELOG.md)
         # Write to file to preserve newlines
-        echo "$CHANGELOG" > release_notes.md
+        if [ -n "$CHANGELOG" ]; then
+          # For pre-releases, add a note at the top
+          if [[ "$VERSION" != "$BASE_VERSION" ]]; then
+            echo "> **Pre-release**: This is version \`$VERSION\` based on $BASE_VERSION" > release_notes.md
+            echo "" >> release_notes.md
+            echo "$CHANGELOG" >> release_notes.md
+          else
+            echo "$CHANGELOG" > release_notes.md
+          fi
+        else
+          echo "## Pre-release $VERSION" > release_notes.md
+          echo "" >> release_notes.md
+          echo "This is a pre-release version for testing purposes." >> release_notes.md
+        fi
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
@@ -58,4 +87,4 @@ jobs:
           homematicip-local-climate-schedule-card.js
           dist/homematicip-local-climate-schedule-card.js.map
         draft: false
-        prerelease: false
+        prerelease: ${{ steps.version.outputs.PRERELEASE == 'true' }}
