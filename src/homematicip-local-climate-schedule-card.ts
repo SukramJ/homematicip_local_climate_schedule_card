@@ -45,8 +45,11 @@ export class HomematicScheduleCard extends LitElement {
   }
 
   static getStubConfig(hass: HomeAssistant) {
-    // Find climate entities as suggestion
-    const climateEntities = Object.keys(hass.states).filter((eid) => eid.startsWith("climate."));
+    // Find HomematicIP Local climate entities (they have schedule_data attribute)
+    const climateEntities = Object.keys(hass.states).filter(
+      (eid) =>
+        eid.startsWith("climate.") && hass.states[eid].attributes?.schedule_data !== undefined,
+    );
     return {
       type: "custom:homematicip-local-climate-schedule-card",
       entities: climateEntities.length > 0 ? [climateEntities[0]] : [],

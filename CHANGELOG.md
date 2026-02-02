@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Entity selector now only shows HomematicIP Local climate entities (filtered by `integration: "homematicip_local"`)
+- Stub config suggestion now filters for entities with `schedule_data` attribute
+
 ## [0.7.0] - 2026-02-01
 
 ### Added
