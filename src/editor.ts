@@ -35,7 +35,7 @@ export class HomematicScheduleCardEditor extends LitElement {
     {
       name: "entities",
       required: true,
-      selector: { entity: { domain: "climate", multiple: true } },
+      selector: { entity: { domain: "climate", integration: "homematicip_local", multiple: true } },
     },
   ];
 

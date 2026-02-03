@@ -45,8 +45,11 @@ export class HomematicScheduleCard extends LitElement {
   }
 
   static getStubConfig(hass: HomeAssistant) {
-    // Find climate entities as suggestion
-    const climateEntities = Object.keys(hass.states).filter((eid) => eid.startsWith("climate."));
+    // Find HomematicIP Local climate entities (they have schedule_data attribute)
+    const climateEntities = Object.keys(hass.states).filter(
+      (eid) =>
+        eid.startsWith("climate.") && hass.states[eid].attributes?.schedule_data !== undefined,
+    );
     return {
       type: "custom:homematicip-local-climate-schedule-card",
       entities: climateEntities.length > 0 ? [climateEntities[0]] : [],
@@ -56,6 +59,7 @@ export class HomematicScheduleCard extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private _config?: HomematicScheduleCardConfig;
   @state() private _currentProfile?: string;
+  @state() private _activeDeviceProfile?: string;
   @state() private _scheduleData?: SimpleProfileData;
   @state() private _availableProfiles: string[] = [];
   @state() private _activeEntityId?: string;
@@ -275,6 +279,23 @@ export class HomematicScheduleCard extends LitElement {
       return this._activeEntityId;
     }
     return entities[0];
+  }
+
+  /**
+   * Converts preset_mode value to profile name
+   * @param presetMode - The preset_mode from entity attributes (e.g., "week_profile_1")
+   * @returns Profile name (e.g., "P1") or undefined if invalid
+   */
+  private _getProfileFromPresetMode(presetMode?: string): string | undefined {
+    if (!presetMode) return undefined;
+
+    // Match "week_profile_X" pattern and extract the number
+    const match = presetMode.match(/^week_profile_(\d+)$/);
+    if (match && match[1]) {
+      return `P${match[1]}`;
+    }
+
+    return undefined;
   }
 
   private _needsManualReload(entityId?: string): boolean {
@@ -546,6 +567,7 @@ export class HomematicScheduleCard extends LitElement {
     const entityId = this._getActiveEntityId();
     if (!entityId) {
       this._currentProfile = undefined;
+      this._activeDeviceProfile = undefined;
       this._scheduleData = undefined;
       this._availableProfiles = [];
       return;
@@ -554,6 +576,7 @@ export class HomematicScheduleCard extends LitElement {
     const entityState = this.hass.states?.[entityId];
     if (!entityState) {
       this._currentProfile = undefined;
+      this._activeDeviceProfile = undefined;
       this._scheduleData = undefined;
       this._availableProfiles = [];
       return;
@@ -561,7 +584,12 @@ export class HomematicScheduleCard extends LitElement {
 
     const attrs = entityState.attributes as ScheduleEntityAttributes;
 
-    this._currentProfile = this._config.profile || attrs.active_profile;
+    // Extract active profile from preset_mode (e.g., "week_profile_1" -> "P1")
+    const deviceProfile = this._getProfileFromPresetMode(attrs.preset_mode);
+    this._activeDeviceProfile = deviceProfile;
+
+    // Use config profile if set, otherwise use the active device profile
+    this._currentProfile = this._config.profile || deviceProfile || attrs.active_profile;
     this._scheduleData = attrs.schedule_data;
     this._availableProfiles = (attrs.available_profiles || [])
       .slice()
@@ -1189,8 +1217,16 @@ export class HomematicScheduleCard extends LitElement {
                 >
                   ${this._availableProfiles.map(
                     (profile) => html`
-                      <option value=${profile} ?selected=${profile === this._currentProfile}>
-                        ${this._getProfileDisplayName(profile)}
+                      <option
+                        value=${profile}
+                        ?selected=${profile === this._currentProfile}
+                        class=${profile === this._activeDeviceProfile
+                          ? "active-profile-option"
+                          : ""}
+                      >
+                        ${profile === this._activeDeviceProfile
+                          ? "● "
+                          : ""}${this._getProfileDisplayName(profile)}
                       </option>
                     `,
                   )}
@@ -1966,6 +2002,11 @@ export class HomematicScheduleCard extends LitElement {
         color: var(--primary-text-color);
         font-size: 14px;
         cursor: pointer;
+      }
+
+      .profile-selector .active-profile-option {
+        color: var(--success-color, #4caf50);
+        font-weight: 500;
       }
 
       .entity-selector {

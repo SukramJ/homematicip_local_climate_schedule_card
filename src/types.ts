@@ -75,6 +75,7 @@ export interface SimpleProfileData {
 export interface ScheduleEntityAttributes {
   active_profile: string;
   available_profiles: string[];
+  preset_mode?: string;
   schedule_data?: SimpleProfileData;
   friendly_name?: string;
   min_temp?: number;
