@@ -9,11 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Active profile indicator now uses asterisk (\*) instead of green dot (●)
-- Profile selector no longer activates profiles on the device, only switches view
-- Profile selection is now purely for viewing/editing different profiles
-- Active profile is no longer automatically selected when opening the card
-
 ## [0.8.0] - 2026-02-03
 
 ### Added
