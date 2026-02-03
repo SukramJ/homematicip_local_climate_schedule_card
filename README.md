@@ -13,6 +13,7 @@ A custom Lovelace card for Home Assistant to display and edit Homematic thermost
 - ✏️ **Interactive Editor**: Click any day to edit schedule with intuitive time and temperature controls
 - 🎨 **Temperature Visualization**: Color-coded blocks aligned with Home Assistant climate state colors
 - 🔄 **Profile Switching**: Easy dropdown to switch between different schedule profiles
+- ✅ **Active Profile Indicator**: See which profile is currently active on the device (marked with ●)
 - 📱 **Responsive Design**: Works perfectly on desktop and mobile devices
 - 🌍 **Integration Ready**: Seamlessly works with HomematicIP Local integration v2.0.0+
 - ⚙️ **Visual Configuration**: Configure the card directly in the UI - no YAML required
@@ -142,6 +143,14 @@ The card displays your week schedule with color-coded temperature blocks aligned
 
 Hover over any block to see the exact time range and temperature.
 
+### Active Profile Indicator
+
+The card automatically detects which profile is currently active on your thermostat device and marks it with a green dot (●) in the profile selector dropdown. This helps you quickly identify which schedule is actually running on the device.
+
+- The active profile is read from the `preset_mode` attribute of the climate entity
+- When you open the card or switch between entities, the active profile is automatically selected
+- If the device profile changes, the card updates automatically to reflect the new active profile
+
 ### Editing Schedules
 
 1. Click on any day in the week view
@@ -164,6 +173,7 @@ The card uses the **Simple Format** from HomematicIP Local v2.0.0+, which consis
 The base temperature is the default temperature that applies to all times not covered by an explicit period. Think of it as the "background" temperature for the day.
 
 **Example:** If your base temperature is 18°C and you have one period from 06:00-22:00 at 21°C:
+
 - 00:00-06:00: 18°C (base temperature)
 - 06:00-22:00: 21°C (explicit period)
 - 22:00-24:00: 18°C (base temperature)
@@ -175,6 +185,7 @@ When you edit a schedule, the base temperature is shown at the top of the editor
 The card automatically merges consecutive time blocks with the same temperature. This keeps your schedule clean and efficient.
 
 **Example:**
+
 - If you have 06:00-08:00 at 22°C followed by 08:00-10:00 at 22°C
 - The card will display and save this as a single block: 06:00-10:00 at 22°C
 
@@ -183,6 +194,7 @@ This merging happens automatically when you save your schedule.
 #### Efficient Storage
 
 Only temperature periods that **differ from the base temperature** are stored. This means:
+
 - A simple schedule with one heating period uses only 1-2 entries
 - The thermostat fills gaps automatically with the base temperature
 
