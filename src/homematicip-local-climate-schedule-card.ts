@@ -283,14 +283,14 @@ export class HomematicScheduleCard extends LitElement {
 
   /**
    * Converts preset_mode value to profile name
-   * @param presetMode - The preset_mode from entity attributes (e.g., "week_profile_1")
+   * @param presetMode - The preset_mode from entity attributes (e.g., "week_program_1")
    * @returns Profile name (e.g., "P1") or undefined if invalid
    */
   private _getProfileFromPresetMode(presetMode?: string): string | undefined {
     if (!presetMode) return undefined;
 
-    // Match "week_profile_X" pattern and extract the number
-    const match = presetMode.match(/^week_profile_(\d+)$/);
+    // Match "week_program_X" or "week_profile_X" pattern and extract the number
+    const match = presetMode.match(/^week_pro(?:gram|file)_(\d+)$/);
     if (match && match[1]) {
       return `P${match[1]}`;
     }
@@ -584,9 +584,14 @@ export class HomematicScheduleCard extends LitElement {
 
     const attrs = entityState.attributes as ScheduleEntityAttributes;
 
-    // Extract active profile from preset_mode (e.g., "week_profile_1" -> "P1")
+    // Extract active profile from preset_mode (e.g., "week_program_1" -> "P1")
     const deviceProfile = this._getProfileFromPresetMode(attrs.preset_mode);
     this._activeDeviceProfile = deviceProfile;
+
+    // Debug logging
+    console.log("[HomematicIP Schedule Card] preset_mode:", attrs.preset_mode);
+    console.log("[HomematicIP Schedule Card] extracted profile:", deviceProfile);
+    console.log("[HomematicIP Schedule Card] available profiles:", attrs.available_profiles);
 
     // Use config profile if set, otherwise use first available profile (don't auto-select active)
     this._currentProfile = this._config.profile || attrs.active_profile;
@@ -1213,7 +1218,7 @@ export class HomematicScheduleCard extends LitElement {
                           : ""}
                       >
                         ${profile === this._activeDeviceProfile
-                          ? "*"
+                          ? "* "
                           : ""}${this._getProfileDisplayName(profile)}
                       </option>
                     `,
