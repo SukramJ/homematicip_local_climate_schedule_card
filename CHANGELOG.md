@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Schedule view now updates immediately when preset_mode changes externally
+  - Previously, only the dropdown updated but the schedule display showed stale data
+  - Changed from `updated()` to `willUpdate()` lifecycle method to update data before rendering
+  - Ensures parsed schedule cache is cleared before render, not after
 - Card now follows external preset_mode changes (e.g., profile changed directly on thermostat)
   - Resets manual profile selection when device's active profile changes externally
   - Schedule automatically updates to show the new active profile's data
@@ -45,6 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical
 
+- Changed `updated()` lifecycle method to `willUpdate()` for entity data synchronization
+  - Ensures `_updateFromEntity()` runs before render, not after
+  - Fixes timing issue where render used stale cached data
 - Added `preset_mode` to `ScheduleEntityAttributes` interface
 - Added `_activeDeviceProfile` state property to track device's active profile
 - Added `_getProfileFromPresetMode()` helper method to convert `week_profile_X` to `PX` format
