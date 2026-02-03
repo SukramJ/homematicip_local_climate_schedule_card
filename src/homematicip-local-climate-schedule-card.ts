@@ -588,8 +588,8 @@ export class HomematicScheduleCard extends LitElement {
     const deviceProfile = this._getProfileFromPresetMode(attrs.preset_mode);
     this._activeDeviceProfile = deviceProfile;
 
-    // Use config profile if set, otherwise use the active device profile
-    this._currentProfile = this._config.profile || deviceProfile || attrs.active_profile;
+    // Use config profile if set, otherwise use first available profile (don't auto-select active)
+    this._currentProfile = this._config.profile || attrs.active_profile;
     this._scheduleData = attrs.schedule_data;
     this._availableProfiles = (attrs.available_profiles || [])
       .slice()
@@ -635,24 +635,12 @@ export class HomematicScheduleCard extends LitElement {
     return [];
   }
 
-  private async _handleProfileChange(e: Event): Promise<void> {
+  private _handleProfileChange(e: Event): void {
     const select = e.target as HTMLSelectElement;
     const newProfile = select.value;
 
-    const entityId = this._getActiveEntityId();
-    if (!this._config || !this.hass || !entityId) return;
-
-    try {
-      await this.hass.callService("homematicip_local", "set_schedule_active_profile", {
-        entity_id: entityId,
-        profile: newProfile,
-      });
-
-      this._currentProfile = newProfile;
-    } catch (err) {
-      console.error("Failed to change profile:", err);
-      alert(formatString(this._translations.errors.failedToChangeProfile, { error: String(err) }));
-    }
+    // Only change the view, don't activate the profile on the device
+    this._currentProfile = newProfile;
   }
 
   private _updateValidationWarnings(): void {
@@ -1225,7 +1213,7 @@ export class HomematicScheduleCard extends LitElement {
                           : ""}
                       >
                         ${profile === this._activeDeviceProfile
-                          ? "● "
+                          ? "*"
                           : ""}${this._getProfileDisplayName(profile)}
                       </option>
                     `,
