@@ -539,6 +539,7 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
 
       ha-card {
         padding: 16px;
+        overflow: hidden;
       }
 
       .card-header {
@@ -559,6 +560,8 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         justify-content: center;
         gap: 8px;
         margin-bottom: 24px;
+        flex-wrap: wrap;
+        max-width: 100%;
       }
 
       .profile-selector {
@@ -569,6 +572,8 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         color: var(--primary-text-color);
         font-size: 14px;
         cursor: pointer;
+        flex-shrink: 0;
+        max-width: 200px;
       }
 
       .profile-selector .active-profile-option {
@@ -577,7 +582,9 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
       }
 
       .entity-selector {
-        width: 100%;
+        flex: 1 1 auto;
+        min-width: 150px;
+        max-width: 100%;
         font-size: 16px;
       }
 
@@ -592,6 +599,7 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         cursor: pointer;
         transition: background-color 0.2s;
         line-height: 1;
+        flex-shrink: 0;
       }
 
       .export-btn:hover,
@@ -610,6 +618,7 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
 
       .card-content {
         position: relative;
+        overflow: hidden;
       }
 
       .schedule-container {
@@ -618,8 +627,7 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         grid-template-rows: auto 1fr;
         gap: 8px;
         min-height: 400px;
-        overflow-x: auto;
-        overflow-y: visible;
+        overflow: hidden;
         width: 100%;
         box-sizing: border-box;
       }

@@ -7,10 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-02-03
+
+### Added
+
+- Active profile indicator in profile selector dropdown
+  - Shows which profile is currently active on the device with a green dot (●)
+  - Reads from `preset_mode` entity attribute (e.g., `week_profile_1` → `P1`)
+  - Automatically selects active profile when opening card or switching entities
+  - Visual highlighting with green color and bold font for active profile
+  - Active profile updates automatically when device profile changes
+
+### Fixed
+
+- Fixed card layout overflow issues causing horizontal and vertical scrollbars (#81)
+  - Added `overflow: hidden` to ha-card and card-content containers
+  - Made header-controls responsive with `flex-wrap: wrap` and `max-width: 100%`
+  - Changed entity-selector from fixed width to flexible (`flex: 1 1 auto`)
+  - Added `flex-shrink: 0` to profile-selector and buttons to prevent unwanted shrinking
+  - Changed schedule-container overflow from `auto` to `hidden` for cleaner layout
+  - Profile-selector now has `max-width: 200px` to prevent excessive width
+  - Entity-selector now has `min-width: 150px` for better flexibility
+
 ### Changed
 
 - Entity selector now only shows HomematicIP Local climate entities (filtered by `integration: "homematicip_local"`)
 - Stub config suggestion now filters for entities with `schedule_data` attribute
+
+### Technical
+
+- Added `preset_mode` to `ScheduleEntityAttributes` interface
+- Added `_activeDeviceProfile` state property to track device's active profile
+- Added `_getProfileFromPresetMode()` helper method to convert `week_profile_X` to `PX` format
+- Enhanced `_updateFromEntity()` to extract and use active profile from preset_mode
+- Added CSS class `active-profile-option` for styling active profile in dropdown
 
 ## [0.7.0] - 2026-02-01
 
@@ -449,7 +479,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.7.0...HEAD
+[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.4.3...0.5.0

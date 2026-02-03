@@ -1972,6 +1972,7 @@ export class HomematicScheduleCard extends LitElement {
 
       ha-card {
         padding: 16px;
+        overflow: hidden;
       }
 
       .card-header {
@@ -1992,6 +1993,8 @@ export class HomematicScheduleCard extends LitElement {
         justify-content: center;
         gap: 8px;
         margin-bottom: 24px;
+        flex-wrap: wrap;
+        max-width: 100%;
       }
 
       .profile-selector {
@@ -2002,6 +2005,8 @@ export class HomematicScheduleCard extends LitElement {
         color: var(--primary-text-color);
         font-size: 14px;
         cursor: pointer;
+        flex-shrink: 0;
+        max-width: 200px;
       }
 
       .profile-selector .active-profile-option {
@@ -2010,7 +2015,9 @@ export class HomematicScheduleCard extends LitElement {
       }
 
       .entity-selector {
-        width: 100%;
+        flex: 1 1 auto;
+        min-width: 150px;
+        max-width: 100%;
         font-size: 16px;
       }
 
@@ -2025,6 +2032,7 @@ export class HomematicScheduleCard extends LitElement {
         cursor: pointer;
         transition: background-color 0.2s;
         line-height: 1;
+        flex-shrink: 0;
       }
 
       .export-btn:hover,
@@ -2043,6 +2051,7 @@ export class HomematicScheduleCard extends LitElement {
 
       .card-content {
         position: relative;
+        overflow: hidden;
       }
 
       .schedule-container {
@@ -2051,8 +2060,7 @@ export class HomematicScheduleCard extends LitElement {
         grid-template-rows: auto 1fr;
         gap: 8px;
         min-height: 400px;
-        overflow-x: auto;
-        overflow-y: visible;
+        overflow: hidden;
         width: 100%;
         box-sizing: border-box;
       }
