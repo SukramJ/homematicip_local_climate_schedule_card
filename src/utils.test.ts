@@ -21,6 +21,7 @@ import {
   insertBlockWithSplitting,
   fillGapsWithBaseTemperature,
   sortBlocksChronologically,
+  getProfileFromPresetMode,
   TimeBlock,
   ValidationMessage,
   ValidationMessageKey,
@@ -2320,6 +2321,58 @@ describe("Utils", () => {
       const result = sortBlocksChronologically(blocks);
       expect(result[0].slot).toBe(1);
       expect(result[1].slot).toBe(2);
+    });
+  });
+
+  describe("getProfileFromPresetMode", () => {
+    it("should convert week_program_1 to P1", () => {
+      expect(getProfileFromPresetMode("week_program_1")).toBe("P1");
+    });
+
+    it("should convert week_program_2 to P2", () => {
+      expect(getProfileFromPresetMode("week_program_2")).toBe("P2");
+    });
+
+    it("should convert week_program_3 to P3", () => {
+      expect(getProfileFromPresetMode("week_program_3")).toBe("P3");
+    });
+
+    it("should convert week_profile_1 to P1", () => {
+      expect(getProfileFromPresetMode("week_profile_1")).toBe("P1");
+    });
+
+    it("should convert week_profile_2 to P2", () => {
+      expect(getProfileFromPresetMode("week_profile_2")).toBe("P2");
+    });
+
+    it("should handle double-digit numbers", () => {
+      expect(getProfileFromPresetMode("week_program_10")).toBe("P10");
+      expect(getProfileFromPresetMode("week_profile_12")).toBe("P12");
+    });
+
+    it("should return undefined for undefined input", () => {
+      expect(getProfileFromPresetMode(undefined)).toBeUndefined();
+    });
+
+    it("should return undefined for empty string", () => {
+      expect(getProfileFromPresetMode("")).toBeUndefined();
+    });
+
+    it("should return undefined for invalid format", () => {
+      expect(getProfileFromPresetMode("some_other_mode")).toBeUndefined();
+      expect(getProfileFromPresetMode("week_program")).toBeUndefined();
+      expect(getProfileFromPresetMode("week_program_")).toBeUndefined();
+      expect(getProfileFromPresetMode("program_1")).toBeUndefined();
+    });
+
+    it("should return undefined for partial matches", () => {
+      expect(getProfileFromPresetMode("week_program_1_extra")).toBeUndefined();
+      expect(getProfileFromPresetMode("prefix_week_program_1")).toBeUndefined();
+    });
+
+    it("should handle edge cases", () => {
+      expect(getProfileFromPresetMode("week_program_0")).toBe("P0");
+      expect(getProfileFromPresetMode("week_program_99")).toBe("P99");
     });
   });
 });

@@ -8,7 +8,6 @@ import {
   WEEKDAYS,
   ProfileData,
   Weekday,
-  WeekdayData,
   SimpleProfileData,
   EntityConfigOrString,
 } from "./types";
@@ -34,6 +33,7 @@ import {
   insertBlockWithSplitting,
   fillGapsWithBaseTemperature,
   sortBlocksChronologically,
+  getProfileFromPresetMode,
 } from "./utils";
 import { getTranslations, formatString, Translations } from "./localization";
 
@@ -60,6 +60,7 @@ export class HomematicScheduleCard extends LitElement {
   @state() private _config?: HomematicScheduleCardConfig;
   @state() private _currentProfile?: string;
   @state() private _activeDeviceProfile?: string;
+  private _lastScheduleDataHash?: string;
   @state() private _scheduleData?: SimpleProfileData;
   @state() private _availableProfiles: string[] = [];
   private _userSelectedProfile: boolean = false;
@@ -83,7 +84,6 @@ export class HomematicScheduleCard extends LitElement {
   private _keyDownHandler: (e: KeyboardEvent) => void;
   @state() private _translations: Translations = getTranslations("en");
   @state() private _validationWarnings: ValidationMessage[] = [];
-  private _parsedScheduleCache: WeakMap<WeekdayData, TimeBlock[]> = new WeakMap();
   private _weekdayShortLabelMap?: Record<Weekday, string>;
   private _weekdayLongLabelMap?: Record<Weekday, string>;
   @state() private _minTemp: number = 5.0;
@@ -146,7 +146,6 @@ export class HomematicScheduleCard extends LitElement {
     this._copiedSchedule = undefined;
     this._editingWeekday = undefined;
     this._editingBlocks = undefined;
-    this._parsedScheduleCache = new WeakMap();
 
     // Set language from config or detect from Home Assistant
     this._updateLanguage();
@@ -288,15 +287,7 @@ export class HomematicScheduleCard extends LitElement {
    * @returns Profile name (e.g., "P1") or undefined if invalid
    */
   private _getProfileFromPresetMode(presetMode?: string): string | undefined {
-    if (!presetMode) return undefined;
-
-    // Match "week_program_X" or "week_profile_X" pattern and extract the number
-    const match = presetMode.match(/^week_pro(?:gram|file)_(\d+)$/);
-    if (match && match[1]) {
-      return `P${match[1]}`;
-    }
-
-    return undefined;
+    return getProfileFromPresetMode(presetMode);
   }
 
   private _needsManualReload(entityId?: string): boolean {
@@ -497,66 +488,6 @@ export class HomematicScheduleCard extends LitElement {
     return this._historyIndex < this._historyStack.length - 1;
   }
 
-  protected shouldUpdate(changedProps: PropertyValues): boolean {
-    // Always update if config changed
-    if (changedProps.has("_config")) {
-      return true;
-    }
-
-    // Check if hass entity state actually changed
-    if (changedProps.has("hass")) {
-      const oldHass = changedProps.get("hass") as HomeAssistant | undefined;
-      const newHass = this.hass;
-
-      // If no config, don't update
-      if (!this._config) {
-        return false;
-      }
-
-      // If hass is new or entity changed, update
-      if (!oldHass || !newHass) {
-        return true;
-      }
-
-      const entityId = this._getActiveEntityId();
-      if (!entityId) {
-        return true;
-      }
-
-      const oldEntity = oldHass.states?.[entityId];
-      const newEntity = newHass.states?.[entityId];
-
-      // Update if entity object changed
-      if (oldEntity !== newEntity) {
-        return true;
-      }
-
-      // Also check if relevant attributes changed (HA may mutate objects)
-      const oldAttrs = oldEntity?.attributes as ScheduleEntityAttributes | undefined;
-      const newAttrs = newEntity?.attributes as ScheduleEntityAttributes | undefined;
-      if (
-        oldAttrs?.preset_mode !== newAttrs?.preset_mode ||
-        oldAttrs?.schedule_data !== newAttrs?.schedule_data ||
-        oldAttrs?.active_profile !== newAttrs?.active_profile
-      ) {
-        return true;
-      }
-
-      // Check language change
-      const newLanguage = newHass?.language || newHass?.locale?.language;
-      const oldLanguage = oldHass?.language || oldHass?.locale?.language;
-      if (newLanguage !== oldLanguage) {
-        return true;
-      }
-
-      // If nothing relevant changed, skip update
-      return false;
-    }
-
-    // Update for all other property changes
-    return true;
-  }
-
   protected willUpdate(changedProps: PropertyValues): void {
     super.willUpdate(changedProps);
 
@@ -608,6 +539,8 @@ export class HomematicScheduleCard extends LitElement {
 
     if (deviceProfileChanged) {
       this._userSelectedProfile = false;
+      // Trigger reload of schedule_data for the new profile
+      this._reloadScheduleData(entityId, deviceProfile);
     }
 
     this._activeDeviceProfile = deviceProfile;
@@ -627,8 +560,10 @@ export class HomematicScheduleCard extends LitElement {
     this._maxTemp = attrs.max_temp ?? 30.5;
     this._tempStep = attrs.target_temp_step ?? 0.5;
 
-    // Clear cache when schedule data changes
-    this._parsedScheduleCache = new WeakMap();
+    // Track schedule data hash for repeat key invalidation
+    this._lastScheduleDataHash = attrs.schedule_data
+      ? JSON.stringify(attrs.schedule_data)
+      : undefined;
   }
 
   private _getBaseTemperature(weekday: Weekday): number {
@@ -649,17 +584,29 @@ export class HomematicScheduleCard extends LitElement {
       const weekdayData = this._scheduleData[weekday];
       if (!weekdayData) return [];
 
-      const cachedBlocks = this._parsedScheduleCache.get(weekdayData as unknown as WeekdayData);
-      if (cachedBlocks) {
-        return cachedBlocks;
-      }
-
       const { blocks } = parseSimpleWeekdaySchedule(weekdayData);
-      this._parsedScheduleCache.set(weekdayData as unknown as WeekdayData, blocks);
       return blocks;
     }
 
     return [];
+  }
+
+  /**
+   * Reload schedule data when profile changes externally (e.g., on thermostat)
+   * This calls set_schedule_active_profile to refresh the schedule_data attribute
+   */
+  private _reloadScheduleData(entityId: string, profile: string): void {
+    if (!this.hass) return;
+
+    // Call service to reload schedule data (fire and forget)
+    this.hass
+      .callService("homematicip_local", "set_schedule_active_profile", {
+        entity_id: entityId,
+        profile: profile,
+      })
+      .catch(() => {
+        // Silently ignore errors - the user will see stale data but can manually refresh
+      });
   }
 
   private async _handleProfileChange(e: Event): Promise<void> {
@@ -1364,7 +1311,7 @@ export class HomematicScheduleCard extends LitElement {
         <div class="schedule-content">
           ${repeat(
             WEEKDAYS,
-            (weekday) => weekday,
+            (weekday) => `${weekday}-${this._currentProfile}-${this._lastScheduleDataHash}`,
             (weekday) => {
               // Try to get blocks from either simple or legacy schedule
               const rawBlocks = this._getParsedBlocks(weekday);
@@ -1380,7 +1327,7 @@ export class HomematicScheduleCard extends LitElement {
                 >
                   ${repeat(
                     blocks,
-                    (block) => `${block.slot}-${block.startMinutes}`,
+                    (block) => `${block.slot}-${block.startMinutes}-${this._currentProfile}`,
                     (block, blockIndex) => {
                       const isActive = this._isBlockActive(weekday, block);
 
@@ -1497,7 +1444,6 @@ export class HomematicScheduleCard extends LitElement {
     this._editingBlocks = undefined;
     this._copiedSchedule = undefined;
     this._validationWarnings = [];
-    this._parsedScheduleCache = new WeakMap();
     this._userSelectedProfile = false; // Reset manual selection when switching entities
     this._updateFromEntity();
   }
