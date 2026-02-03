@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Previously, only the dropdown updated but the schedule display showed stale data
   - Changed from `updated()` to `willUpdate()` lifecycle method to update data before rendering
   - Ensures parsed schedule cache is cleared before render, not after
+  - Added explicit attribute comparison in `shouldUpdate()` for `preset_mode`, `schedule_data`, and `active_profile`
 - Card now follows external preset_mode changes (e.g., profile changed directly on thermostat)
   - Resets manual profile selection when device's active profile changes externally
   - Schedule automatically updates to show the new active profile's data
@@ -52,6 +53,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed `updated()` lifecycle method to `willUpdate()` for entity data synchronization
   - Ensures `_updateFromEntity()` runs before render, not after
   - Fixes timing issue where render used stale cached data
+- Enhanced `shouldUpdate()` to explicitly compare `preset_mode`, `schedule_data`, and `active_profile` attributes
+  - Handles cases where Home Assistant mutates entity objects instead of creating new ones
 - Added `preset_mode` to `ScheduleEntityAttributes` interface
 - Added `_activeDeviceProfile` state property to track device's active profile
 - Added `_getProfileFromPresetMode()` helper method to convert `week_profile_X` to `PX` format
