@@ -546,8 +546,8 @@ export class HomematicScheduleCard extends LitElement {
     return true;
   }
 
-  protected updated(changedProps: PropertyValues): void {
-    super.updated(changedProps);
+  protected willUpdate(changedProps: PropertyValues): void {
+    super.willUpdate(changedProps);
 
     if (changedProps.has("hass") && this._config) {
       this._updateFromEntity();
