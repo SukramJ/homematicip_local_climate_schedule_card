@@ -7,18 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
 ## [0.8.0] - 2026-02-03
 
 ### Added
 
 - Active profile indicator in profile selector dropdown
   - Shows which profile is currently active on the device with an asterisk (\*)
-  - Reads from `preset_mode` entity attribute (e.g., `week_profile_1` → `P1`)
+  - Reads from `preset_mode` entity attribute (e.g., `week_program_1` → `P1`)
+  - Supports both `week_program_X` and `week_profile_X` formats
   - Visual highlighting with green color and bold font for active profile
   - Active profile updates automatically when device profile changes
-  - Profile selector is now purely for viewing/editing, not for activating profiles
+  - Card automatically displays active profile when opened or entity switched
+  - Profile selector allows viewing/editing other profiles without activating them on device
 
 ### Fixed
 
@@ -33,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Card automatically displays active profile when opened, entity switched, or preset_mode changes
+- Profile selector no longer activates profiles on the device when changed manually
+- Manual profile selection is for viewing/editing without changing the device profile
 - Entity selector now only shows HomematicIP Local climate entities (filtered by `integration: "homematicip_local"`)
 - Stub config suggestion now filters for entities with `schedule_data` attribute
 

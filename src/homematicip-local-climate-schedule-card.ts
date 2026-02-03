@@ -62,6 +62,7 @@ export class HomematicScheduleCard extends LitElement {
   @state() private _activeDeviceProfile?: string;
   @state() private _scheduleData?: SimpleProfileData;
   @state() private _availableProfiles: string[] = [];
+  private _userSelectedProfile: boolean = false;
   @state() private _activeEntityId?: string;
   @state() private _editingWeekday?: Weekday;
   @state() private _editingBlocks?: TimeBlock[];
@@ -588,8 +589,11 @@ export class HomematicScheduleCard extends LitElement {
     const deviceProfile = this._getProfileFromPresetMode(attrs.preset_mode);
     this._activeDeviceProfile = deviceProfile;
 
-    // Use config profile if set, otherwise use first available profile (don't auto-select active)
-    this._currentProfile = this._config.profile || attrs.active_profile;
+    // Use config profile if set, otherwise use the active device profile
+    // But respect user's manual selection (don't override if user manually selected a profile)
+    if (!this._userSelectedProfile) {
+      this._currentProfile = this._config.profile || deviceProfile || attrs.active_profile;
+    }
     this._scheduleData = attrs.schedule_data;
     this._availableProfiles = (attrs.available_profiles || [])
       .slice()
@@ -635,12 +639,28 @@ export class HomematicScheduleCard extends LitElement {
     return [];
   }
 
-  private _handleProfileChange(e: Event): void {
+  private async _handleProfileChange(e: Event): Promise<void> {
     const select = e.target as HTMLSelectElement;
     const newProfile = select.value;
 
-    // Only change the view, don't activate the profile on the device
-    this._currentProfile = newProfile;
+    const entityId = this._getActiveEntityId();
+    if (!this._config || !this.hass || !entityId) return;
+
+    // Mark as user-selected to prevent automatic switching back to active profile
+    this._userSelectedProfile = true;
+
+    try {
+      // Load schedule data for the selected profile (doesn't activate it on device)
+      await this.hass.callService("homematicip_local", "set_schedule_active_profile", {
+        entity_id: entityId,
+        profile: newProfile,
+      });
+
+      this._currentProfile = newProfile;
+    } catch (err) {
+      console.error("Failed to load profile data:", err);
+      alert(formatString(this._translations.errors.failedToChangeProfile, { error: String(err) }));
+    }
   }
 
   private _updateValidationWarnings(): void {
@@ -1455,6 +1475,7 @@ export class HomematicScheduleCard extends LitElement {
     this._copiedSchedule = undefined;
     this._validationWarnings = [];
     this._parsedScheduleCache = new WeakMap();
+    this._userSelectedProfile = false; // Reset manual selection when switching entities
     this._updateFromEntity();
   }
 
