@@ -51,6 +51,23 @@ export function minutesToTime(minutes: number): string {
 }
 
 /**
+ * Convert preset_mode value to profile name
+ * @param presetMode - The preset_mode from entity attributes (e.g., "week_program_1")
+ * @returns Profile name (e.g., "P1") or undefined if not a valid preset_mode
+ */
+export function getProfileFromPresetMode(presetMode?: string): string | undefined {
+  if (!presetMode) return undefined;
+
+  // Match "week_program_X" or "week_profile_X" pattern and extract the number
+  const match = presetMode.match(/^week_pro(?:gram|file)_(\d+)$/);
+  if (match && match[1]) {
+    return `P${match[1]}`;
+  }
+
+  return undefined;
+}
+
+/**
  * Parse weekday schedule data into time blocks
  */
 export interface TimeBlock {
