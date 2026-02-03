@@ -587,6 +587,18 @@ export class HomematicScheduleCard extends LitElement {
 
     // Extract active profile from preset_mode (e.g., "week_program_1" -> "P1")
     const deviceProfile = this._getProfileFromPresetMode(attrs.preset_mode);
+
+    // Detect if the device's active profile changed externally (e.g., user changed it on the thermostat)
+    // If so, reset user selection and follow the new active profile
+    const deviceProfileChanged =
+      deviceProfile !== undefined &&
+      this._activeDeviceProfile !== undefined &&
+      deviceProfile !== this._activeDeviceProfile;
+
+    if (deviceProfileChanged) {
+      this._userSelectedProfile = false;
+    }
+
     this._activeDeviceProfile = deviceProfile;
 
     // Use config profile if set, otherwise use the active device profile

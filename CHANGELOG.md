@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Card now follows external preset_mode changes (e.g., profile changed directly on thermostat)
+  - Resets manual profile selection when device's active profile changes externally
+  - Schedule automatically updates to show the new active profile's data
+  - Active profile indicator in dropdown updates accordingly
 - Fixed card layout overflow issues causing horizontal and vertical scrollbars (#81)
   - Added `overflow: hidden` to ha-card and card-content containers
   - Made header-controls responsive with `flex-wrap: wrap` and `max-width: 100%`
@@ -45,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `_activeDeviceProfile` state property to track device's active profile
 - Added `_getProfileFromPresetMode()` helper method to convert `week_profile_X` to `PX` format
 - Enhanced `_updateFromEntity()` to extract and use active profile from preset_mode
+- Enhanced `_updateFromEntity()` to detect external profile changes and reset `_userSelectedProfile`
 - Added CSS class `active-profile-option` for styling active profile in dropdown
 
 ## [0.7.0] - 2026-02-01
