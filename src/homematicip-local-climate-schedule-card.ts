@@ -588,11 +588,6 @@ export class HomematicScheduleCard extends LitElement {
     const deviceProfile = this._getProfileFromPresetMode(attrs.preset_mode);
     this._activeDeviceProfile = deviceProfile;
 
-    // Debug logging
-    console.log("[HomematicIP Schedule Card] preset_mode:", attrs.preset_mode);
-    console.log("[HomematicIP Schedule Card] extracted profile:", deviceProfile);
-    console.log("[HomematicIP Schedule Card] available profiles:", attrs.available_profiles);
-
     // Use config profile if set, otherwise use first available profile (don't auto-select active)
     this._currentProfile = this._config.profile || attrs.active_profile;
     this._scheduleData = attrs.schedule_data;
