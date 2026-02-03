@@ -12,8 +12,8 @@ A custom Lovelace card for Home Assistant to display and edit Homematic thermost
 - 📅 **Visual Week Schedule Display**: See your entire week at a glance with color-coded temperature blocks
 - ✏️ **Interactive Editor**: Click any day to edit schedule with intuitive time and temperature controls
 - 🎨 **Temperature Visualization**: Color-coded blocks aligned with Home Assistant climate state colors
-- 🔄 **Profile Switching**: Easy dropdown to switch between different schedule profiles
-- ✅ **Active Profile Indicator**: See which profile is currently active on the device (marked with ●)
+- 🔄 **Profile Switching**: Easy dropdown to switch between different schedule profiles for viewing/editing
+- ✅ **Active Profile Indicator**: See which profile is currently active on the device (marked with \*)
 - 📱 **Responsive Design**: Works perfectly on desktop and mobile devices
 - 🌍 **Integration Ready**: Seamlessly works with HomematicIP Local integration v2.0.0+
 - ⚙️ **Visual Configuration**: Configure the card directly in the UI - no YAML required
@@ -39,6 +39,12 @@ A custom Lovelace card for Home Assistant to display and edit Homematic thermost
    - Click "Add Resource"
    - URL: `/local/homematicip-local-climate-schedule-card.js`
    - Resource type: JavaScript Module
+
+## Device Support
+
+This card supports all HomematicIP thermostats with schedule support
+Homematic device with schedule support and more than one profile.
+HM-CC-RT-DN is only supported over thermostat group.
 
 ## Configuration
 
@@ -145,11 +151,12 @@ Hover over any block to see the exact time range and temperature.
 
 ### Active Profile Indicator
 
-The card automatically detects which profile is currently active on your thermostat device and marks it with a green dot (●) in the profile selector dropdown. This helps you quickly identify which schedule is actually running on the device.
+The card automatically detects which profile is currently active on your thermostat device and marks it with an asterisk (\*) in the profile selector dropdown. This helps you quickly identify which schedule is actually running on the device.
 
 - The active profile is read from the `preset_mode` attribute of the climate entity
-- When you open the card or switch between entities, the active profile is automatically selected
-- If the device profile changes, the card updates automatically to reflect the new active profile
+- The asterisk (*) appears before the profile name (e.g., `*P1`or`\*P1 - Comfort`)
+- The profile selector is used only for viewing/editing different profiles, not for activating them
+- If the device profile changes, the card updates the indicator automatically
 
 ### Editing Schedules
 

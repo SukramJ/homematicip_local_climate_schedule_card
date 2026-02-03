@@ -7,16 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Active profile indicator now uses asterisk (\*) instead of green dot (●)
+- Profile selector no longer activates profiles on the device, only switches view
+- Profile selection is now purely for viewing/editing different profiles
+- Active profile is no longer automatically selected when opening the card
+
 ## [0.8.0] - 2026-02-03
 
 ### Added
 
 - Active profile indicator in profile selector dropdown
-  - Shows which profile is currently active on the device with a green dot (●)
+  - Shows which profile is currently active on the device with an asterisk (\*)
   - Reads from `preset_mode` entity attribute (e.g., `week_profile_1` → `P1`)
-  - Automatically selects active profile when opening card or switching entities
   - Visual highlighting with green color and bold font for active profile
   - Active profile updates automatically when device profile changes
+  - Profile selector is now purely for viewing/editing, not for activating profiles
 
 ### Fixed
 
