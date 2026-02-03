@@ -526,8 +526,19 @@ export class HomematicScheduleCard extends LitElement {
       const oldEntity = oldHass.states?.[entityId];
       const newEntity = newHass.states?.[entityId];
 
-      // Update if entity state or attributes changed
+      // Update if entity object changed
       if (oldEntity !== newEntity) {
+        return true;
+      }
+
+      // Also check if relevant attributes changed (HA may mutate objects)
+      const oldAttrs = oldEntity?.attributes as ScheduleEntityAttributes | undefined;
+      const newAttrs = newEntity?.attributes as ScheduleEntityAttributes | undefined;
+      if (
+        oldAttrs?.preset_mode !== newAttrs?.preset_mode ||
+        oldAttrs?.schedule_data !== newAttrs?.schedule_data ||
+        oldAttrs?.active_profile !== newAttrs?.active_profile
+      ) {
         return true;
       }
 
