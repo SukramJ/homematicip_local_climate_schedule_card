@@ -6,7 +6,7 @@ This document provides comprehensive context for AI assistants working with the 
 
 **Name**: HomematicIP Local Climate Schedule Card
 **Type**: Custom Lovelace Card for Home Assistant
-**Version**: 0.7.0
+**Version**: 0.8.0
 **License**: MIT
 **Primary Language**: TypeScript
 **Framework**: Lit (Web Components)
@@ -21,6 +21,7 @@ A custom Lovelace card that displays and allows editing of weekly thermostat sch
 homematicip_local_climate_schedule_card/
 ├── src/                                    # Source code
 │   ├── homematicip-local-climate-schedule-card.ts  # Main card component
+│   ├── editor.ts                           # Visual config editor component
 │   ├── types.ts                            # TypeScript type definitions
 │   ├── utils.ts                            # Utility functions
 │   ├── localization.ts                     # i18n/translation support
@@ -38,7 +39,7 @@ homematicip_local_climate_schedule_card/
 ## Core Technologies
 
 - **Lit 3.0**: Web Components framework for building the UI
-- **TypeScript 5.3**: Type-safe JavaScript
+- **TypeScript 5.9**: Type-safe JavaScript
 - **Rollup**: Module bundler
 - **Jest**: Testing framework with ts-jest
 - **ESLint**: Code linting with TypeScript support
@@ -58,31 +59,49 @@ The primary Lit custom element that:
 - Renders the week view, profile selector, and edit dialogs
 - Handles Home Assistant service calls
 
+### Config Editor (`src/editor.ts`)
+
+Visual configuration editor component that:
+
+- Extends `LitElement` as `HomematicScheduleCardEditor`
+- Provides entity selection (filtered to `climate` domain, `homematicip_local` integration)
+- Per-entity configuration (custom name, profile name overrides)
+- Card-level options via `ha-form` schema (name, toggles, hour format)
+- Registered as `homematicip-local-climate-schedule-card-editor`
+
 ### Type Definitions (`src/types.ts`)
 
 Core TypeScript interfaces including:
 
-- Home Assistant specific types (`HomeAssistant`, `LovelaceCardConfig`)
-- Schedule data structures (`Schedule`, `TimeBlock`, `DaySchedule`)
-- Card configuration options
-- Climate entity attributes
+- `HomeAssistant`: Minimal HA interface with `states`, `callService`, `callWS`, `language`
+- `HomematicScheduleCardConfig`: Card configuration options
+- `EntityConfig`, `EntityConfigOrString`: Per-entity configuration
+- `ScheduleEntityAttributes`: Climate entity attributes from HA
+- `HassEntity`: Single HA entity state
+- Schedule data structures: `SimpleWeekdayData`, `SimpleSchedulePeriod`, `SimpleProfileData`
+- Legacy format types: `ScheduleSlot`, `WeekdayData`, `BackendWeekdayData`, `ProfileData`
+- Constants: `WEEKDAYS`, `WEEKDAY_LABELS`, `WEEKDAY_LABELS_DE`
 
 ### Utilities (`src/utils.ts`)
 
-Helper functions for:
+Helper functions and types including:
 
-- Temperature color mapping
-- Time formatting (12h/24h)
-- Schedule data manipulation
-- Validation logic
+- `TimeBlock` interface: Internal representation of schedule blocks
+- `ValidationMessage`, `ValidationMessageKey`: Validation result types
+- Temperature color mapping and gradient rendering
+- Time formatting (12h/24h) and conversion
+- Schedule data parsing, conversion, and manipulation
+- Block merging, gap filling, and insertion with splitting
+- Validation logic for time blocks and schedule data
 
 ### Localization (`src/localization.ts`)
 
 Translation system that:
 
-- Follows Home Assistant language settings
+- Supports explicit `language` config or auto-detection from Home Assistant settings
 - Provides German and English translations
-- Includes day names, UI labels, and messages
+- Includes day names (short/long), UI labels, error messages, and validation messages
+- API: `getTranslations(language)` returns `Translations` object, `formatString(template, params)` for parameterized strings
 
 ## Schedule Data Model (Simple Format)
 
@@ -92,13 +111,13 @@ The card uses the **Simple Format** introduced in HomematicIP Local integration 
 
 ```typescript
 interface SimpleWeekdayData {
-  base_temperature: number;    // Default temperature for uncovered time periods
-  periods: SimpleSchedulePeriod[];  // Temperature deviations from base
+  base_temperature: number; // Default temperature for uncovered time periods
+  periods: SimpleSchedulePeriod[]; // Temperature deviations from base
 }
 
 interface SimpleSchedulePeriod {
-  starttime: string;   // Format: "HH:MM"
-  endtime: string;     // Format: "HH:MM"
+  starttime: string; // Format: "HH:MM"
+  endtime: string; // Format: "HH:MM"
   temperature: number; // Temperature in °C
 }
 ```
@@ -195,7 +214,7 @@ data:
   profile: P1
   weekday: MONDAY
   base_temperature: 18.0
-  periods:
+  simple_weekday_list:
     - starttime: "06:00"
       endtime: "08:00"
       temperature: 21.0
@@ -215,7 +234,8 @@ npm install
 ### Build Commands
 
 ```bash
-npm run build          # Production build
+npm run build          # Production build + copy to Home Assistant
+npm run build:dev      # Build only (no copy to Home Assistant)
 npm run watch          # Development mode with auto-rebuild
 npm run serve          # Alias for watch
 ```
@@ -243,9 +263,10 @@ npm run validate       # Run all checks + build
 
 Husky automatically runs on commit:
 
-1. **lint-staged**: ESLint + Prettier on staged `.ts` files
-2. **Jest tests**: Related tests for changed files
-3. Full pipeline includes type-check, test, and build
+1. **lint-staged**: ESLint + Prettier on staged `.ts` files, plus related Jest tests
+2. **Type check**: Full TypeScript validation (`npm run type-check`)
+3. **Tests**: All unit tests (`npm test`)
+4. **Build**: Production build (`npm run build`)
 
 To bypass (emergency only):
 
@@ -268,12 +289,20 @@ This card requires the **HomematicIP Local** integration:
 ### Service Calls Used
 
 1. **`homematicip_local.set_schedule_simple_weekday`**
-   - Updates schedule for a specific day using simple format
-   - Parameters: `entity_id`, `profile`, `weekday`, `base_temperature`, `periods`
+   - Updates schedule for a specific day using simple format (v2.0.0+)
+   - Parameters: `entity_id`, `profile`, `weekday`, `base_temperature`, `simple_weekday_list`
 
 2. **`homematicip_local.set_schedule_active_profile`**
-   - Switches active profile (P1, P2, P3, etc.)
+   - Loads profile data for viewing (does not activate on device)
    - Parameters: `entity_id`, `profile`
+
+3. **`homematicip_local.set_schedule_profile_weekday`**
+   - Legacy fallback for older integration versions
+   - Parameters: `entity_id`, `profile`, `weekday`, `weekday_data`
+
+4. **`homematicip_local.reload_device_config`**
+   - Force reload for BidCos-RF devices after saving
+   - Parameters: `device_address`
 
 ### Entity Attributes Expected
 
@@ -281,7 +310,14 @@ Climate entities should expose:
 
 - `available_profiles`: Available profile names
 - `active_profile`: Currently active profile
+- `preset_mode`: Current mode (patterns: `week_program_X` or `week_profile_X`)
 - `schedule_data`: Week schedule with base temperature and time periods per day (v2.0.0+ format)
+- `friendly_name`: Display name
+- `min_temp`: Minimum allowed temperature
+- `max_temp`: Maximum allowed temperature
+- `target_temp_step`: Temperature increment step
+- `interface_id`: Device interface ID
+- `address`: Device address (used for BidCos-RF reload)
 
 ## Card Configuration
 
@@ -320,17 +356,19 @@ entities:
 
 ### All Options
 
-| Option                  | Type              | Default        | Description                     |
-| ----------------------- | ----------------- | -------------- | ------------------------------- |
-| `entity`                | string            | —              | Single entity ID                |
-| `entities`              | string[] or array | —              | Multiple entities with dropdown |
-| `name`                  | string            | Entity name    | Custom card title               |
-| `profile`               | string            | Active profile | Force specific profile          |
-| `show_profile_selector` | boolean           | `true`         | Show profile dropdown           |
-| `editable`              | boolean           | `true`         | Enable editing                  |
-| `show_temperature`      | boolean           | `true`         | Show temps on blocks            |
-| `temperature_unit`      | string            | `°C`           | Temperature unit                |
-| `hour_format`           | string            | `24`           | `12` or `24` hour format        |
+| Option                  | Type              | Default        | Description                       |
+| ----------------------- | ----------------- | -------------- | --------------------------------- |
+| `entity`                | string            | —              | Single entity ID (legacy)         |
+| `entities`              | string[] or array | —              | Multiple entities with dropdown   |
+| `name`                  | string            | Entity name    | Custom card title                 |
+| `profile`               | string            | Active profile | Force specific profile            |
+| `show_profile_selector` | boolean           | `true`         | Show profile dropdown             |
+| `editable`              | boolean           | `true`         | Enable editing                    |
+| `show_temperature`      | boolean           | `true`         | Show temps on blocks              |
+| `show_gradient`         | boolean           | `false`        | Show color gradient between temps |
+| `temperature_unit`      | string            | `°C`           | Temperature unit                  |
+| `hour_format`           | string            | `24`           | `12` or `24` hour format          |
+| `language`              | string            | Auto-detect    | Force language (`en` or `de`)     |
 
 #### Entity Object Options
 
@@ -353,7 +391,7 @@ entities:
 ### Modifying Schedule Logic
 
 1. Check `src/utils.ts` for helper functions
-2. Update `TimeBlock` or `DaySchedule` types if data structure changes
+2. Update `TimeBlock` (in `utils.ts`) or schedule types (in `types.ts`) if data structure changes
 3. Ensure backward compatibility with existing schedules
 4. Add unit tests for edge cases
 
@@ -361,7 +399,7 @@ entities:
 
 1. Edit `src/localization.ts`
 2. Add keys to both `de` and `en` objects
-3. Use translations via `localize(this.hass, key)`
+3. Use translations via `getTranslations(language)` and `formatString(template, params)`
 4. Test with different Home Assistant language settings
 
 ### Updating Styles
@@ -505,8 +543,8 @@ docs(readme): update installation instructions
 
 1. Update version in `package.json`
 2. Update `CHANGELOG.md`
-3. Create git tag: `git tag -a v0.7.0 -m "Release 0.7.0"`
-4. Push tag: `git push origin v0.7.0`
+3. Create git tag: `git tag -a v0.8.0 -m "Release 0.8.0"`
+4. Push tag: `git push origin v0.8.0`
 5. GitHub releases automatically built
 
 ## Useful Resources
