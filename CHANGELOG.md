@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-02-05
+
+### Fixed
+
+- Improved hint text for editing schedules
+  - Changed "Click on a day to edit its schedule" to "Click on a time slot to edit the schedule"
+  - Changed "Klicken Sie auf einen Tag, um den Zeitplan zu bearbeiten" to "Klicken Sie auf einen Zeitabschnitt, um den Zeitplan zu bearbeiten"
+  - Previous wording was misleading as clicking on the day label (Mo, Di, ...) had no effect
+
 ## [0.8.0] - 2026-02-03
 
 ### Added
@@ -498,7 +507,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.8.0...HEAD
+[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.9.0...HEAD
+[0.9.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.5.0...0.6.0

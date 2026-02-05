@@ -6,7 +6,7 @@ This document provides comprehensive context for AI assistants working with the 
 
 **Name**: HomematicIP Local Climate Schedule Card
 **Type**: Custom Lovelace Card for Home Assistant
-**Version**: 0.8.0
+**Version**: 0.9.0
 **License**: MIT
 **Primary Language**: TypeScript
 **Framework**: Lit (Web Components)
@@ -543,8 +543,8 @@ docs(readme): update installation instructions
 
 1. Update version in `package.json`
 2. Update `CHANGELOG.md`
-3. Create git tag: `git tag -a v0.8.0 -m "Release 0.8.0"`
-4. Push tag: `git push origin v0.8.0`
+3. Create git tag: `git tag -a v0.9.0 -m "Release 0.9.0"`
+4. Push tag: `git push origin v0.9.0`
 5. GitHub releases automatically built
 
 ## Useful Resources
