@@ -6,16 +6,13 @@ import {
   HomeAssistant,
   ScheduleEntityAttributes,
   WEEKDAYS,
-  ProfileData,
   Weekday,
   SimpleProfileData,
   EntityConfigOrString,
 } from "./types";
 import "./editor";
 import {
-  convertToBackendFormat,
   validateTimeBlocks,
-  validateProfileData,
   parseSimpleWeekdaySchedule,
   timeBlocksToSimpleWeekdayData,
   calculateBaseTemperature,
@@ -953,30 +950,15 @@ export class HomematicScheduleCard extends LitElement {
 
         // Extract schedule data (support both with and without metadata wrapper)
         let scheduleData: unknown;
-        let isSimpleFormat = false;
         if ("scheduleData" in data) {
           scheduleData = data.scheduleData;
-          const format = "format" in data ? data.format : undefined;
-          const version = "version" in data ? data.version : undefined;
-          isSimpleFormat = format === "simple" || version === "2.0";
         } else {
           // Assume the entire file is schedule data
           scheduleData = importData;
-          // Try to detect format by checking first weekday structure
-          const firstWeekday =
-            scheduleData && typeof scheduleData === "object" && "MONDAY" in scheduleData
-              ? (scheduleData as Record<string, unknown>).MONDAY
-              : null;
-          isSimpleFormat = Array.isArray(firstWeekday);
         }
 
-        // Validate schedule data based on format
-        let validationError: ValidationMessage | null;
-        if (isSimpleFormat) {
-          validationError = validateSimpleProfileData(scheduleData);
-        } else {
-          validationError = validateProfileData(scheduleData);
-        }
+        // Validate schedule data
+        const validationError = validateSimpleProfileData(scheduleData);
 
         if (validationError) {
           const localizedError = this._translateValidationMessage(validationError);
@@ -1000,43 +982,24 @@ export class HomematicScheduleCard extends LitElement {
         }, 10000);
 
         try {
-          if (isSimpleFormat) {
-            // Import simple format
-            const importedSchedule = scheduleData as SimpleProfileData;
-            for (const weekday of WEEKDAYS) {
-              const simpleWeekdayData = importedSchedule[weekday];
-              if (simpleWeekdayData) {
-                // simpleWeekdayData is an object: {base_temperature, periods[]}
-                const { base_temperature: baseTemperature, periods } = simpleWeekdayData;
-                await this.hass.callService("homematicip_local", "set_schedule_simple_weekday", {
-                  entity_id: entityId,
-                  profile: this._currentProfile,
-                  weekday: weekday,
-                  base_temperature: baseTemperature,
-                  simple_weekday_list: periods,
-                });
-              }
+          const importedSchedule = scheduleData as SimpleProfileData;
+          for (const weekday of WEEKDAYS) {
+            const simpleWeekdayData = importedSchedule[weekday];
+            if (simpleWeekdayData) {
+              // simpleWeekdayData is an object: {base_temperature, periods[]}
+              const { base_temperature: baseTemperature, periods } = simpleWeekdayData;
+              await this.hass.callService("homematicip_local", "set_schedule_simple_weekday", {
+                entity_id: entityId,
+                profile: this._currentProfile,
+                weekday: weekday,
+                base_temperature: baseTemperature,
+                simple_weekday_list: periods,
+              });
             }
-
-            // Update local state
-            this._scheduleData = importedSchedule;
-          } else {
-            // Import legacy format (backward compatibility for old export files)
-            const importedSchedule = scheduleData as ProfileData;
-            for (const weekday of WEEKDAYS) {
-              const weekdayData = importedSchedule[weekday];
-              if (weekdayData) {
-                const backendData = convertToBackendFormat(weekdayData);
-                await this.hass.callService("homematicip_local", "set_schedule_profile_weekday", {
-                  entity_id: entityId,
-                  profile: this._currentProfile,
-                  weekday: weekday,
-                  weekday_data: backendData,
-                });
-              }
-            }
-            // Local state will be updated by _updateFromEntity() below
           }
+
+          // Update local state
+          this._scheduleData = importedSchedule;
 
           this._updateFromEntity();
           this.requestUpdate();

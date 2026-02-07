@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.9.0] - 2026-02-05
+### Removed
+
+- Dropped support for importing schedules in legacy 13-slot format
+- Removed `set_schedule_profile_weekday` service call (only simple format is supported)
+- Removed legacy format detection logic from schedule import
+- Removed unused imports: `ProfileData`, `convertToBackendFormat`, `validateProfileData`
 
 ### Fixed
 
