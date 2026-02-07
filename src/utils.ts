@@ -68,6 +68,16 @@ export function getProfileFromPresetMode(presetMode?: string): string | undefine
 }
 
 /**
+ * Convert device_active_profile_index (1-based) to profile name
+ * @param index - The 1-based profile index from entity attributes (e.g., 1 for P1)
+ * @returns Profile name (e.g., "P1") or undefined if index is not provided
+ */
+export function getActiveProfileFromIndex(index?: number | null): string | undefined {
+  if (index === undefined || index === null) return undefined;
+  return `P${index}`;
+}
+
+/**
  * Parse weekday schedule data into time blocks
  */
 export interface TimeBlock {
@@ -813,6 +823,28 @@ export function fillGapsWithBaseTemperature(
 
   // Merge consecutive blocks with same temperature
   return mergeConsecutiveBlocks(result);
+}
+
+export type ScheduleApiVersion = "v1" | "v2";
+
+/**
+ * Determine the schedule API version from the entity attribute value
+ * Returns "v2" for "v2.0", defaults to "v1" for any other value or undefined
+ */
+export function getScheduleApiVersion(scheduleApiVersion?: string): ScheduleApiVersion {
+  return scheduleApiVersion === "v2.0" ? "v2" : "v1";
+}
+
+/**
+ * Extract device address from the entity address attribute
+ * Address format: "device_address:channel_no" (e.g., "000C9709AEF157:1")
+ * Returns the device_address part, or undefined if the format is invalid
+ */
+export function getDeviceAddress(address?: string): string | undefined {
+  if (!address) return undefined;
+  const parts = address.split(":");
+  if (parts.length !== 2) return undefined;
+  return parts[0];
 }
 
 /**

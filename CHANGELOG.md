@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-02-07
+
+**Requires Homematic(IP) Local integration >= 2.3.0 for V2 API support. Fully backward compatible with older versions (V1 API).**
+
+### Added
+
+- Multi-API-version support (V1 + V2) for the Homematic(IP) Local integration
+  - Auto-detects API version per entity via `schedule_api_version` attribute
+  - V2 uses device-based service calls (`set_schedule_weekday` with `device_address`)
+  - V1 continues to use entity-based service calls (`set_schedule_simple_weekday` with `entity_id`)
+  - Mixed V1/V2 entities in the same card are fully supported
+- API version badge in the card header showing the detected version (v1/v2)
+
 ### Removed
 
 - Dropped support for importing schedules in legacy 13-slot format
@@ -20,6 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Changed "Click on a day to edit its schedule" to "Click on a time slot to edit the schedule"
   - Changed "Klicken Sie auf einen Tag, um den Zeitplan zu bearbeiten" to "Klicken Sie auf einen Zeitabschnitt, um den Zeitplan zu bearbeiten"
   - Previous wording was misleading as clicking on the day label (Mo, Di, ...) had no effect
+
+### Technical
+
+- Added `schedule_api_version` to `ScheduleEntityAttributes` type
+- Added `ScheduleApiVersion` type and utility functions `getScheduleApiVersion()`, `getDeviceAddress()`
+- Added `_callSetActiveProfile()` and `_callSetScheduleWeekday()` helper methods that encapsulate V1/V2 service call differences
+- Refactored `_scheduleReloadDeviceConfig()` to use shared `getDeviceAddress()` utility
+- All 5 direct `callService` sites replaced with API-version-aware helpers
 
 ## [0.8.0] - 2026-02-03
 

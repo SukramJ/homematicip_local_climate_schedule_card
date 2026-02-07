@@ -15,9 +15,10 @@ The API version is determined by the `schedule_api_version` attribute on the cli
 
 ## Changes from V1
 
-1. **Service names**: The `_simple` suffix is removed (e.g. `set_schedule_simple_weekday` becomes `set_schedule_weekday`)
+1. **Service names**: The `_simple` suffix is removed (e.g. `set_schedule_simple_weekday` becomes `set_schedule_weekday`), and `set_schedule_active_profile` is renamed to `set_current_schedule_profile`
 2. **Device-based services**: All services switch from `entity_id` to device identification via `device_id` or `device_address` (exactly one must be provided)
 3. **Data format**: Remains unchanged
+4. **Entity attributes**: `active_profile` is replaced by `current_schedule_profile`, and a new `device_active_profile_index` attribute (1-based integer) replaces `preset_mode` parsing for profile detection
 
 ## Device Identification
 
@@ -69,11 +70,11 @@ data:
 
 ---
 
-## 2. `homematicip_local.set_schedule_active_profile`
+## 2. `homematicip_local.set_current_schedule_profile`
 
 Loads the schedule data for a profile. This call does **not** activate the profile on the device — it only provides the schedule data for display purposes.
 
-Service name is unchanged from V1.
+Replaces V1 service `set_schedule_active_profile`.
 
 ### Parameters
 
@@ -86,7 +87,7 @@ Service name is unchanged from V1.
 ### Example
 
 ```yaml
-service: homematicip_local.set_schedule_active_profile
+service: homematicip_local.set_current_schedule_profile
 data:
   device_address: "000C9709AEF157"
   profile: "P2"
@@ -119,11 +120,19 @@ data:
 
 ## V1 to V2 Migration Summary
 
-| V1 Service                    | V2 Service                    | Parameter Change                              |
-| ----------------------------- | ----------------------------- | --------------------------------------------- |
-| `set_schedule_simple_weekday` | `set_schedule_weekday`        | `entity_id` → `device_id` or `device_address` |
-| `set_schedule_active_profile` | `set_schedule_active_profile` | `entity_id` → `device_id` or `device_address` |
-| `reload_device_config`        | `reload_device_config`        | No change (already device-based)              |
+| V1 Service                    | V2 Service                     | Parameter Change                              |
+| ----------------------------- | ------------------------------ | --------------------------------------------- |
+| `set_schedule_simple_weekday` | `set_schedule_weekday`         | `entity_id` → `device_id` or `device_address` |
+| `set_schedule_active_profile` | `set_current_schedule_profile` | `entity_id` → `device_id` or `device_address` |
+| `reload_device_config`        | `reload_device_config`         | No change (already device-based)              |
+
+### Entity Attribute Changes
+
+| V1 Attribute         | V2 Attribute                  | Description                                         |
+| -------------------- | ----------------------------- | --------------------------------------------------- |
+| `active_profile`     | `current_schedule_profile`    | Currently loaded profile name (e.g. `"P1"`)         |
+| `preset_mode`        | `device_active_profile_index` | 1-based integer index (e.g. `1` for P1, `2` for P2) |
+| `available_profiles` | `available_profiles`          | Unchanged                                           |
 
 ## Additional V2 Services (not yet used by the card)
 
