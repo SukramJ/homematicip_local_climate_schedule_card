@@ -31,6 +31,10 @@ import {
   fillGapsWithBaseTemperature,
   sortBlocksChronologically,
   getProfileFromPresetMode,
+  getActiveProfileFromIndex,
+  getScheduleApiVersion,
+  getDeviceAddress,
+  ScheduleApiVersion,
 } from "./utils";
 import { getTranslations, formatString, Translations } from "./localization";
 
@@ -299,23 +303,78 @@ export class HomematicScheduleCard extends LitElement {
     );
   }
 
+  private _getScheduleApiVersion(entityId: string): ScheduleApiVersion {
+    const entity = this.hass?.states[entityId];
+    return getScheduleApiVersion(entity?.attributes?.schedule_api_version);
+  }
+
+  private _getDeviceAddress(entityId: string): string | undefined {
+    const entity = this.hass?.states[entityId];
+    return getDeviceAddress(entity?.attributes?.address);
+  }
+
+  private _requireDeviceAddress(entityId: string): string {
+    const deviceAddress = this._getDeviceAddress(entityId);
+    if (!deviceAddress) {
+      throw new Error(
+        `Cannot resolve device_address for entity ${entityId}. ` +
+          `Ensure the entity has a valid address attribute (format: "device_address:channel").`,
+      );
+    }
+    return deviceAddress;
+  }
+
+  private async _callSetActiveProfile(entityId: string, profile: string): Promise<void> {
+    const apiVersion = this._getScheduleApiVersion(entityId);
+    if (apiVersion === "v2") {
+      const deviceAddress = this._requireDeviceAddress(entityId);
+      await this.hass.callService("homematicip_local", "set_current_schedule_profile", {
+        device_address: deviceAddress,
+        profile: profile,
+      });
+    } else {
+      await this.hass.callService("homematicip_local", "set_schedule_active_profile", {
+        entity_id: entityId,
+        profile: profile,
+      });
+    }
+  }
+
+  private async _callSetScheduleWeekday(
+    entityId: string,
+    profile: string,
+    weekday: string,
+    baseTemperature: number,
+    periods: { starttime: string; endtime: string; temperature: number }[],
+  ): Promise<void> {
+    const apiVersion = this._getScheduleApiVersion(entityId);
+    if (apiVersion === "v2") {
+      const deviceAddress = this._requireDeviceAddress(entityId);
+      await this.hass.callService("homematicip_local", "set_schedule_weekday", {
+        device_address: deviceAddress,
+        profile: profile,
+        weekday: weekday,
+        base_temperature: baseTemperature,
+        simple_weekday_list: periods,
+      });
+    } else {
+      await this.hass.callService("homematicip_local", "set_schedule_simple_weekday", {
+        entity_id: entityId,
+        profile: profile,
+        weekday: weekday,
+        base_temperature: baseTemperature,
+        simple_weekday_list: periods,
+      });
+    }
+  }
+
   private _scheduleReloadDeviceConfig(entityId: string): void {
     if (!this.hass) return;
-    const entity = this.hass.states[entityId];
-    const address = entity?.attributes?.address;
-    if (!address) {
-      console.warn("Cannot reload device config: address attribute missing");
+    const deviceAddress = this._getDeviceAddress(entityId);
+    if (!deviceAddress) {
+      console.warn("Cannot reload device config: address attribute missing or invalid format");
       return;
     }
-
-    // Parse address format: "device_address:channel_no" (e.g., "000C9709AEF157:1")
-    const parts = address.split(":");
-    if (parts.length !== 2) {
-      console.warn("Cannot reload device config: invalid address format", address);
-      return;
-    }
-
-    const [deviceAddress] = parts;
 
     // Schedule reload after 5 seconds delay
     setTimeout(async () => {
@@ -524,8 +583,12 @@ export class HomematicScheduleCard extends LitElement {
 
     const attrs = entityState.attributes as ScheduleEntityAttributes;
 
-    // Extract active profile from preset_mode (e.g., "week_program_1" -> "P1")
-    const deviceProfile = this._getProfileFromPresetMode(attrs.preset_mode);
+    // Extract active profile: V2 uses device_active_profile_index, V1 uses preset_mode
+    const apiVersion = this._getScheduleApiVersion(entityId);
+    const deviceProfile =
+      apiVersion === "v2"
+        ? getActiveProfileFromIndex(attrs.device_active_profile_index)
+        : this._getProfileFromPresetMode(attrs.preset_mode);
 
     // Detect if the device's active profile changed externally (e.g., user changed it on the thermostat)
     // If so, reset user selection and follow the new active profile
@@ -543,9 +606,12 @@ export class HomematicScheduleCard extends LitElement {
     this._activeDeviceProfile = deviceProfile;
 
     // Use config profile if set, otherwise use the active device profile
+    // V2 uses current_schedule_profile, V1 uses active_profile as fallback
+    const activeProfile =
+      apiVersion === "v2" ? attrs.current_schedule_profile : attrs.active_profile;
     // But respect user's manual selection (don't override if user manually selected a profile)
     if (!this._userSelectedProfile) {
-      this._currentProfile = this._config.profile || deviceProfile || attrs.active_profile;
+      this._currentProfile = this._config.profile || deviceProfile || activeProfile;
     }
     this._scheduleData = attrs.schedule_data;
     this._availableProfiles = (attrs.available_profiles || [])
@@ -590,20 +656,16 @@ export class HomematicScheduleCard extends LitElement {
 
   /**
    * Reload schedule data when profile changes externally (e.g., on thermostat)
-   * This calls set_schedule_active_profile to refresh the schedule_data attribute
+   * This calls set_schedule_active_profile (V1) or set_current_schedule_profile (V2)
+   * to refresh the schedule_data attribute
    */
   private _reloadScheduleData(entityId: string, profile: string): void {
     if (!this.hass) return;
 
     // Call service to reload schedule data (fire and forget)
-    this.hass
-      .callService("homematicip_local", "set_schedule_active_profile", {
-        entity_id: entityId,
-        profile: profile,
-      })
-      .catch(() => {
-        // Silently ignore errors - the user will see stale data but can manually refresh
-      });
+    this._callSetActiveProfile(entityId, profile).catch(() => {
+      // Silently ignore errors - the user will see stale data but can manually refresh
+    });
   }
 
   private async _handleProfileChange(e: Event): Promise<void> {
@@ -618,10 +680,7 @@ export class HomematicScheduleCard extends LitElement {
 
     try {
       // Load schedule data for the selected profile (doesn't activate it on device)
-      await this.hass.callService("homematicip_local", "set_schedule_active_profile", {
-        entity_id: entityId,
-        profile: newProfile,
-      });
+      await this._callSetActiveProfile(entityId, newProfile);
 
       this._currentProfile = newProfile;
     } catch (err) {
@@ -721,16 +780,15 @@ export class HomematicScheduleCard extends LitElement {
     }, 10000);
 
     try {
-      // Call the new simple schedule service
-      // simpleWeekdayData is an object: {base_temperature, periods[]}
+      // Save schedule via API-version-aware helper
       const { base_temperature: baseTemperature, periods } = simpleWeekdayData;
-      await this.hass.callService("homematicip_local", "set_schedule_simple_weekday", {
-        entity_id: entityId,
-        profile: this._currentProfile,
-        weekday: this._editingWeekday,
-        base_temperature: baseTemperature,
-        simple_weekday_list: periods,
-      });
+      await this._callSetScheduleWeekday(
+        entityId,
+        this._currentProfile,
+        this._editingWeekday,
+        baseTemperature,
+        periods,
+      );
 
       // Update local state
       if (this._scheduleData) {
@@ -827,16 +885,15 @@ export class HomematicScheduleCard extends LitElement {
     }, 10000);
 
     try {
-      // Call the new simple schedule service
-      // simpleWeekdayData is an object: {base_temperature, periods[]}
+      // Save schedule via API-version-aware helper
       const { base_temperature: baseTemperature, periods } = simpleWeekdayData;
-      await this.hass.callService("homematicip_local", "set_schedule_simple_weekday", {
-        entity_id: entityId,
-        profile: this._currentProfile,
-        weekday: weekday,
-        base_temperature: baseTemperature,
-        simple_weekday_list: periods,
-      });
+      await this._callSetScheduleWeekday(
+        entityId,
+        this._currentProfile,
+        weekday,
+        baseTemperature,
+        periods,
+      );
 
       // Update local state
       if (this._scheduleData) {
@@ -986,15 +1043,14 @@ export class HomematicScheduleCard extends LitElement {
           for (const weekday of WEEKDAYS) {
             const simpleWeekdayData = importedSchedule[weekday];
             if (simpleWeekdayData) {
-              // simpleWeekdayData is an object: {base_temperature, periods[]}
               const { base_temperature: baseTemperature, periods } = simpleWeekdayData;
-              await this.hass.callService("homematicip_local", "set_schedule_simple_weekday", {
-                entity_id: entityId,
-                profile: this._currentProfile,
-                weekday: weekday,
-                base_temperature: baseTemperature,
-                simple_weekday_list: periods,
-              });
+              await this._callSetScheduleWeekday(
+                entityId,
+                this._currentProfile,
+                weekday,
+                baseTemperature,
+                periods,
+              );
             }
           }
 
@@ -1173,6 +1229,11 @@ export class HomematicScheduleCard extends LitElement {
                   )}
                 </select>
               `
+            : ""}
+          ${activeEntityId
+            ? html`<span class="api-version-badge"
+                >${this._getScheduleApiVersion(activeEntityId)}</span
+              >`
             : ""}
           <button
             class="export-btn"
@@ -1988,6 +2049,14 @@ export class HomematicScheduleCard extends LitElement {
 
       .export-btn:disabled:hover {
         background-color: var(--card-background-color);
+      }
+
+      .api-version-badge {
+        font-size: 10px;
+        color: var(--secondary-text-color);
+        opacity: 0.6;
+        flex-shrink: 0;
+        user-select: none;
       }
 
       .card-content {

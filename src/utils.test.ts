@@ -22,6 +22,9 @@ import {
   fillGapsWithBaseTemperature,
   sortBlocksChronologically,
   getProfileFromPresetMode,
+  getScheduleApiVersion,
+  getActiveProfileFromIndex,
+  getDeviceAddress,
   TimeBlock,
   ValidationMessage,
   ValidationMessageKey,
@@ -2373,6 +2376,68 @@ describe("Utils", () => {
     it("should handle edge cases", () => {
       expect(getProfileFromPresetMode("week_program_0")).toBe("P0");
       expect(getProfileFromPresetMode("week_program_99")).toBe("P99");
+    });
+  });
+
+  describe("getActiveProfileFromIndex", () => {
+    it("should convert index 1 to P1", () => {
+      expect(getActiveProfileFromIndex(1)).toBe("P1");
+    });
+
+    it("should convert index 3 to P3", () => {
+      expect(getActiveProfileFromIndex(3)).toBe("P3");
+    });
+
+    it("should return undefined for undefined input", () => {
+      expect(getActiveProfileFromIndex(undefined)).toBeUndefined();
+    });
+
+    it("should return undefined for null input", () => {
+      expect(getActiveProfileFromIndex(null)).toBeUndefined();
+    });
+  });
+
+  describe("getScheduleApiVersion", () => {
+    it('should return "v2" for "v2.0"', () => {
+      expect(getScheduleApiVersion("v2.0")).toBe("v2");
+    });
+
+    it('should return "v1" for undefined', () => {
+      expect(getScheduleApiVersion(undefined)).toBe("v1");
+    });
+
+    it('should return "v1" for unknown values', () => {
+      expect(getScheduleApiVersion("v1.0")).toBe("v1");
+      expect(getScheduleApiVersion("v3.0")).toBe("v1");
+      expect(getScheduleApiVersion("")).toBe("v1");
+      expect(getScheduleApiVersion("v2")).toBe("v1");
+    });
+  });
+
+  describe("getDeviceAddress", () => {
+    it("should extract device address from address with channel", () => {
+      expect(getDeviceAddress("000C9709AEF157:1")).toBe("000C9709AEF157");
+    });
+
+    it("should return undefined for undefined input", () => {
+      expect(getDeviceAddress(undefined)).toBeUndefined();
+    });
+
+    it("should return undefined for empty string", () => {
+      expect(getDeviceAddress("")).toBeUndefined();
+    });
+
+    it("should return undefined for address without colon", () => {
+      expect(getDeviceAddress("000C9709AEF157")).toBeUndefined();
+    });
+
+    it("should return undefined for address with multiple colons", () => {
+      expect(getDeviceAddress("000C9709:AEF157:1")).toBeUndefined();
+    });
+
+    it("should handle different channel numbers", () => {
+      expect(getDeviceAddress("ABC123:0")).toBe("ABC123");
+      expect(getDeviceAddress("ABC123:10")).toBe("ABC123");
     });
   });
 });
