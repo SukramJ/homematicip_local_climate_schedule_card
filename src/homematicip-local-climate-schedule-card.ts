@@ -583,6 +583,14 @@ export class HomematicScheduleCard extends LitElement {
 
     const attrs = entityState.attributes as ScheduleEntityAttributes;
 
+    if (entityId.startsWith("sensor.") && attrs.schedule_type !== "climate") {
+      this._currentProfile = undefined;
+      this._activeDeviceProfile = undefined;
+      this._scheduleData = undefined;
+      this._availableProfiles = [];
+      return;
+    }
+
     // Extract active profile: V2 uses device_active_profile_index, V1 uses preset_mode
     const apiVersion = this._getScheduleApiVersion(entityId);
     const deviceProfile =
@@ -1196,6 +1204,26 @@ export class HomematicScheduleCard extends LitElement {
           </div>
         </ha-card>
       `;
+    }
+
+    if (activeEntityId?.startsWith("sensor.")) {
+      const sensorAttrs = entityState.attributes as ScheduleEntityAttributes;
+      if (sensorAttrs.schedule_type !== "climate") {
+        return html`
+          <ha-card>
+            <div class="card-header">
+              <div class="name">${headerTitle}</div>
+            </div>
+            <div class="card-content">
+              <div class="error">
+                ${formatString(this._translations.ui.sensorNotSupported, {
+                  entity: activeEntityId,
+                })}
+              </div>
+            </div>
+          </ha-card>
+        `;
+      }
     }
 
     return html`

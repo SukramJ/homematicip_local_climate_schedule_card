@@ -111,6 +111,7 @@ describe("localization", () => {
       expect(translations.ui.saveAll).toBeDefined();
       expect(translations.ui.discard).toBeDefined();
       expect(translations.ui.confirmDiscardChanges).toBeDefined();
+      expect(translations.ui.sensorNotSupported).toBeDefined();
 
       // Check error messages
       expect(translations.errors).toBeDefined();
