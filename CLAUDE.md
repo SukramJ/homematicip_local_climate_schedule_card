@@ -6,7 +6,7 @@ This document provides comprehensive context for AI assistants working with the 
 
 **Name**: HomematicIP Local Climate Schedule Card
 **Type**: Custom Lovelace Card for Home Assistant
-**Version**: 0.9.0
+**Version**: 0.10.0
 **License**: MIT
 **Primary Language**: TypeScript
 **Framework**: Lit (Web Components)

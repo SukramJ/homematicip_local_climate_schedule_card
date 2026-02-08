@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-02-08
+
+### Added
+
+- Validation guard for sensor entities without `schedule_type: "climate"`
+  - Sensor entities are gracefully rejected with a localized error message
+  - Guard in `_updateFromEntity` clears state for incompatible sensor entities
+  - Guard in `render` displays user-friendly error in card UI
+- Warning for entities without `schedule_data` attribute
+  - Displays localized error message when an entity does not provide schedule data
+  - Guard in `_updateFromEntity` clears state for entities without schedule data
+  - Guard in `render` displays user-friendly warning in card UI
+
+### Technical
+
+- Added `schedule_type` to `ScheduleEntityAttributes` type
+- Added `sensorNotSupported` translation key (EN + DE) for incompatible sensor entity error
+- Added `noScheduleData` translation key (EN + DE) for missing schedule data warning
+
 ## [0.9.0] - 2026-02-07
 
 **Requires Homematic(IP) Local integration >= 2.3.0 for V2 API support. Fully backward compatible with older versions (V1 API).**
@@ -533,7 +552,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.9.0...HEAD
+[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.10.0...HEAD
+[0.10.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.9.0...0.10.0
 [0.9.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.7.0...0.8.0
 [0.7.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.6.0...0.7.0

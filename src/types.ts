@@ -77,6 +77,7 @@ export interface ScheduleEntityAttributes {
   available_profiles: string[];
   preset_mode?: string;
   schedule_data?: SimpleProfileData;
+  schedule_type?: string;
   schedule_api_version?: string;
   current_schedule_profile?: string; // V2: replaces active_profile
   device_active_profile_index?: number; // V2: 1-based, P1=1, P2=2, ...

@@ -50,6 +50,8 @@ export interface Translations {
     editSlot: string;
     saveSlot: string;
     cancelSlotEdit: string;
+    sensorNotSupported: string;
+    noScheduleData: string;
   };
   // Error messages
   errors: {
@@ -125,6 +127,8 @@ const en: Translations = {
     editSlot: "Edit",
     saveSlot: "Save",
     cancelSlotEdit: "Cancel",
+    sensorNotSupported: "Sensor entity {entity} does not have a climate schedule type.",
+    noScheduleData: "Entity {entity} does not provide schedule data.",
   },
   errors: {
     failedToChangeProfile: "Failed to change profile: {error}",
@@ -215,6 +219,8 @@ const de: Translations = {
     editSlot: "Bearbeiten",
     saveSlot: "Speichern",
     cancelSlotEdit: "Abbrechen",
+    sensorNotSupported: "Sensor-Entität {entity} hat keinen Klima-Zeitplantyp.",
+    noScheduleData: "Entität {entity} stellt keine Zeitplandaten bereit.",
   },
   errors: {
     failedToChangeProfile: "Fehler beim Wechseln des Profils: {error}",
