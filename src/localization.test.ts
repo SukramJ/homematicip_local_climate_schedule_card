@@ -112,6 +112,7 @@ describe("localization", () => {
       expect(translations.ui.discard).toBeDefined();
       expect(translations.ui.confirmDiscardChanges).toBeDefined();
       expect(translations.ui.sensorNotSupported).toBeDefined();
+      expect(translations.ui.noScheduleData).toBeDefined();
 
       // Check error messages
       expect(translations.errors).toBeDefined();

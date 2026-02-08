@@ -15,11 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Sensor entities are gracefully rejected with a localized error message
   - Guard in `_updateFromEntity` clears state for incompatible sensor entities
   - Guard in `render` displays user-friendly error in card UI
+- Warning for entities without `schedule_data` attribute
+  - Displays localized error message when an entity does not provide schedule data
+  - Guard in `_updateFromEntity` clears state for entities without schedule data
+  - Guard in `render` displays user-friendly warning in card UI
 
 ### Technical
 
 - Added `schedule_type` to `ScheduleEntityAttributes` type
 - Added `sensorNotSupported` translation key (EN + DE) for incompatible sensor entity error
+- Added `noScheduleData` translation key (EN + DE) for missing schedule data warning
 
 ## [0.9.0] - 2026-02-07
 

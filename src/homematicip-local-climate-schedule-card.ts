@@ -591,6 +591,14 @@ export class HomematicScheduleCard extends LitElement {
       return;
     }
 
+    if (!attrs.schedule_data) {
+      this._currentProfile = undefined;
+      this._activeDeviceProfile = undefined;
+      this._scheduleData = undefined;
+      this._availableProfiles = [];
+      return;
+    }
+
     // Extract active profile: V2 uses device_active_profile_index, V1 uses preset_mode
     const apiVersion = this._getScheduleApiVersion(entityId);
     const deviceProfile =
@@ -1224,6 +1232,24 @@ export class HomematicScheduleCard extends LitElement {
           </ha-card>
         `;
       }
+    }
+
+    const currentAttrs = entityState.attributes as ScheduleEntityAttributes;
+    if (!currentAttrs.schedule_data) {
+      return html`
+        <ha-card>
+          <div class="card-header">
+            <div class="name">${headerTitle}</div>
+          </div>
+          <div class="card-content">
+            <div class="error">
+              ${formatString(this._translations.ui.noScheduleData, {
+                entity: activeEntityId || "",
+              })}
+            </div>
+          </div>
+        </ha-card>
+      `;
     }
 
     return html`
