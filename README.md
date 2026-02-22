@@ -224,54 +224,7 @@ This card is specifically designed for the **HomematicIP Local** integration and
 
 ## Development
 
-### Setup
-
-```bash
-npm install
-```
-
-### Build
-
-```bash
-npm run build
-```
-
-### Watch Mode
-
-```bash
-npm run watch
-```
-
-### Testing
-
-```bash
-npm test
-npm run test:coverage
-```
-
-### Linting
-
-```bash
-npm run lint
-npm run lint:fix
-```
-
-### Pre-commit Hooks
-
-This project uses Husky for Git hooks. When you commit, the following checks run automatically:
-
-1. **Lint-staged**: ESLint + Prettier on staged files
-2. **Type Check**: TypeScript validation
-3. **Tests**: All unit tests
-4. **Build**: Production build
-
-See [PRE_COMMIT_HOOKS.md](PRE_COMMIT_HOOKS.md) for detailed documentation.
-
-To bypass hooks (emergency only):
-
-```bash
-git commit --no-verify -m "emergency commit"
-```
+Development of this card happens in the [homematicip-local-frontend](https://github.com/SukramJ/homematicip-local-frontend) monorepo. This repository is used for HACS distribution only.
 
 ## Troubleshooting
 
@@ -295,13 +248,7 @@ git commit --no-verify -m "emergency commit"
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+Contributions are welcome! Please submit Pull Requests to the [homematicip-local-frontend](https://github.com/SukramJ/homematicip-local-frontend) monorepo where development happens.
 
 ## License
 
