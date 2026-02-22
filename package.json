@@ -1,83 +1,18 @@
 {
   "name": "homematicip-local-climate-schedule-card",
   "version": "0.10.0",
-  "description": "Custom Lovelace card for Homematic thermostat schedules - HACS compatible",
-  "main": "dist/homematicip-local-climate-schedule-card.js",
-  "scripts": {
-    "build": "rollup -c && npm run copy-to-ha",
-    "build:dev": "rollup -c",
-    "copy-to-ha": "mkdir -p ../homematicip_local/config/www/community/homematicip_local_climate_schedule_card && cp dist/homematicip-local-climate-schedule-card.js ../homematicip_local/config/www/community/homematicip_local_climate_schedule_card/",
-    "watch": "rollup -c --watch",
-    "serve": "rollup -c --watch",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,js,json,md}\" \"*.{json,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\" \"*.{json,md}\"",
-    "validate": "npm run lint && npm run type-check && npm test && npm run build",
-    "prepare": "husky",
-    "pre-commit": "lint-staged"
-  },
-  "keywords": [
-    "homeassistant",
-    "lovelace",
-    "custom-card",
-    "homematic",
-    "schedule",
-    "climate",
-    "thermostat",
-    "hacs"
-  ],
+  "description": "Custom Lovelace card for HomematicIP Local thermostat schedules",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/SukramJ/homematicip_local_climate_schedule_card.git"
   },
-  "bugs": {
-    "url": "https://github.com/SukramJ/homematicip_local_climate_schedule_card/issues"
-  },
-  "homepage": "https://github.com/SukramJ/homematicip_local_climate_schedule_card#readme",
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "lit": "^3.3.2",
-    "tslib": "^2.8.1"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "@rollup/plugin-babel": "^6.1.0",
-    "@rollup/plugin-commonjs": "^29.0.0",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-replace": "^6.0.3",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@rollup/plugin-typescript": "^12.3.0",
-    "@types/jest": "^30.0.0",
-    "@typescript-eslint/eslint-plugin": "^8.55.0",
-    "@typescript-eslint/parser": "^8.55.0",
-    "eslint": "^9.39.2",
-    "typescript-eslint": "^8.55.0",
-    "husky": "^9.1.7",
-    "jest": "^30.2.0",
-    "jest-environment-jsdom": "^30.2.0",
-    "lint-staged": "^16.2.7",
-    "prettier": "^3.8.1",
-    "rollup": "^4.57.1",
-    "ts-jest": "^29.4.6",
-    "typescript": "^5.9.3"
-  },
-  "lint-staged": {
-    "*.ts": [
-      "eslint --fix",
-      "jest --bail --findRelatedTests --passWithNoTests"
-    ],
-    "*.{ts,js,json,md}": [
-      "prettier --write"
-    ]
-  },
-  "overrides": {
-    "test-exclude": "^7.0.1"
-  }
+  "homepage": "https://github.com/SukramJ/homematicip_local_climate_schedule_card",
+  "keywords": [
+    "home-assistant",
+    "lovelace",
+    "homematic",
+    "schedule",
+    "climate"
+  ]
 }
