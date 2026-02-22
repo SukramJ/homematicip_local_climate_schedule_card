@@ -1,8 +1,8 @@
-function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)n=Reflect.decorate(t,e,i,s);else for(var a=t.length-1;a>=0;a--)(o=t[a])&&(n=(r<3?o(n):r>3?o(e,i,n):o(e,i))||n);return r>3&&n&&Object.defineProperty(e,i,n),n}"function"==typeof SuppressedError&&SuppressedError;const e=globalThis,i=e.ShadowRoot&&(void 0===e.ShadyCSS||e.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),o=new WeakMap;let r=class{constructor(t,e,i){if(this._$cssResult$=!0,i!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=t,this.t=e}get styleSheet(){let t=this.o;const e=this.t;if(i&&void 0===t){const i=void 0!==e&&1===e.length;i&&(t=o.get(e)),void 0===t&&((this.o=t=new CSSStyleSheet).replaceSync(this.cssText),i&&o.set(e,t))}return t}toString(){return this.cssText}};const n=(t,...e)=>{const i=1===t.length?t[0]:e.reduce((e,i,s)=>e+(t=>{if(!0===t._$cssResult$)return t.cssText;if("number"==typeof t)return t;throw Error("Value passed to 'css' function must be a 'css' function result: "+t+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+t[s+1],t[0]);return new r(i,t,s)},a=i?t=>t:t=>t instanceof CSSStyleSheet?(t=>{let e="";for(const i of t.cssRules)e+=i.cssText;return(t=>new r("string"==typeof t?t:t+"",void 0,s))(e)})(t):t,{is:l,defineProperty:d,getOwnPropertyDescriptor:c,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:u}=Object,g=globalThis,m=g.trustedTypes,_=m?m.emptyScript:"",f=g.reactiveElementPolyfillSupport,v=(t,e)=>t,y={toAttribute(t,e){switch(e){case Boolean:t=t?_:null;break;case Object:case Array:t=null==t?t:JSON.stringify(t)}return t},fromAttribute(t,e){let i=t;switch(e){case Boolean:i=null!==t;break;case Number:i=null===t?null:Number(t);break;case Object:case Array:try{i=JSON.parse(t)}catch(t){i=null}}return i}},b=(t,e)=>!l(t,e),x={attribute:!0,type:String,converter:y,reflect:!1,useDefault:!1,hasChanged:b};Symbol.metadata??=Symbol("metadata"),g.litPropertyMetadata??=new WeakMap;let k=class extends HTMLElement{static addInitializer(t){this._$Ei(),(this.l??=[]).push(t)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(t,e=x){if(e.state&&(e.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(t)&&((e=Object.create(e)).wrapped=!0),this.elementProperties.set(t,e),!e.noAccessor){const i=Symbol(),s=this.getPropertyDescriptor(t,i,e);void 0!==s&&d(this.prototype,t,s)}}static getPropertyDescriptor(t,e,i){const{get:s,set:o}=c(this.prototype,t)??{get(){return this[e]},set(t){this[e]=t}};return{get:s,set(e){const r=s?.call(this);o?.call(this,e),this.requestUpdate(t,r,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(t){return this.elementProperties.get(t)??x}static _$Ei(){if(this.hasOwnProperty(v("elementProperties")))return;const t=u(this);t.finalize(),void 0!==t.l&&(this.l=[...t.l]),this.elementProperties=new Map(t.elementProperties)}static finalize(){if(this.hasOwnProperty(v("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(v("properties"))){const t=this.properties,e=[...h(t),...p(t)];for(const i of e)this.createProperty(i,t[i])}const t=this[Symbol.metadata];if(null!==t){const e=litPropertyMetadata.get(t);if(void 0!==e)for(const[t,i]of e)this.elementProperties.set(t,i)}this._$Eh=new Map;for(const[t,e]of this.elementProperties){const i=this._$Eu(t,e);void 0!==i&&this._$Eh.set(i,t)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(t){const e=[];if(Array.isArray(t)){const i=new Set(t.flat(1/0).reverse());for(const t of i)e.unshift(a(t))}else void 0!==t&&e.push(a(t));return e}static _$Eu(t,e){const i=e.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof t?t.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(t=>this.enableUpdating=t),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(t=>t(this))}addController(t){(this._$EO??=new Set).add(t),void 0!==this.renderRoot&&this.isConnected&&t.hostConnected?.()}removeController(t){this._$EO?.delete(t)}_$E_(){const t=new Map,e=this.constructor.elementProperties;for(const i of e.keys())this.hasOwnProperty(i)&&(t.set(i,this[i]),delete this[i]);t.size>0&&(this._$Ep=t)}createRenderRoot(){const t=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((t,s)=>{if(i)t.adoptedStyleSheets=s.map(t=>t instanceof CSSStyleSheet?t:t.styleSheet);else for(const i of s){const s=document.createElement("style"),o=e.litNonce;void 0!==o&&s.setAttribute("nonce",o),s.textContent=i.cssText,t.appendChild(s)}})(t,this.constructor.elementStyles),t}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(t=>t.hostConnected?.())}enableUpdating(t){}disconnectedCallback(){this._$EO?.forEach(t=>t.hostDisconnected?.())}attributeChangedCallback(t,e,i){this._$AK(t,i)}_$ET(t,e){const i=this.constructor.elementProperties.get(t),s=this.constructor._$Eu(t,i);if(void 0!==s&&!0===i.reflect){const o=(void 0!==i.converter?.toAttribute?i.converter:y).toAttribute(e,i.type);this._$Em=t,null==o?this.removeAttribute(s):this.setAttribute(s,o),this._$Em=null}}_$AK(t,e){const i=this.constructor,s=i._$Eh.get(t);if(void 0!==s&&this._$Em!==s){const t=i.getPropertyOptions(s),o="function"==typeof t.converter?{fromAttribute:t.converter}:void 0!==t.converter?.fromAttribute?t.converter:y;this._$Em=s;const r=o.fromAttribute(e,t.type);this[s]=r??this._$Ej?.get(s)??r,this._$Em=null}}requestUpdate(t,e,i,s=!1,o){if(void 0!==t){const r=this.constructor;if(!1===s&&(o=this[t]),i??=r.getPropertyOptions(t),!((i.hasChanged??b)(o,e)||i.useDefault&&i.reflect&&o===this._$Ej?.get(t)&&!this.hasAttribute(r._$Eu(t,i))))return;this.C(t,e,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(t,e,{useDefault:i,reflect:s,wrapped:o},r){i&&!(this._$Ej??=new Map).has(t)&&(this._$Ej.set(t,r??e??this[t]),!0!==o||void 0!==r)||(this._$AL.has(t)||(this.hasUpdated||i||(e=void 0),this._$AL.set(t,e)),!0===s&&this._$Em!==t&&(this._$Eq??=new Set).add(t))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(t){Promise.reject(t)}const t=this.scheduleUpdate();return null!=t&&await t,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[t,e]of this._$Ep)this[t]=e;this._$Ep=void 0}const t=this.constructor.elementProperties;if(t.size>0)for(const[e,i]of t){const{wrapped:t}=i,s=this[e];!0!==t||this._$AL.has(e)||void 0===s||this.C(e,void 0,i,s)}}let t=!1;const e=this._$AL;try{t=this.shouldUpdate(e),t?(this.willUpdate(e),this._$EO?.forEach(t=>t.hostUpdate?.()),this.update(e)):this._$EM()}catch(e){throw t=!1,this._$EM(),e}t&&this._$AE(e)}willUpdate(t){}_$AE(t){this._$EO?.forEach(t=>t.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(t)),this.updated(t)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(t){return!0}update(t){this._$Eq&&=this._$Eq.forEach(t=>this._$ET(t,this[t])),this._$EM()}updated(t){}firstUpdated(t){}};k.elementStyles=[],k.shadowRootOptions={mode:"open"},k[v("elementProperties")]=new Map,k[v("finalized")]=new Map,f?.({ReactiveElement:k}),(g.reactiveElementVersions??=[]).push("2.1.2");const $=globalThis,S=t=>t,w=$.trustedTypes,T=w?w.createPolicy("lit-html",{createHTML:t=>t}):void 0,E="$lit$",A=`lit$${Math.random().toFixed(9).slice(2)}$`,M="?"+A,D=`<${M}>`,P=document,B=()=>P.createComment(""),C=t=>null===t||"object"!=typeof t&&"function"!=typeof t,I=Array.isArray,O="[ \t\n\f\r]",N=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,z=/-->/g,U=/>/g,W=RegExp(`>|${O}(?:([^\\s"'>=/]+)(${O}*=${O}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),L=/'/g,R=/"/g,H=/^(?:script|style|textarea|title)$/i,j=(t,...e)=>({_$litType$:1,strings:t,values:e}),F=Symbol.for("lit-noChange"),V=Symbol.for("lit-nothing"),Y=new WeakMap,Z=P.createTreeWalker(P,129);function J(t,e){if(!I(t)||!t.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==T?T.createHTML(e):e}class q{constructor({strings:t,_$litType$:e},i){let s;this.parts=[];let o=0,r=0;const n=t.length-1,a=this.parts,[l,d]=((t,e)=>{const i=t.length-1,s=[];let o,r=2===e?"<svg>":3===e?"<math>":"",n=N;for(let e=0;e<i;e++){const i=t[e];let a,l,d=-1,c=0;for(;c<i.length&&(n.lastIndex=c,l=n.exec(i),null!==l);)c=n.lastIndex,n===N?"!--"===l[1]?n=z:void 0!==l[1]?n=U:void 0!==l[2]?(H.test(l[2])&&(o=RegExp("</"+l[2],"g")),n=W):void 0!==l[3]&&(n=W):n===W?">"===l[0]?(n=o??N,d=-1):void 0===l[1]?d=-2:(d=n.lastIndex-l[2].length,a=l[1],n=void 0===l[3]?W:'"'===l[3]?R:L):n===R||n===L?n=W:n===z||n===U?n=N:(n=W,o=void 0);const h=n===W&&t[e+1].startsWith("/>")?" ":"";r+=n===N?i+D:d>=0?(s.push(a),i.slice(0,d)+E+i.slice(d)+A+h):i+A+(-2===d?e:h)}return[J(t,r+(t[i]||"<?>")+(2===e?"</svg>":3===e?"</math>":"")),s]})(t,e);if(this.el=q.createElement(l,i),Z.currentNode=this.el.content,2===e||3===e){const t=this.el.content.firstChild;t.replaceWith(...t.childNodes)}for(;null!==(s=Z.nextNode())&&a.length<n;){if(1===s.nodeType){if(s.hasAttributes())for(const t of s.getAttributeNames())if(t.endsWith(E)){const e=d[r++],i=s.getAttribute(t).split(A),n=/([.?@])?(.*)/.exec(e);a.push({type:1,index:o,name:n[2],strings:i,ctor:"."===n[1]?tt:"?"===n[1]?et:"@"===n[1]?it:X}),s.removeAttribute(t)}else t.startsWith(A)&&(a.push({type:6,index:o}),s.removeAttribute(t));if(H.test(s.tagName)){const t=s.textContent.split(A),e=t.length-1;if(e>0){s.textContent=w?w.emptyScript:"";for(let i=0;i<e;i++)s.append(t[i],B()),Z.nextNode(),a.push({type:2,index:++o});s.append(t[e],B())}}}else if(8===s.nodeType)if(s.data===M)a.push({type:2,index:o});else{let t=-1;for(;-1!==(t=s.data.indexOf(A,t+1));)a.push({type:7,index:o}),t+=A.length-1}o++}}static createElement(t,e){const i=P.createElement("template");return i.innerHTML=t,i}}function K(t,e,i=t,s){if(e===F)return e;let o=void 0!==s?i._$Co?.[s]:i._$Cl;const r=C(e)?void 0:e._$litDirective$;return o?.constructor!==r&&(o?._$AO?.(!1),void 0===r?o=void 0:(o=new r(t),o._$AT(t,i,s)),void 0!==s?(i._$Co??=[])[s]=o:i._$Cl=o),void 0!==o&&(e=K(t,o._$AS(t,e.values),o,s)),e}class G{constructor(t,e){this._$AV=[],this._$AN=void 0,this._$AD=t,this._$AM=e}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(t){const{el:{content:e},parts:i}=this._$AD,s=(t?.creationScope??P).importNode(e,!0);Z.currentNode=s;let o=Z.nextNode(),r=0,n=0,a=i[0];for(;void 0!==a;){if(r===a.index){let e;2===a.type?e=new Q(o,o.nextSibling,this,t):1===a.type?e=new a.ctor(o,a.name,a.strings,this,t):6===a.type&&(e=new st(o,this,t)),this._$AV.push(e),a=i[++n]}r!==a?.index&&(o=Z.nextNode(),r++)}return Z.currentNode=P,s}p(t){let e=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(t,i,e),e+=i.strings.length-2):i._$AI(t[e])),e++}}class Q{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(t,e,i,s){this.type=2,this._$AH=V,this._$AN=void 0,this._$AA=t,this._$AB=e,this._$AM=i,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let t=this._$AA.parentNode;const e=this._$AM;return void 0!==e&&11===t?.nodeType&&(t=e.parentNode),t}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(t,e=this){t=K(this,t,e),C(t)?t===V||null==t||""===t?(this._$AH!==V&&this._$AR(),this._$AH=V):t!==this._$AH&&t!==F&&this._(t):void 0!==t._$litType$?this.$(t):void 0!==t.nodeType?this.T(t):(t=>I(t)||"function"==typeof t?.[Symbol.iterator])(t)?this.k(t):this._(t)}O(t){return this._$AA.parentNode.insertBefore(t,this._$AB)}T(t){this._$AH!==t&&(this._$AR(),this._$AH=this.O(t))}_(t){this._$AH!==V&&C(this._$AH)?this._$AA.nextSibling.data=t:this.T(P.createTextNode(t)),this._$AH=t}$(t){const{values:e,_$litType$:i}=t,s="number"==typeof i?this._$AC(t):(void 0===i.el&&(i.el=q.createElement(J(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===s)this._$AH.p(e);else{const t=new G(s,this),i=t.u(this.options);t.p(e),this.T(i),this._$AH=t}}_$AC(t){let e=Y.get(t.strings);return void 0===e&&Y.set(t.strings,e=new q(t)),e}k(t){I(this._$AH)||(this._$AH=[],this._$AR());const e=this._$AH;let i,s=0;for(const o of t)s===e.length?e.push(i=new Q(this.O(B()),this.O(B()),this,this.options)):i=e[s],i._$AI(o),s++;s<e.length&&(this._$AR(i&&i._$AB.nextSibling,s),e.length=s)}_$AR(t=this._$AA.nextSibling,e){for(this._$AP?.(!1,!0,e);t!==this._$AB;){const e=S(t).nextSibling;S(t).remove(),t=e}}setConnected(t){void 0===this._$AM&&(this._$Cv=t,this._$AP?.(t))}}class X{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(t,e,i,s,o){this.type=1,this._$AH=V,this._$AN=void 0,this.element=t,this.name=e,this._$AM=s,this.options=o,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=V}_$AI(t,e=this,i,s){const o=this.strings;let r=!1;if(void 0===o)t=K(this,t,e,0),r=!C(t)||t!==this._$AH&&t!==F,r&&(this._$AH=t);else{const s=t;let n,a;for(t=o[0],n=0;n<o.length-1;n++)a=K(this,s[i+n],e,n),a===F&&(a=this._$AH[n]),r||=!C(a)||a!==this._$AH[n],a===V?t=V:t!==V&&(t+=(a??"")+o[n+1]),this._$AH[n]=a}r&&!s&&this.j(t)}j(t){t===V?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,t??"")}}class tt extends X{constructor(){super(...arguments),this.type=3}j(t){this.element[this.name]=t===V?void 0:t}}class et extends X{constructor(){super(...arguments),this.type=4}j(t){this.element.toggleAttribute(this.name,!!t&&t!==V)}}class it extends X{constructor(t,e,i,s,o){super(t,e,i,s,o),this.type=5}_$AI(t,e=this){if((t=K(this,t,e,0)??V)===F)return;const i=this._$AH,s=t===V&&i!==V||t.capture!==i.capture||t.once!==i.once||t.passive!==i.passive,o=t!==V&&(i===V||s);s&&this.element.removeEventListener(this.name,this,i),o&&this.element.addEventListener(this.name,this,t),this._$AH=t}handleEvent(t){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,t):this._$AH.handleEvent(t)}}class st{constructor(t,e,i){this.element=t,this.type=6,this._$AN=void 0,this._$AM=e,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(t){K(this,t)}}const ot={I:Q},rt=$.litHtmlPolyfillSupport;rt?.(q,Q),($.litHtmlVersions??=[]).push("3.3.2");const nt=globalThis;let at=class extends k{constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const t=super.createRenderRoot();return this.renderOptions.renderBefore??=t.firstChild,t}update(t){const e=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(t),this._$Do=((t,e,i)=>{const s=i?.renderBefore??e;let o=s._$litPart$;if(void 0===o){const t=i?.renderBefore??null;s._$litPart$=o=new Q(e.insertBefore(B(),t),t,void 0,i??{})}return o._$AI(t),o})(e,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return F}};at._$litElement$=!0,at.finalized=!0,nt.litElementHydrateSupport?.({LitElement:at});const lt=nt.litElementPolyfillSupport;lt?.({LitElement:at}),(nt.litElementVersions??=[]).push("4.2.2");let dt=class{constructor(t){}get _$AU(){return this._$AM._$AU}_$AT(t,e,i){this._$Ct=t,this._$AM=e,this._$Ci=i}_$AS(t,e){return this.update(t,e)}update(t,e){return this.render(...e)}};const{I:ct}=ot,ht=t=>t,pt=()=>document.createComment(""),ut=(t,e,i)=>{const s=t._$AA.parentNode,o=void 0===e?t._$AB:e._$AA;if(void 0===i){const e=s.insertBefore(pt(),o),r=s.insertBefore(pt(),o);i=new ct(e,r,t,t.options)}else{const e=i._$AB.nextSibling,r=i._$AM,n=r!==t;if(n){let e;i._$AQ?.(t),i._$AM=t,void 0!==i._$AP&&(e=t._$AU)!==r._$AU&&i._$AP(e)}if(e!==o||n){let t=i._$AA;for(;t!==e;){const e=ht(t).nextSibling;ht(s).insertBefore(t,o),t=e}}}return i},gt=(t,e,i=t)=>(t._$AI(e,i),t),mt={},_t=(t,e=mt)=>t._$AH=e,ft=t=>{t._$AR(),t._$AA.remove()},vt=(t,e,i)=>{const s=new Map;for(let o=e;o<=i;o++)s.set(t[o],o);return s},yt=(kt=class extends dt{constructor(t){if(super(t),2!==t.type)throw Error("repeat() can only be used in text expressions")}dt(t,e,i){let s;void 0===i?i=e:void 0!==e&&(s=e);const o=[],r=[];let n=0;for(const e of t)o[n]=s?s(e,n):n,r[n]=i(e,n),n++;return{values:r,keys:o}}render(t,e,i){return this.dt(t,e,i).values}update(t,[e,i,s]){const o=(t=>t._$AH)(t),{values:r,keys:n}=this.dt(e,i,s);if(!Array.isArray(o))return this.ut=n,r;const a=this.ut??=[],l=[];let d,c,h=0,p=o.length-1,u=0,g=r.length-1;for(;h<=p&&u<=g;)if(null===o[h])h++;else if(null===o[p])p--;else if(a[h]===n[u])l[u]=gt(o[h],r[u]),h++,u++;else if(a[p]===n[g])l[g]=gt(o[p],r[g]),p--,g--;else if(a[h]===n[g])l[g]=gt(o[h],r[g]),ut(t,l[g+1],o[h]),h++,g--;else if(a[p]===n[u])l[u]=gt(o[p],r[u]),ut(t,o[h],o[p]),p--,u++;else if(void 0===d&&(d=vt(n,u,g),c=vt(a,h,p)),d.has(a[h]))if(d.has(a[p])){const e=c.get(n[u]),i=void 0!==e?o[e]:null;if(null===i){const e=ut(t,o[h]);gt(e,r[u]),l[u]=e}else l[u]=gt(i,r[u]),ut(t,o[h],i),o[e]=null;u++}else ft(o[p]),p--;else ft(o[h]),h++;for(;u<=g;){const e=ut(t,l[g+1]);gt(e,r[u]),l[u++]=e}for(;h<=p;){const t=o[h++];null!==t&&ft(t)}return this.ut=n,_t(t,l),F}},(...t)=>({_$litDirective$:kt,values:t})),bt={attribute:!0,type:String,converter:y,reflect:!1,hasChanged:b},xt=(t=bt,e,i)=>{const{kind:s,metadata:o}=i;let r=globalThis.litPropertyMetadata.get(o);if(void 0===r&&globalThis.litPropertyMetadata.set(o,r=new Map),"setter"===s&&((t=Object.create(t)).wrapped=!0),r.set(i.name,t),"accessor"===s){const{name:s}=i;return{set(i){const o=e.get.call(this);e.set.call(this,i),this.requestUpdate(s,o,t,!0,i)},init(e){return void 0!==e&&this.C(s,void 0,t,e),e}}}if("setter"===s){const{name:s}=i;return function(i){const o=this[s];e.call(this,i),this.requestUpdate(s,o,t,!0,i)}}throw Error("Unsupported decorator location: "+s)};var kt;function $t(t){return(e,i)=>"object"==typeof i?xt(t,e,i):((t,e,i)=>{const s=e.hasOwnProperty(i);return e.constructor.createProperty(i,t),s?Object.getOwnPropertyDescriptor(e,i):void 0})(t,e,i)}function St(t){return $t({...t,state:!0,attribute:!1})}const wt=["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"];function Tt(t){const[e,i]=t.split(":").map(Number);return 60*e+i}function Et(t){const e=t%60;return`${Math.floor(t/60).toString().padStart(2,"0")}:${e.toString().padStart(2,"0")}`}function At(t,e="24"){if("24"===e)return t;const[i,s]=t.split(":");let o=parseInt(i,10);if(24===o)return"12:00 AM";const r=o>=12?"PM":"AM";return 0===o?o=12:o>12&&(o-=12),`${o}:${s||"00"} ${r}`}function Mt(t){return t<10?"#2b9af9":t<14?"#40c4ff":t<17?"#26c6da":t<19?"#66bb6a":t<21?"#9ccc65":t<23?"#ffb74d":t<25?"#ff8100":"#f4511e"}function Dt(t){const{base_temperature:e,periods:i}=t,s=[],o=[...i].sort((t,e)=>Tt(t.starttime)-Tt(e.starttime));for(let t=0;t<o.length;t++){const e=o[t];s.push({startTime:e.starttime,startMinutes:Tt(e.starttime),endTime:e.endtime,endMinutes:Tt(e.endtime),temperature:e.temperature,slot:t+1})}return{blocks:s,baseTemperature:e}}function Pt(t,e){const i=[],s=[...t].sort((t,e)=>t.startMinutes-e.startMinutes);for(const t of s)i.push({starttime:t.startTime,endtime:t.endTime,temperature:t.temperature});return{base_temperature:e,periods:i}}function Bt(t){if(0===t.length)return 20;const e=new Map;for(const i of t){const t=i.endMinutes-i.startMinutes,s=e.get(i.temperature)||0;e.set(i.temperature,s+t)}let i=0,s=20;for(const[t,o]of e.entries())o>i&&(i=o,s=t);return s}function Ct(t){if(0===t.length)return[];const e=[...t].sort((t,e)=>t.startMinutes-e.startMinutes),i=[];let s={...e[0]};for(let t=1;t<e.length;t++){const o=e[t];s.endMinutes===o.startMinutes&&s.temperature===o.temperature?s={...s,endTime:o.endTime,endMinutes:o.endMinutes}:(i.push(s),s={...o})}return i.push(s),i.map((t,e)=>({...t,slot:e+1}))}function It(t,e){if(0===t.length)return[{startTime:"00:00",startMinutes:0,endTime:"24:00",endMinutes:1440,temperature:e,slot:1}];const i=[...t].sort((t,e)=>t.startMinutes-e.startMinutes),s=[];let o=0;for(const t of i)t.startMinutes>o&&s.push({startTime:Et(o),startMinutes:o,endTime:t.startTime,endMinutes:t.startMinutes,temperature:e,slot:s.length+1}),s.push({...t,slot:s.length+1}),o=t.endMinutes;return o<1440&&s.push({startTime:Et(o),startMinutes:o,endTime:"24:00",endMinutes:1440,temperature:e,slot:s.length+1}),Ct(s)}function Ot(t){return[...t].sort((t,e)=>t.startMinutes-e.startMinutes).map((t,e)=>({...t,slot:e+1}))}function Nt(t,e=5,i=30.5){const{base_temperature:s,periods:o}=t;if(s<e||s>i)return{key:"temperatureOutOfRange",params:{block:"base",min:`${e}`,max:`${i}`}};let r=0;for(let t=0;t<o.length;t++){const s=o[t];if(!s.starttime||!s.endtime||void 0===s.temperature)return{key:"slotMissingValues",params:{slot:`${t+1}`}};const n=Tt(s.starttime),a=Tt(s.endtime);if(a<=n)return{key:"blockEndBeforeStart",params:{block:`${t+1}`}};if(n<r)return{key:"slotTimeBackwards",params:{slot:`${t+1}`,time:s.starttime}};if(s.temperature<e||s.temperature>i)return{key:"temperatureOutOfRange",params:{block:`${t+1}`,min:`${e}`,max:`${i}`}};r=a}return null}const zt=(t,e,i)=>{const s=new CustomEvent(e,{bubbles:!0,composed:!0,detail:i});t.dispatchEvent(s)};class Ut extends at{constructor(){super(...arguments),this._expandedEntity=null,this._computeLabel=t=>({entities:"Entities",name:"Card Name (optional)",show_profile_selector:"Show profile selector",editable:"Allow editing",show_temperature:"Show temperature values",show_gradient:"Show color gradient",hour_format:"Time format"}[t.name]||t.name)}static{this.ENTITY_SCHEMA=[{name:"entities",required:!0,selector:{entity:{domain:"climate",integration:"homematicip_local",multiple:!0}}}]}static{this.OPTIONS_SCHEMA=[{name:"name",selector:{text:{}}},{name:"show_profile_selector",selector:{boolean:{}},default:!0},{name:"editable",selector:{boolean:{}},default:!0},{name:"show_temperature",selector:{boolean:{}},default:!0},{name:"show_gradient",selector:{boolean:{}},default:!1},{name:"hour_format",selector:{select:{options:[{value:"24",label:"24h"},{value:"12",label:"12h (AM/PM)"}]}},default:"24"}]}setConfig(t){this._config=t}_getEntityId(t){return"string"==typeof t?t:t.entity}_getEntityName(t){return"string"==typeof t?"":t.name||""}_getEntityProfileNames(t){return"string"==typeof t?{}:t.profile_names||{}}_getEntityIds(){return this._config?.entities?this._config.entities.map(t=>this._getEntityId(t)):[]}_getAvailableProfiles(t){const e=this.hass?.states?.[t];return e?.attributes?.available_profiles?[...e.attributes.available_profiles].sort():[]}render(){if(!this.hass||!this._config)return V;const t={entities:this._getEntityIds()};return j`
+function e(e,t,i,s){var r,o=arguments.length,a=o<3?t:null===s?s=Object.getOwnPropertyDescriptor(t,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)a=Reflect.decorate(e,t,i,s);else for(var n=e.length-1;n>=0;n--)(r=e[n])&&(a=(o<3?r(a):o>3?r(t,i,a):r(t,i))||a);return o>3&&a&&Object.defineProperty(t,i,a),a}"function"==typeof SuppressedError&&SuppressedError;const t=globalThis,i=t.ShadowRoot&&(void 0===t.ShadyCSS||t.ShadyCSS.nativeShadow)&&"adoptedStyleSheets"in Document.prototype&&"replace"in CSSStyleSheet.prototype,s=Symbol(),r=new WeakMap;let o=class{constructor(e,t,i){if(this._$cssResult$=!0,i!==s)throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");this.cssText=e,this.t=t}get styleSheet(){let e=this.o;const t=this.t;if(i&&void 0===e){const i=void 0!==t&&1===t.length;i&&(e=r.get(t)),void 0===e&&((this.o=e=new CSSStyleSheet).replaceSync(this.cssText),i&&r.set(t,e))}return e}toString(){return this.cssText}};const a=(e,...t)=>{const i=1===e.length?e[0]:t.reduce((t,i,s)=>t+(e=>{if(!0===e._$cssResult$)return e.cssText;if("number"==typeof e)return e;throw Error("Value passed to 'css' function must be a 'css' function result: "+e+". Use 'unsafeCSS' to pass non-literal values, but take care to ensure page security.")})(i)+e[s+1],e[0]);return new o(i,e,s)},n=i?e=>e:e=>e instanceof CSSStyleSheet?(e=>{let t="";for(const i of e.cssRules)t+=i.cssText;return(e=>new o("string"==typeof e?e:e+"",void 0,s))(t)})(e):e,{is:l,defineProperty:d,getOwnPropertyDescriptor:c,getOwnPropertyNames:h,getOwnPropertySymbols:p,getPrototypeOf:u}=Object,_=globalThis,m=_.trustedTypes,f=m?m.emptyScript:"",g=_.reactiveElementPolyfillSupport,y=(e,t)=>e,v={toAttribute(e,t){switch(t){case Boolean:e=e?f:null;break;case Object:case Array:e=null==e?e:JSON.stringify(e)}return e},fromAttribute(e,t){let i=e;switch(t){case Boolean:i=null!==e;break;case Number:i=null===e?null:Number(e);break;case Object:case Array:try{i=JSON.parse(e)}catch(e){i=null}}return i}},b=(e,t)=>!l(e,t),S={attribute:!0,type:String,converter:v,reflect:!1,useDefault:!1,hasChanged:b};Symbol.metadata??=Symbol("metadata"),_.litPropertyMetadata??=new WeakMap;let $=class extends HTMLElement{static addInitializer(e){this._$Ei(),(this.l??=[]).push(e)}static get observedAttributes(){return this.finalize(),this._$Eh&&[...this._$Eh.keys()]}static createProperty(e,t=S){if(t.state&&(t.attribute=!1),this._$Ei(),this.prototype.hasOwnProperty(e)&&((t=Object.create(t)).wrapped=!0),this.elementProperties.set(e,t),!t.noAccessor){const i=Symbol(),s=this.getPropertyDescriptor(e,i,t);void 0!==s&&d(this.prototype,e,s)}}static getPropertyDescriptor(e,t,i){const{get:s,set:r}=c(this.prototype,e)??{get(){return this[t]},set(e){this[t]=e}};return{get:s,set(t){const o=s?.call(this);r?.call(this,t),this.requestUpdate(e,o,i)},configurable:!0,enumerable:!0}}static getPropertyOptions(e){return this.elementProperties.get(e)??S}static _$Ei(){if(this.hasOwnProperty(y("elementProperties")))return;const e=u(this);e.finalize(),void 0!==e.l&&(this.l=[...e.l]),this.elementProperties=new Map(e.elementProperties)}static finalize(){if(this.hasOwnProperty(y("finalized")))return;if(this.finalized=!0,this._$Ei(),this.hasOwnProperty(y("properties"))){const e=this.properties,t=[...h(e),...p(e)];for(const i of t)this.createProperty(i,e[i])}const e=this[Symbol.metadata];if(null!==e){const t=litPropertyMetadata.get(e);if(void 0!==t)for(const[e,i]of t)this.elementProperties.set(e,i)}this._$Eh=new Map;for(const[e,t]of this.elementProperties){const i=this._$Eu(e,t);void 0!==i&&this._$Eh.set(i,e)}this.elementStyles=this.finalizeStyles(this.styles)}static finalizeStyles(e){const t=[];if(Array.isArray(e)){const i=new Set(e.flat(1/0).reverse());for(const e of i)t.unshift(n(e))}else void 0!==e&&t.push(n(e));return t}static _$Eu(e,t){const i=t.attribute;return!1===i?void 0:"string"==typeof i?i:"string"==typeof e?e.toLowerCase():void 0}constructor(){super(),this._$Ep=void 0,this.isUpdatePending=!1,this.hasUpdated=!1,this._$Em=null,this._$Ev()}_$Ev(){this._$ES=new Promise(e=>this.enableUpdating=e),this._$AL=new Map,this._$E_(),this.requestUpdate(),this.constructor.l?.forEach(e=>e(this))}addController(e){(this._$EO??=new Set).add(e),void 0!==this.renderRoot&&this.isConnected&&e.hostConnected?.()}removeController(e){this._$EO?.delete(e)}_$E_(){const e=new Map,t=this.constructor.elementProperties;for(const i of t.keys())this.hasOwnProperty(i)&&(e.set(i,this[i]),delete this[i]);e.size>0&&(this._$Ep=e)}createRenderRoot(){const e=this.shadowRoot??this.attachShadow(this.constructor.shadowRootOptions);return((e,s)=>{if(i)e.adoptedStyleSheets=s.map(e=>e instanceof CSSStyleSheet?e:e.styleSheet);else for(const i of s){const s=document.createElement("style"),r=t.litNonce;void 0!==r&&s.setAttribute("nonce",r),s.textContent=i.cssText,e.appendChild(s)}})(e,this.constructor.elementStyles),e}connectedCallback(){this.renderRoot??=this.createRenderRoot(),this.enableUpdating(!0),this._$EO?.forEach(e=>e.hostConnected?.())}enableUpdating(e){}disconnectedCallback(){this._$EO?.forEach(e=>e.hostDisconnected?.())}attributeChangedCallback(e,t,i){this._$AK(e,i)}_$ET(e,t){const i=this.constructor.elementProperties.get(e),s=this.constructor._$Eu(e,i);if(void 0!==s&&!0===i.reflect){const r=(void 0!==i.converter?.toAttribute?i.converter:v).toAttribute(t,i.type);this._$Em=e,null==r?this.removeAttribute(s):this.setAttribute(s,r),this._$Em=null}}_$AK(e,t){const i=this.constructor,s=i._$Eh.get(e);if(void 0!==s&&this._$Em!==s){const e=i.getPropertyOptions(s),r="function"==typeof e.converter?{fromAttribute:e.converter}:void 0!==e.converter?.fromAttribute?e.converter:v;this._$Em=s;const o=r.fromAttribute(t,e.type);this[s]=o??this._$Ej?.get(s)??o,this._$Em=null}}requestUpdate(e,t,i,s=!1,r){if(void 0!==e){const o=this.constructor;if(!1===s&&(r=this[e]),i??=o.getPropertyOptions(e),!((i.hasChanged??b)(r,t)||i.useDefault&&i.reflect&&r===this._$Ej?.get(e)&&!this.hasAttribute(o._$Eu(e,i))))return;this.C(e,t,i)}!1===this.isUpdatePending&&(this._$ES=this._$EP())}C(e,t,{useDefault:i,reflect:s,wrapped:r},o){i&&!(this._$Ej??=new Map).has(e)&&(this._$Ej.set(e,o??t??this[e]),!0!==r||void 0!==o)||(this._$AL.has(e)||(this.hasUpdated||i||(t=void 0),this._$AL.set(e,t)),!0===s&&this._$Em!==e&&(this._$Eq??=new Set).add(e))}async _$EP(){this.isUpdatePending=!0;try{await this._$ES}catch(e){Promise.reject(e)}const e=this.scheduleUpdate();return null!=e&&await e,!this.isUpdatePending}scheduleUpdate(){return this.performUpdate()}performUpdate(){if(!this.isUpdatePending)return;if(!this.hasUpdated){if(this.renderRoot??=this.createRenderRoot(),this._$Ep){for(const[e,t]of this._$Ep)this[e]=t;this._$Ep=void 0}const e=this.constructor.elementProperties;if(e.size>0)for(const[t,i]of e){const{wrapped:e}=i,s=this[t];!0!==e||this._$AL.has(t)||void 0===s||this.C(t,void 0,i,s)}}let e=!1;const t=this._$AL;try{e=this.shouldUpdate(t),e?(this.willUpdate(t),this._$EO?.forEach(e=>e.hostUpdate?.()),this.update(t)):this._$EM()}catch(t){throw e=!1,this._$EM(),t}e&&this._$AE(t)}willUpdate(e){}_$AE(e){this._$EO?.forEach(e=>e.hostUpdated?.()),this.hasUpdated||(this.hasUpdated=!0,this.firstUpdated(e)),this.updated(e)}_$EM(){this._$AL=new Map,this.isUpdatePending=!1}get updateComplete(){return this.getUpdateComplete()}getUpdateComplete(){return this._$ES}shouldUpdate(e){return!0}update(e){this._$Eq&&=this._$Eq.forEach(e=>this._$ET(e,this[e])),this._$EM()}updated(e){}firstUpdated(e){}};$.elementStyles=[],$.shadowRootOptions={mode:"open"},$[y("elementProperties")]=new Map,$[y("finalized")]=new Map,g?.({ReactiveElement:$}),(_.reactiveElementVersions??=[]).push("2.1.2");const E=globalThis,w=e=>e,k=E.trustedTypes,x=k?k.createPolicy("lit-html",{createHTML:e=>e}):void 0,A="$lit$",T=`lit$${Math.random().toFixed(9).slice(2)}$`,P="?"+T,D=`<${P}>`,C=document,M=()=>C.createComment(""),I=e=>null===e||"object"!=typeof e&&"function"!=typeof e,O=Array.isArray,L="[ \t\n\f\r]",N=/<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g,U=/-->/g,R=/>/g,W=RegExp(`>|${L}(?:([^\\s"'>=/]+)(${L}*=${L}*(?:[^ \t\n\f\r"'\`<>=]|("|')|))|$)`,"g"),B=/'/g,F=/"/g,H=/^(?:script|style|textarea|title)$/i,j=(e,...t)=>({_$litType$:1,strings:e,values:t}),z=Symbol.for("lit-noChange"),V=Symbol.for("lit-nothing"),Z=new WeakMap,Y=C.createTreeWalker(C,129);function q(e,t){if(!O(e)||!e.hasOwnProperty("raw"))throw Error("invalid template strings array");return void 0!==x?x.createHTML(t):t}const J=(e,t)=>{const i=e.length-1,s=[];let r,o=2===t?"<svg>":3===t?"<math>":"",a=N;for(let t=0;t<i;t++){const i=e[t];let n,l,d=-1,c=0;for(;c<i.length&&(a.lastIndex=c,l=a.exec(i),null!==l);)c=a.lastIndex,a===N?"!--"===l[1]?a=U:void 0!==l[1]?a=R:void 0!==l[2]?(H.test(l[2])&&(r=RegExp("</"+l[2],"g")),a=W):void 0!==l[3]&&(a=W):a===W?">"===l[0]?(a=r??N,d=-1):void 0===l[1]?d=-2:(d=a.lastIndex-l[2].length,n=l[1],a=void 0===l[3]?W:'"'===l[3]?F:B):a===F||a===B?a=W:a===U||a===R?a=N:(a=W,r=void 0);const h=a===W&&e[t+1].startsWith("/>")?" ":"";o+=a===N?i+D:d>=0?(s.push(n),i.slice(0,d)+A+i.slice(d)+T+h):i+T+(-2===d?t:h)}return[q(e,o+(e[i]||"<?>")+(2===t?"</svg>":3===t?"</math>":"")),s]};class K{constructor({strings:e,_$litType$:t},i){let s;this.parts=[];let r=0,o=0;const a=e.length-1,n=this.parts,[l,d]=J(e,t);if(this.el=K.createElement(l,i),Y.currentNode=this.el.content,2===t||3===t){const e=this.el.content.firstChild;e.replaceWith(...e.childNodes)}for(;null!==(s=Y.nextNode())&&n.length<a;){if(1===s.nodeType){if(s.hasAttributes())for(const e of s.getAttributeNames())if(e.endsWith(A)){const t=d[o++],i=s.getAttribute(e).split(T),a=/([.?@])?(.*)/.exec(t);n.push({type:1,index:r,name:a[2],strings:i,ctor:"."===a[1]?te:"?"===a[1]?ie:"@"===a[1]?se:ee}),s.removeAttribute(e)}else e.startsWith(T)&&(n.push({type:6,index:r}),s.removeAttribute(e));if(H.test(s.tagName)){const e=s.textContent.split(T),t=e.length-1;if(t>0){s.textContent=k?k.emptyScript:"";for(let i=0;i<t;i++)s.append(e[i],M()),Y.nextNode(),n.push({type:2,index:++r});s.append(e[t],M())}}}else if(8===s.nodeType)if(s.data===P)n.push({type:2,index:r});else{let e=-1;for(;-1!==(e=s.data.indexOf(T,e+1));)n.push({type:7,index:r}),e+=T.length-1}r++}}static createElement(e,t){const i=C.createElement("template");return i.innerHTML=e,i}}function G(e,t,i=e,s){if(t===z)return t;let r=void 0!==s?i._$Co?.[s]:i._$Cl;const o=I(t)?void 0:t._$litDirective$;return r?.constructor!==o&&(r?._$AO?.(!1),void 0===o?r=void 0:(r=new o(e),r._$AT(e,i,s)),void 0!==s?(i._$Co??=[])[s]=r:i._$Cl=r),void 0!==r&&(t=G(e,r._$AS(e,t.values),r,s)),t}class Q{constructor(e,t){this._$AV=[],this._$AN=void 0,this._$AD=e,this._$AM=t}get parentNode(){return this._$AM.parentNode}get _$AU(){return this._$AM._$AU}u(e){const{el:{content:t},parts:i}=this._$AD,s=(e?.creationScope??C).importNode(t,!0);Y.currentNode=s;let r=Y.nextNode(),o=0,a=0,n=i[0];for(;void 0!==n;){if(o===n.index){let t;2===n.type?t=new X(r,r.nextSibling,this,e):1===n.type?t=new n.ctor(r,n.name,n.strings,this,e):6===n.type&&(t=new re(r,this,e)),this._$AV.push(t),n=i[++a]}o!==n?.index&&(r=Y.nextNode(),o++)}return Y.currentNode=C,s}p(e){let t=0;for(const i of this._$AV)void 0!==i&&(void 0!==i.strings?(i._$AI(e,i,t),t+=i.strings.length-2):i._$AI(e[t])),t++}}class X{get _$AU(){return this._$AM?._$AU??this._$Cv}constructor(e,t,i,s){this.type=2,this._$AH=V,this._$AN=void 0,this._$AA=e,this._$AB=t,this._$AM=i,this.options=s,this._$Cv=s?.isConnected??!0}get parentNode(){let e=this._$AA.parentNode;const t=this._$AM;return void 0!==t&&11===e?.nodeType&&(e=t.parentNode),e}get startNode(){return this._$AA}get endNode(){return this._$AB}_$AI(e,t=this){e=G(this,e,t),I(e)?e===V||null==e||""===e?(this._$AH!==V&&this._$AR(),this._$AH=V):e!==this._$AH&&e!==z&&this._(e):void 0!==e._$litType$?this.$(e):void 0!==e.nodeType?this.T(e):(e=>O(e)||"function"==typeof e?.[Symbol.iterator])(e)?this.k(e):this._(e)}O(e){return this._$AA.parentNode.insertBefore(e,this._$AB)}T(e){this._$AH!==e&&(this._$AR(),this._$AH=this.O(e))}_(e){this._$AH!==V&&I(this._$AH)?this._$AA.nextSibling.data=e:this.T(C.createTextNode(e)),this._$AH=e}$(e){const{values:t,_$litType$:i}=e,s="number"==typeof i?this._$AC(e):(void 0===i.el&&(i.el=K.createElement(q(i.h,i.h[0]),this.options)),i);if(this._$AH?._$AD===s)this._$AH.p(t);else{const e=new Q(s,this),i=e.u(this.options);e.p(t),this.T(i),this._$AH=e}}_$AC(e){let t=Z.get(e.strings);return void 0===t&&Z.set(e.strings,t=new K(e)),t}k(e){O(this._$AH)||(this._$AH=[],this._$AR());const t=this._$AH;let i,s=0;for(const r of e)s===t.length?t.push(i=new X(this.O(M()),this.O(M()),this,this.options)):i=t[s],i._$AI(r),s++;s<t.length&&(this._$AR(i&&i._$AB.nextSibling,s),t.length=s)}_$AR(e=this._$AA.nextSibling,t){for(this._$AP?.(!1,!0,t);e!==this._$AB;){const t=w(e).nextSibling;w(e).remove(),e=t}}setConnected(e){void 0===this._$AM&&(this._$Cv=e,this._$AP?.(e))}}class ee{get tagName(){return this.element.tagName}get _$AU(){return this._$AM._$AU}constructor(e,t,i,s,r){this.type=1,this._$AH=V,this._$AN=void 0,this.element=e,this.name=t,this._$AM=s,this.options=r,i.length>2||""!==i[0]||""!==i[1]?(this._$AH=Array(i.length-1).fill(new String),this.strings=i):this._$AH=V}_$AI(e,t=this,i,s){const r=this.strings;let o=!1;if(void 0===r)e=G(this,e,t,0),o=!I(e)||e!==this._$AH&&e!==z,o&&(this._$AH=e);else{const s=e;let a,n;for(e=r[0],a=0;a<r.length-1;a++)n=G(this,s[i+a],t,a),n===z&&(n=this._$AH[a]),o||=!I(n)||n!==this._$AH[a],n===V?e=V:e!==V&&(e+=(n??"")+r[a+1]),this._$AH[a]=n}o&&!s&&this.j(e)}j(e){e===V?this.element.removeAttribute(this.name):this.element.setAttribute(this.name,e??"")}}class te extends ee{constructor(){super(...arguments),this.type=3}j(e){this.element[this.name]=e===V?void 0:e}}class ie extends ee{constructor(){super(...arguments),this.type=4}j(e){this.element.toggleAttribute(this.name,!!e&&e!==V)}}class se extends ee{constructor(e,t,i,s,r){super(e,t,i,s,r),this.type=5}_$AI(e,t=this){if((e=G(this,e,t,0)??V)===z)return;const i=this._$AH,s=e===V&&i!==V||e.capture!==i.capture||e.once!==i.once||e.passive!==i.passive,r=e!==V&&(i===V||s);s&&this.element.removeEventListener(this.name,this,i),r&&this.element.addEventListener(this.name,this,e),this._$AH=e}handleEvent(e){"function"==typeof this._$AH?this._$AH.call(this.options?.host??this.element,e):this._$AH.handleEvent(e)}}class re{constructor(e,t,i){this.element=e,this.type=6,this._$AN=void 0,this._$AM=t,this.options=i}get _$AU(){return this._$AM._$AU}_$AI(e){G(this,e)}}const oe=E.litHtmlPolyfillSupport;oe?.(K,X),(E.litHtmlVersions??=[]).push("3.3.2");const ae=globalThis;class ne extends ${constructor(){super(...arguments),this.renderOptions={host:this},this._$Do=void 0}createRenderRoot(){const e=super.createRenderRoot();return this.renderOptions.renderBefore??=e.firstChild,e}update(e){const t=this.render();this.hasUpdated||(this.renderOptions.isConnected=this.isConnected),super.update(e),this._$Do=((e,t,i)=>{const s=i?.renderBefore??t;let r=s._$litPart$;if(void 0===r){const e=i?.renderBefore??null;s._$litPart$=r=new X(t.insertBefore(M(),e),e,void 0,i??{})}return r._$AI(e),r})(t,this.renderRoot,this.renderOptions)}connectedCallback(){super.connectedCallback(),this._$Do?.setConnected(!0)}disconnectedCallback(){super.disconnectedCallback(),this._$Do?.setConnected(!1)}render(){return z}}ne._$litElement$=!0,ne.finalized=!0,ae.litElementHydrateSupport?.({LitElement:ne});const le=ae.litElementPolyfillSupport;le?.({LitElement:ne}),(ae.litElementVersions??=[]).push("4.2.2");const de={attribute:!0,type:String,converter:v,reflect:!1,hasChanged:b},ce=(e=de,t,i)=>{const{kind:s,metadata:r}=i;let o=globalThis.litPropertyMetadata.get(r);if(void 0===o&&globalThis.litPropertyMetadata.set(r,o=new Map),"setter"===s&&((e=Object.create(e)).wrapped=!0),o.set(i.name,e),"accessor"===s){const{name:s}=i;return{set(i){const r=t.get.call(this);t.set.call(this,i),this.requestUpdate(s,r,e,!0,i)},init(t){return void 0!==t&&this.C(s,void 0,e,t),t}}}if("setter"===s){const{name:s}=i;return function(i){const r=this[s];t.call(this,i),this.requestUpdate(s,r,e,!0,i)}}throw Error("Unsupported decorator location: "+s)};function he(e){return(t,i)=>"object"==typeof i?ce(e,t,i):((e,t,i)=>{const s=t.hasOwnProperty(i);return t.constructor.createProperty(i,e),s?Object.getOwnPropertyDescriptor(t,i):void 0})(e,t,i)}function pe(e){return he({...e,state:!0,attribute:!1})}const ue=["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"];function _e(e){const[t,i]=e.split(":").map(Number);return 60*t+i}function me(e){const{base_temperature:t,periods:i}=e,s=[],r=[...i].sort((e,t)=>_e(e.starttime)-_e(t.starttime));for(let e=0;e<r.length;e++){const t=r[e];s.push({startTime:t.starttime,startMinutes:_e(t.starttime),endTime:t.endtime,endMinutes:_e(t.endtime),temperature:t.temperature,slot:e+1})}return{blocks:s,baseTemperature:t}}function fe(e,t){const i=[],s=[...e].sort((e,t)=>e.startMinutes-t.startMinutes);for(const e of s)i.push({starttime:e.startTime,endtime:e.endTime,temperature:e.temperature});return{base_temperature:t,periods:i}}function ge(e){if(0===e.length)return 20;const t=new Map;for(const i of e){const e=i.endMinutes-i.startMinutes,s=t.get(i.temperature)||0;t.set(i.temperature,s+e)}let i=0,s=20;for(const[e,r]of t.entries())r>i&&(i=r,s=e);return s}function ye(e,t=5,i=30.5){const{base_temperature:s,periods:r}=e;if(s<t||s>i)return{key:"temperatureOutOfRange",params:{block:"base",min:`${t}`,max:`${i}`}};let o=0;for(let e=0;e<r.length;e++){const s=r[e];if(!s.starttime||!s.endtime||void 0===s.temperature)return{key:"slotMissingValues",params:{slot:`${e+1}`}};const a=_e(s.starttime),n=_e(s.endtime);if(n<=a)return{key:"blockEndBeforeStart",params:{block:`${e+1}`}};if(a<o)return{key:"slotTimeBackwards",params:{slot:`${e+1}`,time:s.starttime}};if(s.temperature<t||s.temperature>i)return{key:"temperatureOutOfRange",params:{block:`${e+1}`,min:`${t}`,max:`${i}`}};o=n}return null}const ve=(e,t,i)=>{const s=new CustomEvent(t,{bubbles:!0,composed:!0,detail:i});e.dispatchEvent(s)};class be extends ne{constructor(){super(...arguments),this._expandedEntity=null,this._computeLabel=e=>({entities:"Entities",name:"Card Name (optional)",show_profile_selector:"Show profile selector",editable:"Allow editing",show_temperature:"Show temperature values",show_gradient:"Show color gradient",hour_format:"Time format"}[e.name]||e.name)}static{this.ENTITY_SCHEMA=[{name:"entities",required:!0,selector:{entity:{domain:"climate",integration:"homematicip_local",multiple:!0}}}]}static{this.OPTIONS_SCHEMA=[{name:"name",selector:{text:{}}},{name:"show_profile_selector",selector:{boolean:{}},default:!0},{name:"editable",selector:{boolean:{}},default:!0},{name:"show_temperature",selector:{boolean:{}},default:!0},{name:"show_gradient",selector:{boolean:{}},default:!1},{name:"hour_format",selector:{select:{options:[{value:"24",label:"24h"},{value:"12",label:"12h (AM/PM)"}]}},default:"24"}]}setConfig(e){this._config=e}_getEntityId(e){return"string"==typeof e?e:e.entity}_getEntityName(e){return"string"==typeof e?"":e.name||""}_getEntityProfileNames(e){return"string"==typeof e?{}:e.profile_names||{}}_getEntityIds(){return this._config?.entities?this._config.entities.map(e=>this._getEntityId(e)):[]}_getAvailableProfiles(e){const t=this.hass?.states?.[e];return t?.attributes?.available_profiles?[...t.attributes.available_profiles].sort():[]}render(){if(!this.hass||!this._config)return V;const e={entities:this._getEntityIds()};return j`
       <ha-form
         .hass=${this.hass}
-        .data=${t}
-        .schema=${Ut.ENTITY_SCHEMA}
+        .data=${e}
+        .schema=${be.ENTITY_SCHEMA}
         .computeLabel=${this._computeLabel}
         @value-changed=${this._entitiesChanged}
       ></ha-form>
@@ -12,43 +12,43 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
       <ha-form
         .hass=${this.hass}
         .data=${this._config}
-        .schema=${Ut.OPTIONS_SCHEMA}
+        .schema=${be.OPTIONS_SCHEMA}
         .computeLabel=${this._computeLabel}
         @value-changed=${this._optionsChanged}
       ></ha-form>
-    `}_renderEntityConfig(){const t=this._config?.entities||[];return 0===t.length?j``:j`
+    `}_renderEntityConfig(){const e=this._config?.entities||[];return 0===e.length?j``:j`
       <div class="entity-config">
         <div class="section-header">Entity Configuration</div>
-        ${t.map((t,e)=>{const i=this._getEntityId(t),s=this._getEntityName(t),o=this._getEntityProfileNames(t),r=this.hass?.states?.[i]?.attributes.friendly_name||i,n=this._getAvailableProfiles(i),a=this._expandedEntity===i;return j`
+        ${e.map((e,t)=>{const i=this._getEntityId(e),s=this._getEntityName(e),r=this._getEntityProfileNames(e),o=this.hass?.states?.[i]?.attributes.friendly_name||i,a=this._getAvailableProfiles(i),n=this._expandedEntity===i;return j`
             <div class="entity-section">
               <div class="entity-header" @click=${()=>this._toggleEntity(i)}>
-                <span class="expand-icon">${a?"▼":"▶"}</span>
-                <span class="entity-title" title=${i}>${r}</span>
+                <span class="expand-icon">${n?"▼":"▶"}</span>
+                <span class="entity-title" title=${i}>${o}</span>
               </div>
 
-              ${a?j`
+              ${n?j`
                     <div class="entity-details">
                       <div class="config-row">
                         <label>Display Name</label>
                         <input
                           type="text"
                           .value=${s}
-                          placeholder=${r}
-                          @input=${t=>this._entityNameChanged(e,t)}
+                          placeholder=${o}
+                          @input=${e=>this._entityNameChanged(t,e)}
                         />
                       </div>
 
-                      ${n.length>0?j`
+                      ${a.length>0?j`
                             <div class="profile-names-section">
                               <div class="profile-names-header">Profile Names</div>
-                              ${n.map(t=>j`
+                              ${a.map(e=>j`
                                   <div class="config-row profile-row">
-                                    <label>${t}</label>
+                                    <label>${e}</label>
                                     <input
                                       type="text"
-                                      .value=${o[t]||""}
-                                      placeholder=${t}
-                                      @input=${i=>this._profileNameChanged(e,t,i)}
+                                      .value=${r[e]||""}
+                                      placeholder=${e}
+                                      @input=${i=>this._profileNameChanged(t,e,i)}
                                     />
                                   </div>
                                 `)}
@@ -61,7 +61,7 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
             </div>
           `})}
       </div>
-    `}_toggleEntity(t){this._expandedEntity=this._expandedEntity===t?null:t}_entitiesChanged(t){t.stopPropagation();const e=(t.detail.value?.entities||[]).map(t=>{const e=this._config?.entities?.find(e=>this._getEntityId(e)===t);return e&&"string"!=typeof e&&(e.name||Object.keys(e.profile_names||{}).length>0)?{...e,entity:t}:t}),i={...this._config,entities:e};zt(this,"config-changed",{config:i})}_getOrCreateEntityConfig(t,e){const i=t[e];return"string"==typeof i?{entity:i}:{...i}}_simplifyEntityConfig(t){const e=!!t.name,i=Object.keys(t.profile_names||{}).length>0;return e||i?t:t.entity}_entityNameChanged(t,e){const i=e.target.value.trim(),s=[...this._config?.entities||[]];if(t>=s.length)return;const o=this._getOrCreateEntityConfig(s,t);i?o.name=i:delete o.name,s[t]=this._simplifyEntityConfig(o);const r={...this._config,entities:s};zt(this,"config-changed",{config:r})}_profileNameChanged(t,e,i){const s=i.target.value.trim(),o=[...this._config?.entities||[]];if(t>=o.length)return;const r=this._getOrCreateEntityConfig(o,t);r.profile_names||(r.profile_names={}),s?r.profile_names[e]=s:delete r.profile_names[e],0===Object.keys(r.profile_names).length&&delete r.profile_names,o[t]=this._simplifyEntityConfig(r);const n={...this._config,entities:o};zt(this,"config-changed",{config:n})}_optionsChanged(t){t.stopPropagation();const e={...this._config,...t.detail.value,entities:this._config.entities};zt(this,"config-changed",{config:e})}static{this.styles=n`
+    `}_toggleEntity(e){this._expandedEntity=this._expandedEntity===e?null:e}_entitiesChanged(e){e.stopPropagation();const t=(e.detail.value?.entities||[]).map(e=>{const t=this._config?.entities?.find(t=>this._getEntityId(t)===e);return t&&"string"!=typeof t&&(t.name||Object.keys(t.profile_names||{}).length>0)?{...t,entity:e}:e}),i={...this._config,entities:t};ve(this,"config-changed",{config:i})}_getOrCreateEntityConfig(e,t){const i=e[t];return"string"==typeof i?{entity:i}:{...i}}_simplifyEntityConfig(e){const t=!!e.name,i=Object.keys(e.profile_names||{}).length>0;return t||i?e:e.entity}_entityNameChanged(e,t){const i=t.target.value.trim(),s=[...this._config?.entities||[]];if(e>=s.length)return;const r=this._getOrCreateEntityConfig(s,e);i?r.name=i:delete r.name,s[e]=this._simplifyEntityConfig(r);const o={...this._config,entities:s};ve(this,"config-changed",{config:o})}_profileNameChanged(e,t,i){const s=i.target.value.trim(),r=[...this._config?.entities||[]];if(e>=r.length)return;const o=this._getOrCreateEntityConfig(r,e);o.profile_names||(o.profile_names={}),s?o.profile_names[t]=s:delete o.profile_names[t],0===Object.keys(o.profile_names).length&&delete o.profile_names,r[e]=this._simplifyEntityConfig(o);const a={...this._config,entities:r};ve(this,"config-changed",{config:a})}_optionsChanged(e){e.stopPropagation();const t={...this._config,...e.detail.value,entities:this._config.entities};ve(this,"config-changed",{config:t})}static{this.styles=a`
     ha-form {
       display: block;
     }
@@ -187,37 +187,45 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
       font-style: italic;
       margin-top: 8px;
     }
-  `}}t([$t({attribute:!1})],Ut.prototype,"hass",void 0),t([St()],Ut.prototype,"_config",void 0),t([St()],Ut.prototype,"_expandedEntity",void 0),customElements.define("homematicip-local-climate-schedule-card-editor",Ut);const Wt={en:{weekdays:{short:{monday:"Mo",tuesday:"Tu",wednesday:"We",thursday:"Th",friday:"Fr",saturday:"Sa",sunday:"Su"},long:{monday:"Monday",tuesday:"Tuesday",wednesday:"Wednesday",thursday:"Thursday",friday:"Friday",saturday:"Saturday",sunday:"Sunday"}},ui:{schedule:"Schedule",loading:"Loading schedule data...",entityNotFound:"Entity {entity} not found",clickToEdit:"Click on a time slot to edit the schedule",edit:"Edit {weekday}",cancel:"Cancel",save:"Save",addTimeBlock:"+ Add Time Block",copySchedule:"Copy schedule",pasteSchedule:"Paste schedule",undo:"Undo",redo:"Redo",undoShortcut:"Undo (Ctrl+Z)",redoShortcut:"Redo (Ctrl+Y)",exportSchedule:"Export",importSchedule:"Import",exportTooltip:"Export schedule to JSON file",importTooltip:"Import schedule from JSON file",exportSuccess:"Schedule exported successfully",importSuccess:"Schedule imported successfully",unsavedChanges:"Unsaved changes",saveAll:"Save all",discard:"Discard",confirmDiscardChanges:"You have unsaved changes. Do you want to discard them?",from:"From",to:"To",baseTemperature:"Base Temperature",baseTemperatureDescription:"Temperature for unscheduled periods",temperaturePeriods:"Temperature Periods",editSlot:"Edit",saveSlot:"Save",cancelSlotEdit:"Cancel",sensorNotSupported:"Sensor entity {entity} does not have a climate schedule type.",noScheduleData:"Entity {entity} does not provide schedule data."},errors:{failedToChangeProfile:"Failed to change profile: {error}",failedToSaveSchedule:"Failed to save schedule: {error}",failedToPasteSchedule:"Failed to paste schedule: {error}",invalidSchedule:"Invalid schedule: {error}",failedToExport:"Failed to export schedule: {error}",failedToImport:"Failed to import schedule: {error}",invalidImportFile:"Invalid file format. Please select a JSON file.",invalidImportFormat:"Invalid JSON format in file.",invalidImportData:"Invalid schedule data: {error}"},warnings:{title:"Validation Warnings",noWarnings:"No issues detected"},validationMessages:{blockEndBeforeStart:"Block {block}: End time is before start time",blockZeroDuration:"Block {block}: Block has zero duration",invalidStartTime:"Block {block}: Invalid start time",invalidEndTime:"Block {block}: Invalid end time",temperatureOutOfRange:"Block {block}: Temperature out of range ({min}-{max}°C)",invalidSlotCount:"Invalid number of slots: {count} (expected 13)",invalidSlotKey:"Invalid slot key: {key} (must be integer 1-13)",missingSlot:"Missing slot {slot}",slotMissingValues:"Slot {slot} missing ENDTIME or TEMPERATURE",slotTimeBackwards:"Slot {slot} time goes backwards: {time}",slotTimeExceedsDay:"Slot {slot} time exceeds 24:00: {time}",lastSlotMustEnd:"Last slot must end at 24:00",scheduleMustBeObject:"Schedule data must be an object",missingWeekday:"Missing weekday: {weekday}",invalidWeekdayData:"Invalid data for {weekday}",weekdayValidationError:"{weekday}: {details}"}},de:{weekdays:{short:{monday:"Mo",tuesday:"Di",wednesday:"Mi",thursday:"Do",friday:"Fr",saturday:"Sa",sunday:"So"},long:{monday:"Montag",tuesday:"Dienstag",wednesday:"Mittwoch",thursday:"Donnerstag",friday:"Freitag",saturday:"Samstag",sunday:"Sonntag"}},ui:{schedule:"Zeitplan",loading:"Zeitplandaten werden geladen...",entityNotFound:"Entität {entity} nicht gefunden",clickToEdit:"Klicken Sie auf einen Zeitabschnitt, um den Zeitplan zu bearbeiten",edit:"{weekday} bearbeiten",cancel:"Abbrechen",save:"Speichern",addTimeBlock:"+ Zeitblock hinzufügen",copySchedule:"Zeitplan kopieren",pasteSchedule:"Zeitplan einfügen",undo:"Rückgängig",redo:"Wiederholen",undoShortcut:"Rückgängig (Strg+Z)",redoShortcut:"Wiederholen (Strg+Y)",exportSchedule:"Exportieren",importSchedule:"Importieren",exportTooltip:"Zeitplan als JSON-Datei exportieren",importTooltip:"Zeitplan aus JSON-Datei importieren",exportSuccess:"Zeitplan erfolgreich exportiert",importSuccess:"Zeitplan erfolgreich importiert",unsavedChanges:"Ungespeicherte Änderungen",saveAll:"Alle speichern",discard:"Verwerfen",confirmDiscardChanges:"Sie haben ungespeicherte Änderungen. Möchten Sie diese verwerfen?",from:"Von",to:"Bis",baseTemperature:"Basistemperatur",baseTemperatureDescription:"Temperatur für nicht geplante Zeiträume",temperaturePeriods:"Temperaturperioden",editSlot:"Bearbeiten",saveSlot:"Speichern",cancelSlotEdit:"Abbrechen",sensorNotSupported:"Sensor-Entität {entity} hat keinen Klima-Zeitplantyp.",noScheduleData:"Entität {entity} stellt keine Zeitplandaten bereit."},errors:{failedToChangeProfile:"Fehler beim Wechseln des Profils: {error}",failedToSaveSchedule:"Fehler beim Speichern des Zeitplans: {error}",failedToPasteSchedule:"Fehler beim Einfügen des Zeitplans: {error}",invalidSchedule:"Ungültiger Zeitplan: {error}",failedToExport:"Fehler beim Exportieren des Zeitplans: {error}",failedToImport:"Fehler beim Importieren des Zeitplans: {error}",invalidImportFile:"Ungültiges Dateiformat. Bitte wählen Sie eine JSON-Datei.",invalidImportFormat:"Ungültiges JSON-Format in der Datei.",invalidImportData:"Ungültige Zeitplandaten: {error}"},warnings:{title:"Validierungswarnungen",noWarnings:"Keine Probleme erkannt"},validationMessages:{blockEndBeforeStart:"Block {block}: Die Endzeit liegt vor der Startzeit",blockZeroDuration:"Block {block}: Der Block hat keine Dauer",invalidStartTime:"Block {block}: Ungültige Startzeit",invalidEndTime:"Block {block}: Ungültige Endzeit",temperatureOutOfRange:"Block {block}: Temperatur außerhalb des Bereichs ({min}-{max}°C)",invalidSlotCount:"Ungültige Anzahl an Slots: {count} (erwartet 13)",invalidSlotKey:"Ungültiger Slot-Schlüssel: {key} (muss eine Ganzzahl 1-13 sein)",missingSlot:"Slot {slot} fehlt",slotMissingValues:"Slot {slot} fehlt ENDTIME oder TEMPERATURE",slotTimeBackwards:"Slot {slot}: Zeit läuft rückwärts: {time}",slotTimeExceedsDay:"Slot {slot}: Zeit überschreitet 24:00: {time}",lastSlotMustEnd:"Der letzte Slot muss um 24:00 enden",scheduleMustBeObject:"Zeitplandaten müssen ein Objekt sein",missingWeekday:"Fehlender Wochentag: {weekday}",invalidWeekdayData:"Ungültige Daten für {weekday}",weekdayValidationError:"{weekday}: {details}"}}};function Lt(t){const e=t.toLowerCase().split("-")[0];return Wt[e]||Wt.en}function Rt(t,e){let i=t;for(const[t,s]of Object.entries(e))i=i.replace(`{${t}}`,s);return i}let Ht=class extends at{static getConfigElement(){return document.createElement("homematicip-local-climate-schedule-card-editor")}static getStubConfig(t){const e=Object.keys(t.states).filter(e=>e.startsWith("climate.")&&void 0!==t.states[e].attributes?.schedule_data);return{type:"custom:homematicip-local-climate-schedule-card",entities:e.length>0?[e[0]]:[]}}constructor(){super(),this._availableProfiles=[],this._userSelectedProfile=!1,this._isLoading=!1,this._currentTimePercent=0,this._currentTimeMinutes=0,this._historyStack=[],this._historyIndex=-1,this._translations=Lt("en"),this._validationWarnings=[],this._minTemp=5,this._maxTemp=30.5,this._tempStep=.5,this._keyDownHandler=this._handleKeyDown.bind(this)}setConfig(t){const e=[],i=t=>{if(!t)return;const i=t.trim();i&&(e.includes(i)||e.push(i))};if(i(t.entity),Array.isArray(t.entities)&&t.entities.forEach(t=>{i("string"==typeof t?t:t.entity)}),0===e.length)throw new Error("You need to define at least one entity");e.sort((t,e)=>t.localeCompare(e));const s=this._activeEntityId,o=e[0],r=s&&e.includes(s)?s:o;this._config={show_profile_selector:!0,editable:!0,show_temperature:!0,temperature_unit:"°C",hour_format:"24",...t,entity:o},this._activeEntityId=r,this._copiedSchedule=void 0,this._editingWeekday=void 0,this._editingBlocks=void 0,this._updateLanguage()}_getPreferredLanguage(t){return t?.language||t?.locale?.language}_updateLanguage(){let t="en";if(this._config?.language)t=this._config.language;else{const e=this._getPreferredLanguage(this.hass);e&&(t=e)}this._translations=Lt(t),this._weekdayShortLabelMap=this._createWeekdayLabelMap("short"),this._weekdayLongLabelMap=this._createWeekdayLabelMap("long")}_createWeekdayLabelMap(t){const e="short"===t?this._translations.weekdays.short:this._translations.weekdays.long;return{MONDAY:e.monday,TUESDAY:e.tuesday,WEDNESDAY:e.wednesday,THURSDAY:e.thursday,FRIDAY:e.friday,SATURDAY:e.saturday,SUNDAY:e.sunday}}_getWeekdayLabel(t,e="short"){return"long"===e?(this._weekdayLongLabelMap||(this._weekdayLongLabelMap=this._createWeekdayLabelMap("long")),this._weekdayLongLabelMap[t]):(this._weekdayShortLabelMap||(this._weekdayShortLabelMap=this._createWeekdayLabelMap("short")),this._weekdayShortLabelMap[t])}_getTimeLabels(){const t=this._config?.hour_format||"24",e=[];for(let i=0;i<=24;i+=3){const s=`${i.toString().padStart(2,"0")}:00`;e.push({hour:i,label:At(s,t),position:i/24*100})}return e}_formatTimeDisplay(t){return At(t,this._config?.hour_format||"24")}_getEntityId(t){return"string"==typeof t?t:t.entity}_getEntityOptions(){return this._config?this._config.entities?.length?this._config.entities.map(t=>this._getEntityId(t)).sort((t,e)=>t.localeCompare(e)):this._config.entity?[this._config.entity]:[]:[]}_getEntityDisplayName(t){if(this._config?.entities?.length){const e=this._config.entities.find(e=>this._getEntityId(e)===t);if(e&&"string"!=typeof e&&e.name)return e.name}return this.hass?.states?.[t]?.attributes.friendly_name||t}_getProfileDisplayName(t){const e=this._getActiveEntityId();if(e&&this._config?.entities?.length){const i=this._config.entities.find(t=>this._getEntityId(t)===e);if(i&&"string"!=typeof i&&i.profile_names?.[t])return`${t} - ${i.profile_names[t]}`}return t}_getActiveEntityId(){const t=this._getEntityOptions();if(0!==t.length)return this._activeEntityId&&t.includes(this._activeEntityId)?this._activeEntityId:t[0]}_getProfileFromPresetMode(t){return function(t){if(!t)return;const e=t.match(/^week_pro(?:gram|file)_(\d+)$/);return e&&e[1]?`P${e[1]}`:void 0}(t)}_needsManualReload(t){if(!t||!this.hass)return!1;const e=this.hass.states[t];if(!e?.attributes?.interface_id)return!1;const i=e.attributes.interface_id;return i.endsWith("BidCos-RF")||i.endsWith("BidCos-Wired")||i.endsWith("VirtualDevices")}_getScheduleApiVersion(t){const e=this.hass?.states[t];return i=e?.attributes?.schedule_api_version,"v2.0"===i?"v2":"v1";var i}_getDeviceAddress(t){const e=this.hass?.states[t];return function(t){if(!t)return;const e=t.split(":");return 2===e.length?e[0]:void 0}(e?.attributes?.address)}_requireDeviceAddress(t){const e=this._getDeviceAddress(t);if(!e)throw new Error(`Cannot resolve device_address for entity ${t}. Ensure the entity has a valid address attribute (format: "device_address:channel").`);return e}async _callSetActiveProfile(t,e){if("v2"===this._getScheduleApiVersion(t)){const i=this._requireDeviceAddress(t);await this.hass.callService("homematicip_local","set_current_schedule_profile",{device_address:i,profile:e})}else await this.hass.callService("homematicip_local","set_schedule_active_profile",{entity_id:t,profile:e})}async _callSetScheduleWeekday(t,e,i,s,o){if("v2"===this._getScheduleApiVersion(t)){const r=this._requireDeviceAddress(t);await this.hass.callService("homematicip_local","set_schedule_weekday",{device_address:r,profile:e,weekday:i,base_temperature:s,simple_weekday_list:o})}else await this.hass.callService("homematicip_local","set_schedule_simple_weekday",{entity_id:t,profile:e,weekday:i,base_temperature:s,simple_weekday_list:o})}_scheduleReloadDeviceConfig(t){if(!this.hass)return;const e=this._getDeviceAddress(t);e&&setTimeout(async()=>{try{await this.hass.callService("homematicip_local","reload_device_config",{device_address:e})}catch(t){}},5e3)}_formatValidationParams(t){if(!t)return{};const e={};for(const[i,s]of Object.entries(t))"weekday"===i&&wt.includes(s)?e.weekday=this._getWeekdayLabel(s,"long"):e[i]=s;return e}_translateValidationMessage(t){const e=this._translations.validationMessages[t.key]||t.key,i=this._formatValidationParams(t.params);return t.nested&&(i.details=this._translateValidationMessage(t.nested)),Rt(e,i)}getCardSize(){return 12}connectedCallback(){super.connectedCallback(),this._updateCurrentTime(),this._timeUpdateInterval=window.setInterval(()=>{this._updateCurrentTime()},6e4),window.addEventListener("keydown",this._keyDownHandler)}disconnectedCallback(){super.disconnectedCallback(),void 0!==this._timeUpdateInterval&&(clearInterval(this._timeUpdateInterval),this._timeUpdateInterval=void 0),void 0!==this._loadingTimeoutId&&(clearTimeout(this._loadingTimeoutId),this._loadingTimeoutId=void 0),window.removeEventListener("keydown",this._keyDownHandler)}_updateCurrentTime(){const t=new Date,e=60*t.getHours()+t.getMinutes();this._currentTimePercent=e/1440*100,this._currentTimeMinutes=e;const i=t.getDay();this._currentWeekday=["SUNDAY","MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY"][i]}_isBlockActive(t,e){return!(!this._currentWeekday||this._currentWeekday!==t)&&this._currentTimeMinutes>=e.startMinutes&&this._currentTimeMinutes<e.endMinutes}_handleKeyDown(t){if(!this._editingWeekday||!this._editingBlocks)return;const e=t.ctrlKey||t.metaKey;e&&"z"===t.key&&!t.shiftKey?(t.preventDefault(),this._undo()):e&&("y"===t.key||"z"===t.key&&t.shiftKey)&&(t.preventDefault(),this._redo())}_saveHistoryState(){if(!this._editingBlocks)return;const t=JSON.parse(JSON.stringify(this._editingBlocks));this._historyStack=this._historyStack.slice(0,this._historyIndex+1),this._historyStack.push(t),this._historyIndex++,this._historyStack.length>50&&(this._historyStack.shift(),this._historyIndex--)}_undo(){this._historyIndex<=0||(this._historyIndex--,this._editingBlocks=JSON.parse(JSON.stringify(this._historyStack[this._historyIndex])),this._updateValidationWarnings())}_redo(){this._historyIndex>=this._historyStack.length-1||(this._historyIndex++,this._editingBlocks=JSON.parse(JSON.stringify(this._historyStack[this._historyIndex])),this._updateValidationWarnings())}_canUndo(){return this._historyIndex>0}_canRedo(){return this._historyIndex<this._historyStack.length-1}willUpdate(t){if(super.willUpdate(t),t.has("hass")&&this._config){this._updateFromEntity();const e=t.get("hass");this._getPreferredLanguage(this.hass)!==this._getPreferredLanguage(e)&&this._updateLanguage()}}_updateFromEntity(){if(!this.hass||!this._config)return;const t=this._getActiveEntityId();if(!t)return this._currentProfile=void 0,this._activeDeviceProfile=void 0,this._scheduleData=void 0,void(this._availableProfiles=[]);const e=this.hass.states?.[t];if(!e)return this._currentProfile=void 0,this._activeDeviceProfile=void 0,this._scheduleData=void 0,void(this._availableProfiles=[]);const i=e.attributes;if(t.startsWith("sensor.")&&"climate"!==i.schedule_type)return this._currentProfile=void 0,this._activeDeviceProfile=void 0,this._scheduleData=void 0,void(this._availableProfiles=[]);if(!i.schedule_data)return this._currentProfile=void 0,this._activeDeviceProfile=void 0,this._scheduleData=void 0,void(this._availableProfiles=[]);const s=this._getScheduleApiVersion(t),o="v2"===s?function(t){if(null!=t)return`P${t}`}(i.device_active_profile_index):this._getProfileFromPresetMode(i.preset_mode);void 0!==o&&void 0!==this._activeDeviceProfile&&o!==this._activeDeviceProfile&&(this._userSelectedProfile=!1,this._reloadScheduleData(t,o)),this._activeDeviceProfile=o,this._userSelectedProfile||(this._currentProfile=this._config.profile||o||("v2"===s?i.current_schedule_profile:i.active_profile)),this._scheduleData=i.schedule_data,this._availableProfiles=(i.available_profiles||[]).slice().sort((t,e)=>t.localeCompare(e)),this._minTemp=i.min_temp??5,this._maxTemp=i.max_temp??30.5,this._tempStep=i.target_temp_step??.5,this._lastScheduleDataHash=i.schedule_data?JSON.stringify(i.schedule_data):void 0}_getBaseTemperature(t){if(this._scheduleData){const e=this._scheduleData[t];if(e){const{baseTemperature:t}=Dt(e);return t}}return 20}_getParsedBlocks(t){if(this._scheduleData){const e=this._scheduleData[t];if(!e)return[];const{blocks:i}=Dt(e);return i}return[]}_reloadScheduleData(t,e){this.hass&&this._callSetActiveProfile(t,e).catch(()=>{})}async _handleProfileChange(t){const e=t.target.value,i=this._getActiveEntityId();if(this._config&&this.hass&&i){this._userSelectedProfile=!0;try{await this._callSetActiveProfile(i,e),this._currentProfile=e}catch(t){alert(Rt(this._translations.errors.failedToChangeProfile,{error:String(t)}))}}}_updateValidationWarnings(){this._validationWarnings=this._editingBlocks?function(t,e=5,i=30.5){const s=[];if(0===t.length)return s;for(let e=0;e<t.length-1;e++){const i=t[e];i.endMinutes<i.startMinutes&&s.push({key:"blockEndBeforeStart",params:{block:`${e+1}`}}),i.endMinutes===i.startMinutes&&s.push({key:"blockZeroDuration",params:{block:`${e+1}`}})}const o=t[t.length-1];return o.endMinutes<o.startMinutes&&s.push({key:"blockEndBeforeStart",params:{block:`${t.length}`}}),t.forEach((t,o)=>{(t.startMinutes<0||t.startMinutes>1440)&&s.push({key:"invalidStartTime",params:{block:`${o+1}`}}),(t.endMinutes<0||t.endMinutes>1440)&&s.push({key:"invalidEndTime",params:{block:`${o+1}`}}),(t.temperature<e||t.temperature>i)&&s.push({key:"temperatureOutOfRange",params:{block:`${o+1}`,min:`${e}`,max:`${i}`}})}),s}(this._editingBlocks,this._minTemp,this._maxTemp):[]}_handleWeekdayClick(t){if(!this._config?.editable)return;if(!this._scheduleData)return;this._editingWeekday=t,this._editingBlocks=this._getParsedBlocks(t);const e=this._scheduleData[t];if(e){const{baseTemperature:t}=Dt(e);this._editingBaseTemperature=t}else this._editingBaseTemperature=20;this._historyStack=[JSON.parse(JSON.stringify(this._editingBlocks))],this._historyIndex=0,this._updateValidationWarnings()}_closeEditor(){this._editingWeekday=void 0,this._editingBlocks=void 0,this._editingBaseTemperature=void 0,this._editingSlotIndex=void 0,this._editingSlotData=void 0,this._historyStack=[],this._historyIndex=-1}async _saveSchedule(){if(!(this._config&&this.hass&&this._editingWeekday&&this._editingBlocks&&this._currentProfile&&void 0!==this._editingBaseTemperature))return;const t=this._getActiveEntityId();if(!t)return;const e=Pt(this._editingBlocks,this._editingBaseTemperature),i=Nt(e,this._minTemp,this._maxTemp);if(i){const t=this._translateValidationMessage(i);return void alert(Rt(this._translations.errors.invalidSchedule,{error:t}))}this._isLoading=!0,this._loadingTimeoutId=window.setTimeout(()=>{this._isLoading=!1,this._loadingTimeoutId=void 0},1e4);try{const{base_temperature:i,periods:s}=e;await this._callSetScheduleWeekday(t,this._currentProfile,this._editingWeekday,i,s),this._scheduleData&&(this._scheduleData={...this._scheduleData,[this._editingWeekday]:e}),this._updateFromEntity(),this.requestUpdate(),this._closeEditor(),this._needsManualReload(t)&&this._scheduleReloadDeviceConfig(t)}catch(t){alert(Rt(this._translations.errors.failedToSaveSchedule,{error:String(t)}))}finally{void 0!==this._loadingTimeoutId&&(clearTimeout(this._loadingTimeoutId),this._loadingTimeoutId=void 0),this._isLoading=!1}}_copySchedule(t){if(!this._scheduleData)return;const e=this._getParsedBlocks(t);let i;const s=this._scheduleData[t];i=s?Dt(s).baseTemperature:Bt(e),this._copiedSchedule={weekday:t,blocks:JSON.parse(JSON.stringify(e)),baseTemperature:i}}async _pasteSchedule(t){if(!(this._config&&this.hass&&this._currentProfile&&this._copiedSchedule))return;const e=this._getActiveEntityId();if(!e)return;const i=this._copiedSchedule.baseTemperature??Bt(this._copiedSchedule.blocks),s=Pt(this._copiedSchedule.blocks,i),o=Nt(s,this._minTemp,this._maxTemp);if(o){const t=this._translateValidationMessage(o);return void alert(Rt(this._translations.errors.invalidSchedule,{error:t}))}this._isLoading=!0,this._loadingTimeoutId=window.setTimeout(()=>{this._isLoading=!1,this._loadingTimeoutId=void 0},1e4);try{const{base_temperature:i,periods:o}=s;await this._callSetScheduleWeekday(e,this._currentProfile,t,i,o),this._scheduleData&&(this._scheduleData={...this._scheduleData,[t]:s}),this._updateFromEntity(),this.requestUpdate(),this._needsManualReload(e)&&this._scheduleReloadDeviceConfig(e)}catch(t){alert(Rt(this._translations.errors.failedToPasteSchedule,{error:String(t)}))}finally{void 0!==this._loadingTimeoutId&&(clearTimeout(this._loadingTimeoutId),this._loadingTimeoutId=void 0),this._isLoading=!1}}_exportSchedule(){if(this._currentProfile&&this._scheduleData)try{const t={version:"2.0",profile:this._currentProfile,exported:(new Date).toISOString(),scheduleData:this._scheduleData,format:"simple"},e=JSON.stringify(t,null,2),i=new Blob([e],{type:"application/json"}),s=URL.createObjectURL(i),o=document.createElement("a");o.href=s,o.download=`schedule-${this._currentProfile}-${(new Date).toISOString().split("T")[0]}.json`,document.body.appendChild(o),o.click(),document.body.removeChild(o),URL.revokeObjectURL(s)}catch(t){alert(Rt(this._translations.errors.failedToExport,{error:String(t)}))}}_importSchedule(){const t=document.createElement("input");t.type="file",t.accept=".json,application/json",t.onchange=async t=>{const e=t.target.files?.[0];if(e)if(e.name.endsWith(".json")||"application/json"===e.type)try{const t=await e.text();let i,s;try{i=JSON.parse(t)}catch{return void alert(this._translations.errors.invalidImportFormat)}if(!i||"object"!=typeof i)return void alert(this._translations.errors.invalidImportFormat);s="scheduleData"in i?i.scheduleData:i;const o=function(t){if(!t||"object"!=typeof t)return{key:"scheduleMustBeObject"};const e=t,i=["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"];for(const t of i){if(!(t in e))return{key:"missingWeekday",params:{weekday:t}};const i=e[t];if(!i||"object"!=typeof i)return{key:"invalidWeekdayData",params:{weekday:t}};if(!("base_temperature"in i)||!("periods"in i))return{key:"invalidWeekdayData",params:{weekday:t}};const s=Nt(i);if(s)return{key:"weekdayValidationError",params:{weekday:t},nested:s}}return null}(s);if(o){const t=this._translateValidationMessage(o);return void alert(Rt(this._translations.errors.invalidImportData,{error:t}))}const r=this._getActiveEntityId();if(!(this._config&&this.hass&&this._currentProfile&&r))return;this._isLoading=!0,this._loadingTimeoutId=window.setTimeout(()=>{this._isLoading=!1,this._loadingTimeoutId=void 0},1e4);try{const t=s;for(const e of wt){const i=t[e];if(i){const{base_temperature:t,periods:s}=i;await this._callSetScheduleWeekday(r,this._currentProfile,e,t,s)}}this._scheduleData=t,this._updateFromEntity(),this.requestUpdate(),alert(this._translations.ui.importSuccess),this._needsManualReload(r)&&this._scheduleReloadDeviceConfig(r)}catch(t){alert(Rt(this._translations.errors.failedToImport,{error:String(t)}))}finally{void 0!==this._loadingTimeoutId&&(clearTimeout(this._loadingTimeoutId),this._loadingTimeoutId=void 0),this._isLoading=!1}}catch(t){alert(Rt(this._translations.errors.failedToImport,{error:String(t)}))}else alert(this._translations.errors.invalidImportFile)},t.click()}_addTimeBlock(){if(!this._editingBlocks)return;const t=this._editingBlocks[this._editingBlocks.length-1],e=t?t.endMinutes:0,i=Math.min(e+60,1440);i>e&&this._editingBlocks.length<12&&(this._saveHistoryState(),this._editingBlocks=[...this._editingBlocks,{startTime:Et(e),startMinutes:e,endTime:Et(i),endMinutes:i,temperature:20,slot:this._editingBlocks.length+1}],this._updateValidationWarnings())}_removeTimeBlock(t){!this._editingBlocks||this._editingBlocks.length<=1||(this._saveHistoryState(),this._editingBlocks=this._editingBlocks.filter((e,i)=>i!==t),this._editingBlocks=this._editingBlocks.map((t,e)=>({...t,slot:e+1})),this._updateValidationWarnings())}_updateTimeBlock(t,e){if(this._editingBlocks){this._saveHistoryState(),this._editingBlocks=this._editingBlocks.map((i,s)=>{if(s!==t)return i;const o={...i,...e};return e.endTime&&(o.endMinutes=Tt(e.endTime)),o});for(let e=t+1;e<this._editingBlocks.length;e++){const t=this._editingBlocks[e-1];this._editingBlocks[e]={...this._editingBlocks[e],startTime:t.endTime,startMinutes:t.endMinutes}}this._editingBlocks=[...this._editingBlocks],this._updateValidationWarnings()}}render(){if(!this._config||!this.hass)return j``;const t=this._getEntityOptions(),e=t.length>1,i=this._getActiveEntityId(),s=i?this.hass.states?.[i]:void 0,o=this._config.name||(i?this._getEntityDisplayName(i):null)||this._translations.ui.schedule;return s?i?.startsWith("sensor.")&&"climate"!==s.attributes.schedule_type?j`
+  `}}e([he({attribute:!1})],be.prototype,"hass",void 0),e([pe()],be.prototype,"_config",void 0),e([pe()],be.prototype,"_expandedEntity",void 0),customElements.define("homematicip-local-climate-schedule-card-editor",be);const Se={en:{weekdays:{short:{monday:"Mo",tuesday:"Tu",wednesday:"We",thursday:"Th",friday:"Fr",saturday:"Sa",sunday:"Su"},long:{monday:"Monday",tuesday:"Tuesday",wednesday:"Wednesday",thursday:"Thursday",friday:"Friday",saturday:"Saturday",sunday:"Sunday"}},ui:{schedule:"Schedule",loading:"Loading schedule data...",entityNotFound:"Entity {entity} not found",clickToEdit:"Click on a time slot to edit the schedule",edit:"Edit {weekday}",cancel:"Cancel",save:"Save",addTimeBlock:"+ Add Time Block",copySchedule:"Copy schedule",pasteSchedule:"Paste schedule",undo:"Undo",redo:"Redo",undoShortcut:"Undo (Ctrl+Z)",redoShortcut:"Redo (Ctrl+Y)",exportSchedule:"Export",importSchedule:"Import",exportTooltip:"Export schedule to JSON file",importTooltip:"Import schedule from JSON file",exportSuccess:"Schedule exported successfully",importSuccess:"Schedule imported successfully",unsavedChanges:"Unsaved changes",saveAll:"Save all",discard:"Discard",confirmDiscardChanges:"You have unsaved changes. Do you want to discard them?",from:"From",to:"To",baseTemperature:"Base Temperature",baseTemperatureDescription:"Temperature for unscheduled periods",temperaturePeriods:"Temperature Periods",editSlot:"Edit",saveSlot:"Save",cancelSlotEdit:"Cancel",sensorNotSupported:"Sensor entity {entity} does not have a climate schedule type.",noScheduleData:"Entity {entity} does not provide schedule data."},errors:{failedToChangeProfile:"Failed to change profile: {error}",failedToSaveSchedule:"Failed to save schedule: {error}",failedToPasteSchedule:"Failed to paste schedule: {error}",invalidSchedule:"Invalid schedule: {error}",failedToExport:"Failed to export schedule: {error}",failedToImport:"Failed to import schedule: {error}",invalidImportFile:"Invalid file format. Please select a JSON file.",invalidImportFormat:"Invalid JSON format in file.",invalidImportData:"Invalid schedule data: {error}"},warnings:{title:"Validation Warnings",noWarnings:"No issues detected"},validationMessages:{blockEndBeforeStart:"Block {block}: End time is before start time",blockZeroDuration:"Block {block}: Block has zero duration",invalidStartTime:"Block {block}: Invalid start time",invalidEndTime:"Block {block}: Invalid end time",temperatureOutOfRange:"Block {block}: Temperature out of range ({min}-{max}°C)",invalidSlotCount:"Invalid number of slots: {count} (expected 13)",invalidSlotKey:"Invalid slot key: {key} (must be integer 1-13)",missingSlot:"Missing slot {slot}",slotMissingValues:"Slot {slot} missing ENDTIME or TEMPERATURE",slotTimeBackwards:"Slot {slot} time goes backwards: {time}",slotTimeExceedsDay:"Slot {slot} time exceeds 24:00: {time}",lastSlotMustEnd:"Last slot must end at 24:00",scheduleMustBeObject:"Schedule data must be an object",missingWeekday:"Missing weekday: {weekday}",invalidWeekdayData:"Invalid data for {weekday}",weekdayValidationError:"{weekday}: {details}"}},de:{weekdays:{short:{monday:"Mo",tuesday:"Di",wednesday:"Mi",thursday:"Do",friday:"Fr",saturday:"Sa",sunday:"So"},long:{monday:"Montag",tuesday:"Dienstag",wednesday:"Mittwoch",thursday:"Donnerstag",friday:"Freitag",saturday:"Samstag",sunday:"Sonntag"}},ui:{schedule:"Zeitplan",loading:"Zeitplandaten werden geladen...",entityNotFound:"Entität {entity} nicht gefunden",clickToEdit:"Klicken Sie auf einen Zeitabschnitt, um den Zeitplan zu bearbeiten",edit:"{weekday} bearbeiten",cancel:"Abbrechen",save:"Speichern",addTimeBlock:"+ Zeitblock hinzufügen",copySchedule:"Zeitplan kopieren",pasteSchedule:"Zeitplan einfügen",undo:"Rückgängig",redo:"Wiederholen",undoShortcut:"Rückgängig (Strg+Z)",redoShortcut:"Wiederholen (Strg+Y)",exportSchedule:"Exportieren",importSchedule:"Importieren",exportTooltip:"Zeitplan als JSON-Datei exportieren",importTooltip:"Zeitplan aus JSON-Datei importieren",exportSuccess:"Zeitplan erfolgreich exportiert",importSuccess:"Zeitplan erfolgreich importiert",unsavedChanges:"Ungespeicherte Änderungen",saveAll:"Alle speichern",discard:"Verwerfen",confirmDiscardChanges:"Sie haben ungespeicherte Änderungen. Möchten Sie diese verwerfen?",from:"Von",to:"Bis",baseTemperature:"Basistemperatur",baseTemperatureDescription:"Temperatur für nicht geplante Zeiträume",temperaturePeriods:"Temperaturperioden",editSlot:"Bearbeiten",saveSlot:"Speichern",cancelSlotEdit:"Abbrechen",sensorNotSupported:"Sensor-Entität {entity} hat keinen Klima-Zeitplantyp.",noScheduleData:"Entität {entity} stellt keine Zeitplandaten bereit."},errors:{failedToChangeProfile:"Fehler beim Wechseln des Profils: {error}",failedToSaveSchedule:"Fehler beim Speichern des Zeitplans: {error}",failedToPasteSchedule:"Fehler beim Einfügen des Zeitplans: {error}",invalidSchedule:"Ungültiger Zeitplan: {error}",failedToExport:"Fehler beim Exportieren des Zeitplans: {error}",failedToImport:"Fehler beim Importieren des Zeitplans: {error}",invalidImportFile:"Ungültiges Dateiformat. Bitte wählen Sie eine JSON-Datei.",invalidImportFormat:"Ungültiges JSON-Format in der Datei.",invalidImportData:"Ungültige Zeitplandaten: {error}"},warnings:{title:"Validierungswarnungen",noWarnings:"Keine Probleme erkannt"},validationMessages:{blockEndBeforeStart:"Block {block}: Die Endzeit liegt vor der Startzeit",blockZeroDuration:"Block {block}: Der Block hat keine Dauer",invalidStartTime:"Block {block}: Ungültige Startzeit",invalidEndTime:"Block {block}: Ungültige Endzeit",temperatureOutOfRange:"Block {block}: Temperatur außerhalb des Bereichs ({min}-{max}°C)",invalidSlotCount:"Ungültige Anzahl an Slots: {count} (erwartet 13)",invalidSlotKey:"Ungültiger Slot-Schlüssel: {key} (muss eine Ganzzahl 1-13 sein)",missingSlot:"Slot {slot} fehlt",slotMissingValues:"Slot {slot} fehlt ENDTIME oder TEMPERATURE",slotTimeBackwards:"Slot {slot}: Zeit läuft rückwärts: {time}",slotTimeExceedsDay:"Slot {slot}: Zeit überschreitet 24:00: {time}",lastSlotMustEnd:"Der letzte Slot muss um 24:00 enden",scheduleMustBeObject:"Zeitplandaten müssen ein Objekt sein",missingWeekday:"Fehlender Wochentag: {weekday}",invalidWeekdayData:"Ungültige Daten für {weekday}",weekdayValidationError:"{weekday}: {details}"}}};function $e(e){const t=e.toLowerCase().split("-")[0];return Se[t]||Se.en}function Ee(e,t){let i=e;for(const[e,s]of Object.entries(t))i=i.replace(`{${e}}`,s);return i}let we=class extends ne{constructor(){super(...arguments),this._availableProfiles=[],this._userSelectedProfile=!1,this._isLoading=!1,this._translations=$e("en"),this._minTemp=5,this._maxTemp=30.5,this._tempStep=.5}static getConfigElement(){return document.createElement("homematicip-local-climate-schedule-card-editor")}static getStubConfig(e){const t=Object.keys(e.states).filter(t=>t.startsWith("climate.")&&void 0!==e.states[t].attributes?.schedule_data);return{type:"custom:homematicip-local-climate-schedule-card",entities:t.length>0?[t[0]]:[]}}setConfig(e){const t=[],i=e=>{if(!e)return;const i=e.trim();i&&(t.includes(i)||t.push(i))};if(i(e.entity),Array.isArray(e.entities)&&e.entities.forEach(e=>{i("string"==typeof e?e:e.entity)}),0===t.length)throw new Error("You need to define at least one entity");t.sort((e,t)=>e.localeCompare(t));const s=this._activeEntityId,r=t[0],o=s&&t.includes(s)?s:r;this._config={show_profile_selector:!0,editable:!0,show_temperature:!0,temperature_unit:"°C",hour_format:"24",...e,entity:r},this._activeEntityId=o,this._copiedSchedule=void 0,this._editingWeekday=void 0,this._updateLanguage()}_getPreferredLanguage(e){return e?.language||e?.locale?.language}_updateLanguage(){let e="en";if(this._config?.language)e=this._config.language;else{const t=this._getPreferredLanguage(this.hass);t&&(e=t)}this._translations=$e(e),this._weekdayShortLabelMap=this._createWeekdayLabelMap("short"),this._weekdayLongLabelMap=this._createWeekdayLabelMap("long")}_createWeekdayLabelMap(e){const t="short"===e?this._translations.weekdays.short:this._translations.weekdays.long;return{MONDAY:t.monday,TUESDAY:t.tuesday,WEDNESDAY:t.wednesday,THURSDAY:t.thursday,FRIDAY:t.friday,SATURDAY:t.saturday,SUNDAY:t.sunday}}_getWeekdayLabel(e,t="short"){return"long"===t?(this._weekdayLongLabelMap||(this._weekdayLongLabelMap=this._createWeekdayLabelMap("long")),this._weekdayLongLabelMap[e]):(this._weekdayShortLabelMap||(this._weekdayShortLabelMap=this._createWeekdayLabelMap("short")),this._weekdayShortLabelMap[e])}_getEntityId(e){return"string"==typeof e?e:e.entity}_getEntityOptions(){return this._config?this._config.entities?.length?this._config.entities.map(e=>this._getEntityId(e)).sort((e,t)=>e.localeCompare(t)):this._config.entity?[this._config.entity]:[]:[]}_getEntityDisplayName(e){if(this._config?.entities?.length){const t=this._config.entities.find(t=>this._getEntityId(t)===e);if(t&&"string"!=typeof t&&t.name)return t.name}return this.hass?.states?.[e]?.attributes.friendly_name||e}_getProfileDisplayName(e){const t=this._getActiveEntityId();if(t&&this._config?.entities?.length){const i=this._config.entities.find(e=>this._getEntityId(e)===t);if(i&&"string"!=typeof i&&i.profile_names?.[e])return`${e} - ${i.profile_names[e]}`}return e}_getActiveEntityId(){const e=this._getEntityOptions();if(0!==e.length)return this._activeEntityId&&e.includes(this._activeEntityId)?this._activeEntityId:e[0]}_getProfileFromPresetMode(e){return function(e){if(!e)return;const t=e.match(/^week_pro(?:gram|file)_(\d+)$/);return t&&t[1]?`P${t[1]}`:void 0}(e)}_needsManualReload(e){if(!e||!this.hass)return!1;const t=this.hass.states[e];if(!t?.attributes?.interface_id)return!1;const i=t.attributes.interface_id;return i.endsWith("BidCos-RF")||i.endsWith("BidCos-Wired")||i.endsWith("VirtualDevices")}_getScheduleApiVersion(e){const t=this.hass?.states[e];return i=t?.attributes?.schedule_api_version,"v2.0"===i?"v2":"v1";var i}_getDeviceAddress(e){const t=this.hass?.states[e];return function(e){if(!e)return;const t=e.split(":");return 2===t.length?t[0]:void 0}(t?.attributes?.address)}_requireDeviceAddress(e){const t=this._getDeviceAddress(e);if(!t)throw new Error(`Cannot resolve device_address for entity ${e}. Ensure the entity has a valid address attribute (format: "device_address:channel").`);return t}async _callSetActiveProfile(e,t){if("v2"===this._getScheduleApiVersion(e)){const i=this._requireDeviceAddress(e);await this.hass.callService("homematicip_local","set_current_schedule_profile",{device_address:i,profile:t})}else await this.hass.callService("homematicip_local","set_schedule_active_profile",{entity_id:e,profile:t})}async _callSetScheduleWeekday(e,t,i,s,r){if("v2"===this._getScheduleApiVersion(e)){const o=this._requireDeviceAddress(e);await this.hass.callService("homematicip_local","set_schedule_weekday",{device_address:o,profile:t,weekday:i,base_temperature:s,simple_weekday_list:r})}else await this.hass.callService("homematicip_local","set_schedule_simple_weekday",{entity_id:e,profile:t,weekday:i,base_temperature:s,simple_weekday_list:r})}_scheduleReloadDeviceConfig(e){if(!this.hass)return;const t=this._getDeviceAddress(e);t&&setTimeout(async()=>{try{await this.hass.callService("homematicip_local","reload_device_config",{device_address:t})}catch(e){}},5e3)}_formatValidationParams(e){if(!e)return{};const t={};for(const[i,s]of Object.entries(e))"weekday"===i&&ue.includes(s)?t.weekday=this._getWeekdayLabel(s,"long"):t[i]=s;return t}_translateValidationMessage(e){const t=this._translations.validationMessages[e.key]||e.key,i=this._formatValidationParams(e.params);return e.nested&&(i.details=this._translateValidationMessage(e.nested)),Ee(t,i)}getCardSize(){return 12}willUpdate(e){if(super.willUpdate(e),e.has("hass")&&this._config){this._updateFromEntity();const t=e.get("hass");this._getPreferredLanguage(this.hass)!==this._getPreferredLanguage(t)&&this._updateLanguage()}}connectedCallback(){super.connectedCallback()}disconnectedCallback(){super.disconnectedCallback(),void 0!==this._loadingTimeoutId&&(clearTimeout(this._loadingTimeoutId),this._loadingTimeoutId=void 0)}_updateFromEntity(){if(!this.hass||!this._config)return;const e=this._getActiveEntityId();if(!e)return this._currentProfile=void 0,this._activeDeviceProfile=void 0,this._scheduleData=void 0,void(this._availableProfiles=[]);const t=this.hass.states?.[e];if(!t)return this._currentProfile=void 0,this._activeDeviceProfile=void 0,this._scheduleData=void 0,void(this._availableProfiles=[]);const i=t.attributes;if(e.startsWith("sensor.")&&"climate"!==i.schedule_type)return this._currentProfile=void 0,this._activeDeviceProfile=void 0,this._scheduleData=void 0,void(this._availableProfiles=[]);if(!i.schedule_data)return this._currentProfile=void 0,this._activeDeviceProfile=void 0,this._scheduleData=void 0,void(this._availableProfiles=[]);const s=this._getScheduleApiVersion(e),r="v2"===s?function(e){if(null!=e)return`P${e}`}(i.device_active_profile_index):this._getProfileFromPresetMode(i.preset_mode);void 0!==r&&void 0!==this._activeDeviceProfile&&r!==this._activeDeviceProfile&&(this._userSelectedProfile=!1,this._reloadScheduleData(e,r)),this._activeDeviceProfile=r,this._userSelectedProfile||(this._currentProfile=this._config.profile||r||("v2"===s?i.current_schedule_profile:i.active_profile)),this._scheduleData=i.schedule_data,this._availableProfiles=(i.available_profiles||[]).slice().sort((e,t)=>e.localeCompare(t)),this._minTemp=i.min_temp??5,this._maxTemp=i.max_temp??30.5,this._tempStep=i.target_temp_step??.5,this._lastScheduleDataHash=i.schedule_data?JSON.stringify(i.schedule_data):void 0}_reloadScheduleData(e,t){this.hass&&this._callSetActiveProfile(e,t).catch(()=>{})}async _handleProfileChange(e){const t=e.target.value,i=this._getActiveEntityId();if(this._config&&this.hass&&i){this._userSelectedProfile=!0;try{await this._callSetActiveProfile(i,t),this._currentProfile=t}catch(e){alert(Ee(this._translations.errors.failedToChangeProfile,{error:String(e)}))}}}_onWeekdayClick(e){this._config?.editable&&this._scheduleData&&(this._editingWeekday=e.detail.weekday)}_onCopySchedule(e){const t=e.detail.weekday;if(!this._scheduleData)return;const i=this._getParsedBlocks(t);let s;const r=this._scheduleData[t];s=r?me(r).baseTemperature:ge(i),this._copiedSchedule={weekday:t,blocks:JSON.parse(JSON.stringify(i)),baseTemperature:s}}async _onPasteSchedule(e){const t=e.detail.weekday;if(!(this._config&&this.hass&&this._currentProfile&&this._copiedSchedule))return;const i=this._getActiveEntityId();if(!i)return;const s=this._copiedSchedule.baseTemperature??ge(this._copiedSchedule.blocks),r=fe(this._copiedSchedule.blocks,s),o=ye(r,this._minTemp,this._maxTemp);if(o){const e=this._translateValidationMessage(o);return void alert(Ee(this._translations.errors.invalidSchedule,{error:e}))}this._isLoading=!0,this._loadingTimeoutId=window.setTimeout(()=>{this._isLoading=!1,this._loadingTimeoutId=void 0},1e4);try{const{base_temperature:e,periods:s}=r;await this._callSetScheduleWeekday(i,this._currentProfile,t,e,s),this._scheduleData&&(this._scheduleData={...this._scheduleData,[t]:r}),this._updateFromEntity(),this.requestUpdate(),this._needsManualReload(i)&&this._scheduleReloadDeviceConfig(i)}catch(e){alert(Ee(this._translations.errors.failedToPasteSchedule,{error:String(e)}))}finally{void 0!==this._loadingTimeoutId&&(clearTimeout(this._loadingTimeoutId),this._loadingTimeoutId=void 0),this._isLoading=!1}}async _onSaveSchedule(e){if(!this._config||!this.hass||!this._currentProfile)return;const t=this._getActiveEntityId();if(!t)return;const{weekday:i,blocks:s,baseTemperature:r}=e.detail,o=fe(s,r),a=ye(o,this._minTemp,this._maxTemp);if(a){const e=this._translateValidationMessage(a);return void alert(Ee(this._translations.errors.invalidSchedule,{error:e}))}this._isLoading=!0,this._loadingTimeoutId=window.setTimeout(()=>{this._isLoading=!1,this._loadingTimeoutId=void 0},1e4);try{const{base_temperature:e,periods:s}=o;await this._callSetScheduleWeekday(t,this._currentProfile,i,e,s),this._scheduleData&&(this._scheduleData={...this._scheduleData,[i]:o}),this._updateFromEntity(),this.requestUpdate(),this._editingWeekday=void 0,this._needsManualReload(t)&&this._scheduleReloadDeviceConfig(t)}catch(e){alert(Ee(this._translations.errors.failedToSaveSchedule,{error:String(e)}))}finally{void 0!==this._loadingTimeoutId&&(clearTimeout(this._loadingTimeoutId),this._loadingTimeoutId=void 0),this._isLoading=!1}}_onValidationFailed(e){alert(Ee(this._translations.errors.invalidSchedule,{error:e.detail.error}))}_onEditorClosed(){this._editingWeekday=void 0}_getParsedBlocks(e){if(this._scheduleData){const t=this._scheduleData[e];if(!t)return[];const{blocks:i}=me(t);return i}return[]}_exportSchedule(){if(this._currentProfile&&this._scheduleData)try{const e={version:"2.0",profile:this._currentProfile,exported:(new Date).toISOString(),scheduleData:this._scheduleData,format:"simple"},t=JSON.stringify(e,null,2),i=new Blob([t],{type:"application/json"}),s=URL.createObjectURL(i),r=document.createElement("a");r.href=s,r.download=`schedule-${this._currentProfile}-${(new Date).toISOString().split("T")[0]}.json`,document.body.appendChild(r),r.click(),document.body.removeChild(r),URL.revokeObjectURL(s)}catch(e){alert(Ee(this._translations.errors.failedToExport,{error:String(e)}))}}_importSchedule(){const e=document.createElement("input");e.type="file",e.accept=".json,application/json",e.onchange=async e=>{const t=e.target.files?.[0];if(t)if(t.name.endsWith(".json")||"application/json"===t.type)try{const e=await t.text();let i,s;try{i=JSON.parse(e)}catch{return void alert(this._translations.errors.invalidImportFormat)}if(!i||"object"!=typeof i)return void alert(this._translations.errors.invalidImportFormat);s="scheduleData"in i?i.scheduleData:i;const r=function(e){if(!e||"object"!=typeof e)return{key:"scheduleMustBeObject"};const t=e,i=["MONDAY","TUESDAY","WEDNESDAY","THURSDAY","FRIDAY","SATURDAY","SUNDAY"];for(const e of i){if(!(e in t))return{key:"missingWeekday",params:{weekday:e}};const i=t[e];if(!i||"object"!=typeof i)return{key:"invalidWeekdayData",params:{weekday:e}};if(!("base_temperature"in i)||!("periods"in i))return{key:"invalidWeekdayData",params:{weekday:e}};const s=ye(i);if(s)return{key:"weekdayValidationError",params:{weekday:e},nested:s}}return null}(s);if(r){const e=this._translateValidationMessage(r);return void alert(Ee(this._translations.errors.invalidImportData,{error:e}))}const o=this._getActiveEntityId();if(!(this._config&&this.hass&&this._currentProfile&&o))return;this._isLoading=!0,this._loadingTimeoutId=window.setTimeout(()=>{this._isLoading=!1,this._loadingTimeoutId=void 0},1e4);try{const e=s;for(const t of ue){const i=e[t];if(i){const{base_temperature:e,periods:s}=i;await this._callSetScheduleWeekday(o,this._currentProfile,t,e,s)}}this._scheduleData=e,this._updateFromEntity(),this.requestUpdate(),alert(this._translations.ui.importSuccess),this._needsManualReload(o)&&this._scheduleReloadDeviceConfig(o)}catch(e){alert(Ee(this._translations.errors.failedToImport,{error:String(e)}))}finally{void 0!==this._loadingTimeoutId&&(clearTimeout(this._loadingTimeoutId),this._loadingTimeoutId=void 0),this._isLoading=!1}}catch(e){alert(Ee(this._translations.errors.failedToImport,{error:String(e)}))}else alert(this._translations.errors.invalidImportFile)},e.click()}_buildGridTranslations(){return this._weekdayShortLabelMap||(this._weekdayShortLabelMap=this._createWeekdayLabelMap("short")),{weekdayShortLabels:this._weekdayShortLabelMap,clickToEdit:this._translations.ui.clickToEdit,copySchedule:this._translations.ui.copySchedule,pasteSchedule:this._translations.ui.pasteSchedule}}_buildEditorTranslations(){return this._weekdayShortLabelMap||(this._weekdayShortLabelMap=this._createWeekdayLabelMap("short")),this._weekdayLongLabelMap||(this._weekdayLongLabelMap=this._createWeekdayLabelMap("long")),{weekdayShortLabels:this._weekdayShortLabelMap,weekdayLongLabels:this._weekdayLongLabelMap,edit:this._translations.ui.edit,cancel:this._translations.ui.cancel,save:this._translations.ui.save,addTimeBlock:this._translations.ui.addTimeBlock,from:this._translations.ui.from,to:this._translations.ui.to,baseTemperature:this._translations.ui.baseTemperature,baseTemperatureDescription:this._translations.ui.baseTemperatureDescription,temperaturePeriods:this._translations.ui.temperaturePeriods,editSlot:this._translations.ui.editSlot,saveSlot:this._translations.ui.saveSlot,cancelSlotEdit:this._translations.ui.cancelSlotEdit,undoShortcut:this._translations.ui.undoShortcut,redoShortcut:this._translations.ui.redoShortcut,warningsTitle:this._translations.warnings.title,validationMessages:this._translations.validationMessages}}_renderEntitySelector(e,t){const i=t&&e.includes(t)?t:e[0];return j`
+      <select
+        class="profile-selector entity-selector"
+        @change=${this._handleEntitySelection}
+        .value=${i}
+      >
+        ${[...e].sort((e,t)=>e.localeCompare(t)).map(e=>{const t=this._getEntityDisplayName(e);return j`<option value=${e}>${t}</option>`})}
+      </select>
+    `}_handleEntitySelection(e){const t=e.target.value;t&&t!==this._getActiveEntityId()&&(this._activeEntityId=t,this._editingWeekday=void 0,this._copiedSchedule=void 0,this._userSelectedProfile=!1,this._updateFromEntity())}render(){if(!this._config||!this.hass)return j``;const e=this._getEntityOptions(),t=e.length>1,i=this._getActiveEntityId(),s=i?this.hass.states?.[i]:void 0,r=this._config.name||(i?this._getEntityDisplayName(i):null)||this._translations.ui.schedule;return s?i?.startsWith("sensor.")&&"climate"!==s.attributes.schedule_type?j`
           <ha-card>
             <div class="card-header">
-              <div class="name">${o}</div>
+              <div class="name">${r}</div>
             </div>
             <div class="card-content">
               <div class="error">
-                ${Rt(this._translations.ui.sensorNotSupported,{entity:i})}
+                ${Ee(this._translations.ui.sensorNotSupported,{entity:i})}
               </div>
             </div>
           </ha-card>
         `:s.attributes.schedule_data?j`
       <ha-card>
         <div class="card-header">
-          <div class="name">${o}</div>
+          <div class="name">${r}</div>
         </div>
         <div class="header-controls">
-          ${e?this._renderEntitySelector(t,i):""}
+          ${t?this._renderEntitySelector(e,i):""}
           ${this._config.show_profile_selector&&this._availableProfiles.length>0?j`
                 <select
                   class="profile-selector"
                   @change=${this._handleProfileChange}
                   .value=${this._currentProfile||""}
                 >
-                  ${this._availableProfiles.map(t=>j`
+                  ${this._availableProfiles.map(e=>j`
                       <option
-                        value=${t}
-                        ?selected=${t===this._currentProfile}
-                        class=${t===this._activeDeviceProfile?"active-profile-option":""}
+                        value=${e}
+                        ?selected=${e===this._currentProfile}
+                        class=${e===this._activeDeviceProfile?"active-profile-option":""}
                       >
-                        ${t===this._activeDeviceProfile?"* ":""}${this._getProfileDisplayName(t)}
+                        ${e===this._activeDeviceProfile?"* ":""}${this._getProfileDisplayName(e)}
                       </option>
                     `)}
                 </select>
@@ -231,19 +239,36 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
             title="${this._translations.ui.exportTooltip}"
             ?disabled=${!this._scheduleData}
           >
-            ⬇️
+            \u2B07\uFE0F
           </button>
           <button
             class="import-btn"
             @click=${this._importSchedule}
             title="${this._translations.ui.importTooltip}"
           >
-            ⬆️
+            \u2B06\uFE0F
           </button>
         </div>
 
         <div class="card-content">
-          ${this._scheduleData?this._renderScheduleView():j`<div class="loading">${this._translations.ui.loading}</div>`}
+          ${this._scheduleData?j`
+                <hmip-schedule-grid
+                  .scheduleData=${this._scheduleData}
+                  .editable=${this._config.editable??!0}
+                  .showTemperature=${this._config.show_temperature??!0}
+                  .showGradient=${this._config.show_gradient??!1}
+                  .temperatureUnit=${this._config.temperature_unit||"°C"}
+                  .hourFormat=${this._config.hour_format||"24"}
+                  .translations=${this._buildGridTranslations()}
+                  .copiedWeekday=${this._copiedSchedule?.weekday}
+                  .editorOpen=${!!this._editingWeekday}
+                  .currentProfile=${this._currentProfile}
+                  .scheduleDataHash=${this._lastScheduleDataHash}
+                  @weekday-click=${this._onWeekdayClick}
+                  @copy-schedule=${this._onCopySchedule}
+                  @paste-schedule=${this._onPasteSchedule}
+                ></hmip-schedule-grid>
+              `:j`<div class="loading">${this._translations.ui.loading}</div>`}
         </div>
 
         ${this._isLoading?j`
@@ -253,311 +278,43 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
             `:""}
       </ha-card>
 
-      ${this._editingWeekday?this._renderEditDialog():""}
+      <hmip-schedule-editor
+        .open=${!!this._editingWeekday}
+        .weekday=${this._editingWeekday}
+        .scheduleData=${this._scheduleData}
+        .minTemp=${this._minTemp}
+        .maxTemp=${this._maxTemp}
+        .tempStep=${this._tempStep}
+        .temperatureUnit=${this._config.temperature_unit||"°C"}
+        .hourFormat=${this._config.hour_format||"24"}
+        .translations=${this._buildEditorTranslations()}
+        @save-schedule=${this._onSaveSchedule}
+        @validation-failed=${this._onValidationFailed}
+        @editor-closed=${this._onEditorClosed}
+      ></hmip-schedule-editor>
     `:j`
         <ha-card>
           <div class="card-header">
-            <div class="name">${o}</div>
+            <div class="name">${r}</div>
           </div>
           <div class="card-content">
             <div class="error">
-              ${Rt(this._translations.ui.noScheduleData,{entity:i||""})}
+              ${Ee(this._translations.ui.noScheduleData,{entity:i||""})}
             </div>
           </div>
         </ha-card>
       `:j`
         <ha-card>
           <div class="card-header">
-            <div class="name">${o}</div>
+            <div class="name">${r}</div>
           </div>
           <div class="card-content">
             <div class="error">
-              ${Rt(this._translations.ui.entityNotFound,{entity:i||this._translations.ui.schedule})}
+              ${Ee(this._translations.ui.entityNotFound,{entity:i||this._translations.ui.schedule})}
             </div>
           </div>
         </ha-card>
-      `}_renderScheduleView(){return this._scheduleData?j`
-      <div class="schedule-container">
-        <!-- Empty cell for time-axis header alignment -->
-        <div class="time-axis-header"></div>
-
-        <!-- Weekday headers -->
-        ${yt(wt,t=>`header-${t}`,t=>{const e=this._copiedSchedule?.weekday===t;return j`
-              <div class="weekday-header">
-                <div class="weekday-label">${this._getWeekdayLabel(t,"short")}</div>
-                ${this._config?.editable?j`
-                      <div class="weekday-actions">
-                        <button
-                          class="copy-btn ${e?"active":""}"
-                          @click=${e=>{e.stopPropagation(),this._copySchedule(t)}}
-                          title="${this._translations.ui.copySchedule}"
-                        >
-                          📋
-                        </button>
-                        <button
-                          class="paste-btn"
-                          @click=${e=>{e.stopPropagation(),this._pasteSchedule(t)}}
-                          title="${this._translations.ui.pasteSchedule}"
-                          ?disabled=${!this._copiedSchedule}
-                        >
-                          📄
-                        </button>
-                      </div>
-                    `:""}
-              </div>
-            `})}
-
-        <!-- Time axis labels -->
-        <div class="time-axis-labels">
-          ${yt(this._getTimeLabels(),t=>t.hour,t=>j`
-              <div class="time-label" style="top: ${t.position}%">${t.label}</div>
-            `)}
-        </div>
-
-        <!-- Time blocks content wrapper (for correct indicator positioning) -->
-        <div class="schedule-content">
-          ${yt(wt,t=>`${t}-${this._currentProfile}-${this._lastScheduleDataHash}`,t=>{const e=this._getParsedBlocks(t),i=this._getBaseTemperature(t),s=It(e,i);return j`
-                <div
-                  class="time-blocks ${this._config?.editable?"editable":""}"
-                  @click=${()=>this._config?.editable&&this._handleWeekdayClick(t)}
-                >
-                  ${yt(s,t=>`${t.slot}-${t.startMinutes}-${this._currentProfile}`,(o,r)=>{const n=this._isBlockActive(t,o),a=o.temperature===i&&!e.some(t=>t.startMinutes===o.startMinutes&&t.endMinutes===o.endMinutes);let l;if(a)l="background-color: var(--secondary-background-color, #e0e0e0);";else if(this._config?.show_gradient){l=`background: ${function(t,e,i){const s=Mt(t);return null===e&&null===i?s:null!==e&&null===i?`linear-gradient(to bottom, ${Mt(e)}, ${s})`:null===e&&null!==i?`linear-gradient(to bottom, ${s}, ${Mt(i)})`:`linear-gradient(to bottom, ${Mt(e)}, ${s} 50%, ${Mt(i)})`}(o.temperature,r>0?s[r-1].temperature:null,r<s.length-1?s[r+1].temperature:null)};`}else l=`background-color: ${Mt(o.temperature)};`;return j`
-                        <div
-                          class="time-block ${n?"active":""} ${a?"base-temp-block":""}"
-                          style="
-                              height: ${(o.endMinutes-o.startMinutes)/1440*100}%;
-                              ${l}
-                            "
-                        >
-                          ${this._config?.show_temperature?j`<span class="temperature"
-                                >${o.temperature.toFixed(1)}°</span
-                              >`:""}
-                          <div class="time-block-tooltip">
-                            <div class="tooltip-time">
-                              ${this._formatTimeDisplay(o.startTime)} -
-                              ${this._formatTimeDisplay(o.endTime)}
-                            </div>
-                            <div class="tooltip-temp">
-                              ${function(t,e="°C"){return`${t.toFixed(1)}${e}`}(o.temperature,this._config?.temperature_unit)}
-                            </div>
-                          </div>
-                        </div>
-                      `})}
-                </div>
-              `})}
-
-          <!-- Current time indicator line (hidden when editor is open) -->
-          ${this._editingWeekday?"":j`<div
-                class="current-time-indicator"
-                style="top: ${this._currentTimePercent}%"
-              ></div>`}
-        </div>
-      </div>
-
-      ${this._config?.editable?j`<div class="hint">${this._translations.ui.clickToEdit}</div>`:""}
-    `:j``}_renderEntitySelector(t,e){const i=e&&t.includes(e)?e:t[0];return j`
-      <select
-        class="profile-selector entity-selector"
-        @change=${this._handleEntitySelection}
-        .value=${i}
-      >
-        ${[...t].sort((t,e)=>t.localeCompare(e)).map(t=>{const e=this._getEntityDisplayName(t);return j`<option value=${t}>${e}</option>`})}
-      </select>
-    `}_handleEntitySelection(t){const e=t.target.value;e&&e!==this._getActiveEntityId()&&(this._activeEntityId=e,this._editingWeekday=void 0,this._editingBlocks=void 0,this._copiedSchedule=void 0,this._validationWarnings=[],this._userSelectedProfile=!1,this._updateFromEntity())}_startSlotEdit(t){if(!this._editingBlocks||t<0||t>=this._editingBlocks.length)return;const e=this._editingBlocks[t];this._editingSlotIndex=t,this._editingSlotData={startTime:e.startTime,endTime:e.endTime,temperature:e.temperature}}_startSlotEditFromDisplay(t,e){if(!this._editingBlocks)return;const i=e[t],s=this._editingBlocks.findIndex(t=>t.startMinutes===i.startMinutes&&t.endMinutes===i.endMinutes&&t.temperature===i.temperature);-1!==s&&this._startSlotEdit(s)}_cancelSlotEdit(){this._editingSlotIndex=void 0,this._editingSlotData=void 0}_saveSlotEdit(){if(void 0===this._editingSlotIndex||!this._editingSlotData||!this._editingBlocks||void 0===this._editingBaseTemperature)return;const t=this._editingSlotIndex,{startTime:e,endTime:i,temperature:s}=this._editingSlotData,o={startTime:e,startMinutes:Tt(e),endTime:i,endMinutes:Tt(i),temperature:s,slot:t+1},r=this._editingBlocks.filter((e,i)=>i!==t),n=function(t,e){const i=[],s=e.startMinutes,o=e.endMinutes,r=[...t].sort((t,e)=>t.startMinutes-e.startMinutes);for(const t of r){const e=t.startMinutes,r=t.endMinutes;r<=s||e>=o?i.push(t):(e<s&&i.push({...t,endTime:Et(s),endMinutes:s,slot:i.length+1}),r>o&&i.push({...t,startTime:Et(o),startMinutes:o,slot:i.length+1}))}i.push({...e,slot:i.length+1});const n=i.sort((t,e)=>t.startMinutes-e.startMinutes);return Ct(n)}(r,o),a=Ct(Ot(n));this._saveHistoryState(),this._editingBlocks=a,this._editingSlotIndex=void 0,this._editingSlotData=void 0,this._updateValidationWarnings()}_addNewSlot(){if(!this._editingBlocks||void 0===this._editingBaseTemperature)return;if(this._editingBlocks.length>=12)return;let t=0,e=60;if(this._editingBlocks.length>0){const i=Ot(this._editingBlocks),s=i[i.length-1];if(s.endMinutes<1440)t=s.endMinutes,e=Math.min(t+60,1440);else{let s=!1;for(let o=0;o<i.length;o++){const r=0===o?0:i[o-1].endMinutes;if(i[o].startMinutes>r){t=r,e=i[o].startMinutes,s=!0;break}}if(!s)return}}const i=Math.min(this._editingBaseTemperature+2,this._maxTemp),s={startTime:Et(t),startMinutes:t,endTime:Et(e),endMinutes:e,temperature:i,slot:this._editingBlocks.length+1};this._saveHistoryState();const o=Ot([...this._editingBlocks,s]);this._editingBlocks=o;const r=o.findIndex(i=>i.startMinutes===t&&i.endMinutes===e);r>=0&&this._startSlotEdit(r),this._updateValidationWarnings()}_renderEditor(){if(!this._editingWeekday||!this._editingBlocks)return j``;const t=void 0!==this._editingBaseTemperature?It(this._editingBlocks,this._editingBaseTemperature):this._editingBlocks;return j`
-      <div class="editor">
-        <div class="editor-header">
-          <h3>
-            ${Rt(this._translations.ui.edit,{weekday:this._getWeekdayLabel(this._editingWeekday,"long")})}
-          </h3>
-          <div class="editor-actions">
-            <button
-              class="undo-btn"
-              @click=${this._undo}
-              ?disabled=${!this._canUndo()}
-              title="${this._translations.ui.undoShortcut}"
-            >
-              ↶
-            </button>
-            <button
-              class="redo-btn"
-              @click=${this._redo}
-              ?disabled=${!this._canRedo()}
-              title="${this._translations.ui.redoShortcut}"
-            >
-              ↷
-            </button>
-            <button class="close-btn" @click=${this._closeEditor}>✕</button>
-          </div>
-        </div>
-
-        ${this._validationWarnings.length>0?j`
-              <div class="validation-warnings">
-                <div class="warnings-header">
-                  <span class="warning-icon">⚠️</span>
-                  <span class="warnings-title">${this._translations.warnings.title}</span>
-                </div>
-                <ul class="warnings-list">
-                  ${this._validationWarnings.map(t=>j`<li class="warning-item">
-                        ${this._translateValidationMessage(t)}
-                      </li>`)}
-                </ul>
-              </div>
-            `:""}
-
-        <!-- Base Temperature Section -->
-        <div class="base-temperature-section">
-          <div class="base-temperature-header">
-            <span class="base-temp-label">${this._translations.ui.baseTemperature}</span>
-            <span class="base-temp-description"
-              >${this._translations.ui.baseTemperatureDescription}</span
-            >
-          </div>
-          <div class="base-temperature-input">
-            <input
-              type="number"
-              class="temp-input base-temp-input"
-              .value=${this._editingBaseTemperature?.toString()||"20.0"}
-              step=${this._tempStep}
-              min=${this._minTemp}
-              max=${this._maxTemp}
-              @change=${t=>{this._saveHistoryState(),this._editingBaseTemperature=parseFloat(t.target.value),this.requestUpdate()}}
-            />
-            <span class="temp-unit">${this._config?.temperature_unit||"°C"}</span>
-            <div
-              class="color-indicator"
-              style="background-color: ${Mt(this._editingBaseTemperature||20)}"
-            ></div>
-          </div>
-        </div>
-
-        <div class="editor-content-label">${this._translations.ui.temperaturePeriods}</div>
-        <div class="editor-content">
-          <div class="time-block-header">
-            <span class="header-cell header-from">${this._translations.ui.from}</span>
-            <span class="header-cell header-to">${this._translations.ui.to}</span>
-            <span class="header-cell header-temp">Temp</span>
-            <span class="header-cell header-actions"></span>
-          </div>
-          ${t.map((e,i)=>{const s=this._editingBlocks.findIndex(t=>t.startMinutes===e.startMinutes&&t.endMinutes===e.endMinutes),o=!(-1!==s);return void 0!==this._editingSlotIndex&&this._editingSlotIndex===s&&void 0!==this._editingSlotData&&this._editingSlotData?j`
-                <div class="time-block-editor editing">
-                  <input
-                    type="time"
-                    class="time-input"
-                    .value=${this._editingSlotData.startTime}
-                    @change=${t=>{this._editingSlotData&&(this._editingSlotData={...this._editingSlotData,startTime:t.target.value},this.requestUpdate())}}
-                  />
-                  <input
-                    type="time"
-                    class="time-input"
-                    .value=${"24:00"===this._editingSlotData.endTime?"23:59":this._editingSlotData.endTime}
-                    @change=${t=>{if(this._editingSlotData){let e=t.target.value;"23:59"===e&&(e="24:00"),this._editingSlotData={...this._editingSlotData,endTime:e},this.requestUpdate()}}}
-                  />
-                  <div class="temp-input-group">
-                    <input
-                      type="number"
-                      class="temp-input"
-                      .value=${this._editingSlotData.temperature.toString()}
-                      step=${this._tempStep}
-                      min=${this._minTemp}
-                      max=${this._maxTemp}
-                      @change=${t=>{this._editingSlotData&&(this._editingSlotData={...this._editingSlotData,temperature:parseFloat(t.target.value)},this.requestUpdate())}}
-                    />
-                    <span class="temp-unit">${this._config?.temperature_unit||"°C"}</span>
-                  </div>
-                  <div class="slot-actions">
-                    <button class="slot-save-btn" @click=${this._saveSlotEdit}>
-                      ${this._translations.ui.saveSlot}
-                    </button>
-                    <button class="slot-cancel-btn" @click=${this._cancelSlotEdit}>
-                      ${this._translations.ui.cancelSlotEdit}
-                    </button>
-                  </div>
-                  <div
-                    class="color-indicator"
-                    style="background-color: ${Mt(this._editingSlotData.temperature)}"
-                  ></div>
-                </div>
-              `:j`
-              <div class="time-block-editor ${o?"base-temp-slot":""}">
-                <span class="time-display">${this._formatTimeDisplay(e.startTime)}</span>
-                <span class="time-display">${this._formatTimeDisplay(e.endTime)}</span>
-                <div class="temp-display-group">
-                  <span class="temp-display">${e.temperature.toFixed(1)}</span>
-                  <span class="temp-unit">${this._config?.temperature_unit||"°C"}</span>
-                </div>
-                <div class="slot-actions">
-                  ${o?j``:j`
-                        <button
-                          class="slot-edit-btn"
-                          @click=${()=>this._startSlotEditFromDisplay(i,t)}
-                          ?disabled=${void 0!==this._editingSlotIndex}
-                        >
-                          ${this._translations.ui.editSlot}
-                        </button>
-                        <button
-                          class="remove-btn"
-                          @click=${()=>this._removeTimeBlockByIndex(i,t)}
-                          ?disabled=${void 0!==this._editingSlotIndex}
-                        >
-                          🗑️
-                        </button>
-                      `}
-                </div>
-                <div
-                  class="color-indicator"
-                  style="background-color: ${Mt(e.temperature)}"
-                ></div>
-              </div>
-            `})}
-          ${this._editingBlocks.length<12&&void 0===this._editingSlotIndex?j`
-                <button class="add-btn" @click=${this._addNewSlot}>
-                  ${this._translations.ui.addTimeBlock}
-                </button>
-              `:""}
-        </div>
-
-        <div class="editor-footer">
-          <button class="cancel-btn" @click=${this._closeEditor}>
-            ${this._translations.ui.cancel}
-          </button>
-          <button class="save-btn" @click=${this._saveSchedule}>
-            ${this._translations.ui.save}
-          </button>
-        </div>
-      </div>
-    `}_removeTimeBlockByIndex(t,e){if(!this._editingBlocks||void 0===this._editingBaseTemperature)return;const i=e[t],s=this._editingBlocks.findIndex(t=>t.startMinutes===i.startMinutes&&t.endMinutes===i.endMinutes&&t.temperature===i.temperature);if(-1===s)return;this._saveHistoryState();const o=this._editingBlocks.filter((t,e)=>e!==s);this._editingBlocks=Ct(Ot(o)),this._updateValidationWarnings()}async _saveAndClose(){await this._saveSchedule()}_switchToWeekday(t){if(t===this._editingWeekday)return;this._editingWeekday=t,this._editingBlocks=this._getParsedBlocks(t);const e=this._scheduleData?.[t];if(e){const{baseTemperature:t}=Dt(e);this._editingBaseTemperature=t}else this._editingBaseTemperature=20;this._historyStack=[JSON.parse(JSON.stringify(this._editingBlocks))],this._historyIndex=0,this._updateValidationWarnings()}_renderEditDialog(){return this._editingWeekday?j`
-      <ha-dialog
-        open
-        @closed=${this._closeEditor}
-        .heading=${Rt(this._translations.ui.edit,{weekday:this._getWeekdayLabel(this._editingWeekday,"long")})}
-        scrimClickAction="close"
-        escapeKeyAction="close"
-      >
-        <div class="dialog-content">
-          <!-- Weekday selector tabs -->
-          <div class="weekday-tabs">
-            ${wt.map(t=>j`
-                <button
-                  class="weekday-tab ${t===this._editingWeekday?"active":""}"
-                  @click=${()=>this._switchToWeekday(t)}
-                >
-                  ${this._getWeekdayLabel(t,"short")}
-                </button>
-              `)}
-          </div>
-
-          <!-- Editor content in dialog -->
-          <div class="dialog-editor">${this._renderEditor()}</div>
-        </div>
-
-        <mwc-button slot="primaryAction" @click=${this._saveAndClose} dialogAction="close">
-          ${this._translations.ui.save}
-        </mwc-button>
-        <mwc-button slot="secondaryAction" @click=${this._closeEditor} dialogAction="close">
-          ${this._translations.ui.cancel}
-        </mwc-button>
-      </ha-dialog>
-    `:j``}static get styles(){return n`
+      `}static get styles(){return a`
       :host {
         display: block;
       }
@@ -654,264 +411,6 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         overflow: hidden;
       }
 
-      .schedule-container {
-        display: grid;
-        grid-template-columns: auto repeat(7, minmax(0, 1fr));
-        grid-template-rows: auto 1fr;
-        gap: 8px;
-        min-height: 400px;
-        overflow: hidden;
-        width: 100%;
-        box-sizing: border-box;
-      }
-
-      .time-axis-header {
-        /* Empty cell in row 1, col 1 - height matches weekday headers */
-      }
-
-      .time-axis-labels {
-        position: relative;
-        border-right: 2px solid var(--divider-color);
-        min-width: 50px;
-      }
-
-      .time-label {
-        position: absolute;
-        right: 8px;
-        transform: translateY(-50%);
-        font-size: 11px;
-        color: var(--secondary-text-color);
-        white-space: nowrap;
-      }
-
-      .schedule-content {
-        grid-column: 2 / -1;
-        display: grid;
-        grid-template-columns: repeat(7, minmax(0, 1fr));
-        gap: 8px;
-        position: relative;
-        min-height: 300px;
-      }
-
-      .current-time-indicator {
-        position: absolute;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background-color: var(--error-color, #ff0000);
-        border-top: 2px dashed var(--error-color, #ff0000);
-        pointer-events: none;
-        z-index: 10;
-        transform: translateY(-50%);
-        box-shadow: 0 0 4px rgba(255, 0, 0, 0.5);
-        will-change: top;
-      }
-
-      .current-time-indicator::before {
-        content: "";
-        position: absolute;
-        left: -6px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 8px;
-        height: 8px;
-        background-color: var(--error-color, #ff0000);
-        border-radius: 50%;
-        box-shadow: 0 0 4px rgba(255, 0, 0, 0.7);
-      }
-
-      .weekday-header {
-        padding: 4px 8px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        background-color: var(--primary-color);
-        color: var(--text-primary-color);
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-      }
-
-      .weekday-label {
-        font-weight: 500;
-        font-size: 14px;
-      }
-
-      .weekday-actions {
-        display: flex;
-        gap: 4px;
-      }
-
-      .copy-btn,
-      .paste-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 14px;
-        padding: 2px 4px;
-        border-radius: 3px;
-        transition: background-color 0.2s;
-        opacity: 0.7;
-      }
-
-      .copy-btn:hover,
-      .paste-btn:not(:disabled):hover {
-        opacity: 1;
-        background-color: rgba(255, 255, 255, 0.2);
-      }
-
-      .copy-btn.active {
-        opacity: 1;
-        background-color: rgba(255, 255, 255, 0.3);
-        animation: pulse 1s ease-in-out;
-        will-change: transform;
-      }
-
-      @keyframes pulse {
-        0%,
-        100% {
-          transform: scale(1);
-        }
-        50% {
-          transform: scale(1.1);
-        }
-      }
-
-      .paste-btn:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-      }
-
-      .time-blocks {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        overflow: visible;
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-      }
-
-      .time-blocks.editable {
-        cursor: pointer;
-        will-change: transform, box-shadow;
-      }
-
-      .time-blocks.editable:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      }
-
-      .time-block {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 12px;
-        font-weight: 500;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-        transition: opacity 0.2s;
-        cursor: pointer;
-      }
-
-      .time-block.base-temp-block {
-        color: var(--secondary-text-color, #666);
-        text-shadow: none;
-        border-top: 1px dashed var(--divider-color, #ccc);
-      }
-
-      .time-block.base-temp-block:first-child {
-        border-top: none;
-      }
-
-      .time-block:hover {
-        opacity: 0.9;
-      }
-
-      .time-block:hover .time-block-tooltip {
-        opacity: 1;
-        visibility: visible;
-      }
-
-      .temperature {
-        user-select: none;
-        position: relative;
-        z-index: 1;
-      }
-
-      /* Active block highlighting */
-      .time-block.active {
-        box-shadow:
-          inset 0 0 0 3px rgba(255, 255, 255, 0.9),
-          0 0 20px rgba(255, 255, 255, 0.6),
-          0 0 30px rgba(255, 255, 255, 0.4);
-        animation: pulse-glow 2s ease-in-out infinite;
-        z-index: 10;
-        will-change: box-shadow;
-      }
-
-      @keyframes pulse-glow {
-        0%,
-        100% {
-          box-shadow:
-            inset 0 0 0 3px rgba(255, 255, 255, 0.9),
-            0 0 15px rgba(255, 255, 255, 0.5),
-            0 0 25px rgba(255, 255, 255, 0.3);
-        }
-        50% {
-          box-shadow:
-            inset 0 0 0 3px rgba(255, 255, 255, 1),
-            0 0 25px rgba(255, 255, 255, 0.8),
-            0 0 40px rgba(255, 255, 255, 0.6);
-        }
-      }
-
-      /* Tooltip styling */
-      .time-block-tooltip {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.95);
-        color: white;
-        padding: 6px 10px;
-        border-radius: 4px;
-        font-size: 10px;
-        white-space: nowrap;
-        opacity: 0;
-        visibility: hidden;
-        transition:
-          opacity 0.2s,
-          visibility 0.2s;
-        z-index: 1000;
-        pointer-events: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        min-width: 80px;
-      }
-
-      .tooltip-time {
-        font-weight: 500;
-        margin-bottom: 2px;
-        text-align: center;
-        font-size: 10px;
-        line-height: 1.2;
-      }
-
-      .tooltip-temp {
-        text-align: center;
-        font-size: 11px;
-        font-weight: 600;
-        line-height: 1.2;
-      }
-
-      .hint {
-        margin-top: 12px;
-        text-align: center;
-        font-size: 12px;
-        color: var(--secondary-text-color);
-      }
-
       .loading,
       .error {
         padding: 20px;
@@ -921,355 +420,6 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
 
       .error {
         color: var(--error-color);
-      }
-
-      /* Editor Styles */
-      .editor {
-        background-color: var(--card-background-color);
-      }
-
-      .editor-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 16px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--divider-color);
-      }
-
-      .editor-header h3 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 500;
-      }
-
-      .editor-actions {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-
-      .undo-btn,
-      .redo-btn,
-      .close-btn {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        color: var(--secondary-text-color);
-        padding: 0;
-        width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        transition:
-          background-color 0.2s,
-          opacity 0.2s;
-      }
-
-      .undo-btn:hover:not(:disabled),
-      .redo-btn:hover:not(:disabled),
-      .close-btn:hover {
-        background-color: var(--divider-color);
-      }
-
-      .undo-btn:disabled,
-      .redo-btn:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-      }
-
-      .validation-warnings {
-        background-color: rgba(255, 152, 0, 0.1);
-        border: 1px solid rgba(255, 152, 0, 0.3);
-        border-radius: 4px;
-        padding: 12px;
-        margin: 12px 0;
-      }
-
-      .warnings-header {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-        font-weight: 500;
-        color: var(--primary-text-color);
-      }
-
-      .warning-icon {
-        font-size: 18px;
-      }
-
-      .warnings-title {
-        font-size: 14px;
-      }
-
-      .warnings-list {
-        margin: 0;
-        padding-left: 28px;
-        list-style-type: disc;
-      }
-
-      .warning-item {
-        color: var(--secondary-text-color);
-        font-size: 13px;
-        line-height: 1.6;
-        margin: 4px 0;
-      }
-
-      /* Base Temperature Section */
-      .base-temperature-section {
-        background-color: rgba(var(--rgb-primary-color, 3, 169, 244), 0.1);
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-        padding: 12px;
-        margin: 12px 0;
-      }
-
-      .base-temperature-header {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        margin-bottom: 8px;
-      }
-
-      .base-temp-label {
-        font-weight: 500;
-        font-size: 14px;
-        color: var(--primary-text-color);
-      }
-
-      .base-temp-description {
-        font-size: 12px;
-        color: var(--secondary-text-color);
-      }
-
-      .base-temperature-input {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-
-      .base-temp-input {
-        width: 80px;
-        font-weight: 500;
-      }
-
-      .editor-content-label {
-        font-weight: 500;
-        font-size: 14px;
-        color: var(--primary-text-color);
-        margin: 16px 0 8px 0;
-        padding-left: 8px;
-      }
-
-      .editor-content {
-        max-height: 500px;
-        overflow-y: auto;
-      }
-
-      .time-block-header {
-        display: grid;
-        grid-template-columns: 100px 100px 90px 1fr 24px;
-        gap: 8px;
-        align-items: center;
-        padding: 8px;
-        border-bottom: 2px solid var(--divider-color);
-        font-weight: 500;
-        font-size: 12px;
-        color: var(--secondary-text-color);
-        text-transform: uppercase;
-      }
-
-      .header-cell {
-        text-align: left;
-      }
-
-      .time-block-editor {
-        display: grid;
-        grid-template-columns: 100px 100px 90px 1fr 24px;
-        gap: 8px;
-        align-items: center;
-        padding: 8px;
-        border-bottom: 1px solid var(--divider-color);
-      }
-
-      .time-block-editor.editing {
-        background-color: var(--primary-color-light, rgba(3, 169, 244, 0.1));
-        border: 1px solid var(--primary-color);
-        border-radius: 4px;
-        margin: 4px 0;
-      }
-
-      .time-block-editor.base-temp-slot {
-        opacity: 0.6;
-        background-color: var(--divider-color);
-      }
-
-      .time-display {
-        font-size: 14px;
-        color: var(--primary-text-color);
-        font-family: monospace;
-      }
-
-      .temp-display-group,
-      .temp-input-group {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-      }
-
-      .temp-display {
-        font-size: 14px;
-        color: var(--primary-text-color);
-        font-weight: 500;
-      }
-
-      .slot-actions {
-        display: flex;
-        gap: 4px;
-        justify-content: flex-end;
-      }
-
-      .slot-edit-btn,
-      .slot-save-btn,
-      .slot-cancel-btn {
-        padding: 4px 8px;
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-        background-color: var(--card-background-color);
-        color: var(--primary-text-color);
-        font-size: 12px;
-        cursor: pointer;
-        white-space: nowrap;
-      }
-
-      .slot-edit-btn:hover,
-      .slot-save-btn:hover,
-      .slot-cancel-btn:hover {
-        background-color: var(--divider-color);
-      }
-
-      .slot-save-btn {
-        background-color: var(--primary-color);
-        color: var(--text-primary-color);
-        border-color: var(--primary-color);
-      }
-
-      .slot-cancel-btn {
-        background-color: var(--error-color, #e74c3c);
-        color: white;
-        border-color: var(--error-color, #e74c3c);
-      }
-
-      .slot-edit-btn:disabled,
-      .remove-btn:disabled {
-        opacity: 0.3;
-        cursor: not-allowed;
-      }
-
-      .block-number {
-        font-weight: 500;
-        color: var(--secondary-text-color);
-      }
-
-      .time-input,
-      .temp-input {
-        padding: 6px 8px;
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-        background-color: var(--card-background-color);
-        color: var(--primary-text-color);
-        font-size: 14px;
-        width: 100%;
-        box-sizing: border-box;
-      }
-
-      .time-input {
-        min-width: 100px;
-        max-width: 120px;
-      }
-
-      .temp-input {
-        max-width: 60px;
-      }
-
-      .temp-unit {
-        color: var(--secondary-text-color);
-        font-size: 14px;
-      }
-
-      .remove-btn {
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 18px;
-        padding: 4px;
-      }
-
-      .remove-btn:hover {
-        opacity: 0.7;
-      }
-
-      .color-indicator {
-        width: 20px;
-        height: 20px;
-        border-radius: 4px;
-        border: 1px solid var(--divider-color);
-        flex-shrink: 0;
-      }
-
-      .add-btn {
-        margin: 12px 0;
-        padding: 10px 16px;
-        background-color: var(--primary-color);
-        color: var(--text-primary-color);
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-        width: 100%;
-      }
-
-      .add-btn:hover {
-        opacity: 0.9;
-      }
-
-      .editor-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 12px;
-        margin-top: 16px;
-        padding-top: 16px;
-        border-top: 1px solid var(--divider-color);
-      }
-
-      .cancel-btn,
-      .save-btn {
-        padding: 10px 24px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-        font-weight: 500;
-      }
-
-      .cancel-btn {
-        background-color: var(--divider-color);
-        color: var(--primary-text-color);
-      }
-
-      .save-btn {
-        background-color: var(--primary-color);
-        color: var(--text-primary-color);
-      }
-
-      .cancel-btn:hover,
-      .save-btn:hover {
-        opacity: 0.9;
       }
 
       /* Loading overlay */
@@ -1332,134 +482,6 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
           padding: 10px 16px;
           font-size: 16px;
         }
-
-        .schedule-container {
-          gap: 4px;
-          min-height: 350px;
-        }
-
-        .time-axis-labels {
-          min-width: 40px;
-        }
-
-        .time-label {
-          font-size: 10px;
-          right: 4px;
-        }
-
-        .schedule-content {
-          gap: 4px;
-        }
-
-        .weekday-header {
-          padding: 6px 4px;
-        }
-
-        .weekday-label {
-          font-size: 12px;
-        }
-
-        .weekday-actions {
-          gap: 6px;
-        }
-
-        .copy-btn,
-        .paste-btn {
-          font-size: 16px;
-          padding: 6px 8px;
-          min-width: 44px;
-          min-height: 44px;
-        }
-
-        .temperature {
-          font-size: 11px;
-        }
-
-        .time-block-tooltip {
-          font-size: 11px;
-          padding: 8px 12px;
-        }
-
-        .hint {
-          font-size: 14px;
-        }
-
-        /* Editor mobile styles */
-        .editor-header h3 {
-          font-size: 18px;
-        }
-
-        .undo-btn,
-        .redo-btn,
-        .close-btn {
-          width: 44px;
-          height: 44px;
-          font-size: 28px;
-        }
-
-        .editor-content {
-          max-height: 400px;
-        }
-
-        .time-block-editor {
-          grid-template-columns: 30px 1fr 70px 40px 44px 20px;
-          gap: 6px;
-          padding: 10px 6px;
-        }
-
-        .block-number {
-          font-size: 13px;
-        }
-
-        .time-input,
-        .temp-input {
-          padding: 10px 8px;
-          font-size: 16px;
-          min-height: 44px;
-        }
-
-        .temp-unit {
-          font-size: 13px;
-        }
-
-        .remove-btn {
-          font-size: 22px;
-          padding: 8px;
-          min-width: 44px;
-          min-height: 44px;
-        }
-
-        .add-btn {
-          padding: 14px 16px;
-          font-size: 16px;
-          min-height: 48px;
-        }
-
-        .editor-footer {
-          flex-direction: column-reverse;
-          gap: 8px;
-        }
-
-        .cancel-btn,
-        .save-btn {
-          width: 100%;
-          padding: 14px 24px;
-          font-size: 16px;
-          min-height: 48px;
-        }
-
-        .validation-warnings {
-          padding: 10px;
-          margin: 10px 0;
-        }
-
-        .warnings-title {
-          font-size: 13px;
-        }
-
-        .warning-item {
-          font-size: 12px;
-        }
       }
 
       /* Small mobile devices (portrait phones) */
@@ -1471,205 +493,19 @@ function t(t,e,i,s){var o,r=arguments.length,n=r<3?e:null===s?s=Object.getOwnPro
         .name {
           font-size: 18px;
         }
-
-        .schedule-container {
-          gap: 2px;
-          min-height: 300px;
-        }
-
-        .time-axis-labels {
-          min-width: 35px;
-        }
-
-        .time-label {
-          font-size: 9px;
-          right: 2px;
-        }
-
-        .schedule-content {
-          gap: 2px;
-        }
-
-        .weekday-label {
-          font-size: 11px;
-        }
-
-        .temperature {
-          font-size: 10px;
-        }
-
-        .time-block-editor {
-          grid-template-columns: 25px 1fr 60px 35px 44px 16px;
-          gap: 4px;
-          padding: 8px 4px;
-        }
-
-        .block-number {
-          font-size: 12px;
-        }
-
-        .editor-header h3 {
-          font-size: 16px;
-        }
-      }
-
-      /* Landscape mobile optimization */
-      @media (max-width: 768px) and (orientation: landscape) {
-        .schedule-container {
-          min-height: 250px;
-        }
-
-        .editor-content {
-          max-height: 200px;
-        }
       }
 
       /* Touch-specific optimizations */
       @media (hover: none) and (pointer: coarse) {
-        .weekday-column.editable:hover {
-          transform: none;
-          box-shadow: none;
-        }
-
-        .weekday-column.editable:active {
-          transform: scale(0.98);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-
-        .time-block:hover {
-          opacity: 1;
-        }
-
-        .time-block:active {
-          opacity: 0.85;
-        }
-
-        /* Show tooltip on tap instead of hover */
-        .time-block:active .time-block-tooltip {
-          opacity: 1;
-          visibility: visible;
-        }
-
-        /* Disable hover effects, use active states */
-        .copy-btn:hover,
-        .paste-btn:not(:disabled):hover,
-        .undo-btn:hover:not(:disabled),
-        .redo-btn:hover:not(:disabled),
-        .close-btn:hover,
-        .add-btn:hover,
-        .cancel-btn:hover,
-        .save-btn:hover,
         .export-btn:hover,
-        .import-btn:hover,
-        .remove-btn:hover {
+        .import-btn:hover {
           opacity: 1;
           background-color: transparent;
-        }
-
-        .copy-btn:active,
-        .paste-btn:not(:disabled):active {
-          background-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .undo-btn:active:not(:disabled),
-        .redo-btn:active:not(:disabled),
-        .close-btn:active {
-          background-color: var(--divider-color);
         }
 
         .export-btn:active:not(:disabled),
         .import-btn:active {
           background-color: var(--divider-color);
         }
-
-        .add-btn:active,
-        .save-btn:active {
-          opacity: 0.85;
-        }
-
-        .cancel-btn:active {
-          opacity: 0.85;
-        }
-
-        .remove-btn:active {
-          opacity: 0.5;
-        }
       }
-
-      /* Dialog styles */
-      ha-dialog {
-        --mdc-dialog-max-width: 90vw;
-        --mdc-dialog-max-height: 90vh;
-      }
-
-      .dialog-content {
-        display: flex;
-        flex-direction: column;
-        gap: 16px;
-        padding: 16px;
-        overflow-y: auto;
-        max-height: calc(90vh - 200px);
-      }
-
-      .weekday-tabs {
-        display: flex;
-        gap: 4px;
-        flex-wrap: wrap;
-        justify-content: center;
-      }
-
-      .weekday-tab {
-        padding: 8px 12px;
-        border: 1px solid var(--divider-color);
-        border-radius: 4px;
-        background-color: var(--card-background-color);
-        color: var(--primary-text-color);
-        font-size: 14px;
-        cursor: pointer;
-        transition:
-          background-color 0.2s,
-          border-color 0.2s;
-        min-width: 40px;
-        text-align: center;
-      }
-
-      .weekday-tab:hover {
-        background-color: var(--divider-color);
-      }
-
-      .weekday-tab.active {
-        background-color: var(--primary-color);
-        color: var(--text-primary-color, #fff);
-        border-color: var(--primary-color);
-      }
-
-      .dialog-editor {
-        flex: 1;
-        min-height: 0;
-      }
-
-      .dialog-editor .editor {
-        box-shadow: none;
-        border: none;
-        padding: 0;
-      }
-
-      .dialog-editor .editor-header {
-        display: none;
-      }
-
-      .dialog-editor .editor-footer {
-        display: none;
-      }
-
-      @media (max-width: 768px) {
-        ha-dialog {
-          --mdc-dialog-max-width: 100vw;
-          --mdc-dialog-max-height: 100vh;
-        }
-
-        .dialog-content {
-          max-height: calc(100vh - 150px);
-        }
-      }
-    `}};t([$t({attribute:!1})],Ht.prototype,"hass",void 0),t([St()],Ht.prototype,"_config",void 0),t([St()],Ht.prototype,"_currentProfile",void 0),t([St()],Ht.prototype,"_activeDeviceProfile",void 0),t([St()],Ht.prototype,"_scheduleData",void 0),t([St()],Ht.prototype,"_availableProfiles",void 0),t([St()],Ht.prototype,"_activeEntityId",void 0),t([St()],Ht.prototype,"_editingWeekday",void 0),t([St()],Ht.prototype,"_editingBlocks",void 0),t([St()],Ht.prototype,"_editingBaseTemperature",void 0),t([St()],Ht.prototype,"_copiedSchedule",void 0),t([St()],Ht.prototype,"_isLoading",void 0),t([St()],Ht.prototype,"_currentTimePercent",void 0),t([St()],Ht.prototype,"_currentTimeMinutes",void 0),t([St()],Ht.prototype,"_currentWeekday",void 0),t([St()],Ht.prototype,"_translations",void 0),t([St()],Ht.prototype,"_validationWarnings",void 0),t([St()],Ht.prototype,"_minTemp",void 0),t([St()],Ht.prototype,"_maxTemp",void 0),t([St()],Ht.prototype,"_tempStep",void 0),t([St()],Ht.prototype,"_editingSlotIndex",void 0),t([St()],Ht.prototype,"_editingSlotData",void 0),Ht=t([(t=>(e,i)=>{void 0!==i?i.addInitializer(()=>{customElements.define(t,e)}):customElements.define(t,e)})("homematicip-local-climate-schedule-card")],Ht),window.customCards=window.customCards||[],window.customCards.push({type:"homematicip-local-climate-schedule-card",name:"Homematic(IP) Local Climate Schedule Card",description:"Display and edit Homematic thermostat schedules",preview:!0});export{Ht as HomematicScheduleCard};
+    `}};var ke;e([he({attribute:!1})],we.prototype,"hass",void 0),e([pe()],we.prototype,"_config",void 0),e([pe()],we.prototype,"_currentProfile",void 0),e([pe()],we.prototype,"_activeDeviceProfile",void 0),e([pe()],we.prototype,"_scheduleData",void 0),e([pe()],we.prototype,"_availableProfiles",void 0),e([pe()],we.prototype,"_activeEntityId",void 0),e([pe()],we.prototype,"_editingWeekday",void 0),e([pe()],we.prototype,"_copiedSchedule",void 0),e([pe()],we.prototype,"_isLoading",void 0),e([pe()],we.prototype,"_translations",void 0),e([pe()],we.prototype,"_minTemp",void 0),e([pe()],we.prototype,"_maxTemp",void 0),e([pe()],we.prototype,"_tempStep",void 0),we=e([(ke="homematicip-local-climate-schedule-card",(e,t)=>{void 0!==t?t.addInitializer(()=>{customElements.define(ke,e)}):customElements.define(ke,e)})],we),window.customCards=window.customCards||[],window.customCards.push({type:"homematicip-local-climate-schedule-card",name:"Homematic(IP) Local Climate Schedule Card",description:"Display and edit Homematic thermostat schedules",preview:!0});export{we as HomematicScheduleCard};
