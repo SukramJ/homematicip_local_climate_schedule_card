@@ -13,20 +13,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `<hmip-schedule-grid>`: visual 7-day timeline with color-coded temperature blocks, copy/paste, current time indicator
   - `<hmip-schedule-editor>`: edit dialog with weekday tabs, undo/redo, inline slot editing, validation warnings
 - Card is now a thin wrapper around shared components (~3170 LOC → ~770 LOC)
-- **Profile switching now uses WebSocket API for V2 entities**: `_callSetActiveProfile` uses
-  `hass.callWS()` with `homematicip_local/config/set_climate_active_profile` instead of
-  `hass.callService("homematicip_local", "set_current_schedule_profile")`.
-  The `config_entry_id` is read from entity attributes. V1 remains unchanged.
+- **V2 entities now use WebSocket API (`hass.callWS()`)** instead of service calls for all
+  backend communication: `set_climate_active_profile`, `set_climate_schedule_weekday`,
+  `reload_device_config`. V1 entities continue to use service calls unchanged.
+- **Read-only mode for non-admin users**: Card is automatically read-only when
+  `hass.user.is_admin` is `false`. Edit UI (weekday click, import, paste) is hidden.
+  Export and profile selector remain accessible to all users.
 
 ### Technical
 
 - Added `@hmip/schedule-ui` workspace dependency
 - Moved grid rendering, editor rendering, slot editing, undo/redo history, keyboard handling, current time tracking, and ~600 lines of CSS into shared components
-- Card retains entity/profile management, service calls, import/export, and config editor
+- Card retains entity/profile management, WebSocket/service calls, import/export, and config editor
 - Communication with shared components via typed CustomEvents (`weekday-click`, `save-schedule`, `editor-closed`, etc.)
 - Translation bridge methods map card localization to component translation interfaces
 - Removed direct dependencies: `lit/directives/repeat.js`, numerous `@hmip/schedule-core` utilities now consumed internally by schedule-ui
-- Added `config_entry_id` to `ClimateScheduleEntityAttributes` in `@hmip/schedule-core`
+- Added `HassUser` type and `user` property to `HomeAssistant` in `@hmip/schedule-core`
+- Added `config_entry_id` to `ClimateScheduleEntityAttributes` and `DeviceScheduleEntityAttributes` in `@hmip/schedule-core`
+- Added `_isEditable` getter combining `config.editable` flag with `hass.user.is_admin`
+- Added `_requireConfigEntryId` helper for WebSocket calls
 
 ## [0.10.0] - 2026-02-08
 
