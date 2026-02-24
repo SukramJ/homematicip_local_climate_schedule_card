@@ -7,23 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
-
-- Extracted schedule grid and editor into shared `@hmip/schedule-ui` package for consistent UX across card and config panel
-  - `<hmip-schedule-grid>`: visual 7-day timeline with color-coded temperature blocks, copy/paste, current time indicator
-  - `<hmip-schedule-editor>`: edit dialog with weekday tabs, undo/redo, inline slot editing, validation warnings
-- Card is now a thin wrapper around shared components (~3170 LOC → ~770 LOC)
-
-### Technical
-
-- Added `@hmip/schedule-ui` workspace dependency
-- Moved grid rendering, editor rendering, slot editing, undo/redo history, keyboard handling, current time tracking, and ~600 lines of CSS into shared components
-- Card retains entity/profile management, service calls, import/export, and config editor
-- Communication with shared components via typed CustomEvents (`weekday-click`, `save-schedule`, `editor-closed`, etc.)
-- Translation bridge methods map card localization to component translation interfaces
-- Removed direct dependencies: `lit/directives/repeat.js`, numerous `@hmip/schedule-core` utilities now consumed internally by schedule-ui
-
-## [0.10.0] - 2026-02-08
+## [0.10.0] - 2026-02-24
 
 ### Added
 
@@ -36,11 +20,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Guard in `_updateFromEntity` clears state for entities without schedule data
   - Guard in `render` displays user-friendly warning in card UI
 
+### Changed
+
+- Extracted schedule grid and editor into shared `@hmip/schedule-ui` package for consistent UX across card and config panel
+  - `<hmip-schedule-grid>`: visual 7-day timeline with color-coded temperature blocks, copy/paste, current time indicator
+  - `<hmip-schedule-editor>`: edit dialog with weekday tabs, undo/redo, inline slot editing, validation warnings
+- Card is now a thin wrapper around shared components (~3170 LOC → ~770 LOC)
+
 ### Technical
 
 - Added `schedule_type` to `ScheduleEntityAttributes` type
 - Added `sensorNotSupported` translation key (EN + DE) for incompatible sensor entity error
 - Added `noScheduleData` translation key (EN + DE) for missing schedule data warning
+- Added `@hmip/schedule-ui` workspace dependency
+- Moved grid rendering, editor rendering, slot editing, undo/redo history, keyboard handling, current time tracking, and ~600 lines of CSS into shared components
+- Card retains entity/profile management, service calls, import/export, and config editor
+- Communication with shared components via typed CustomEvents (`weekday-click`, `save-schedule`, `editor-closed`, etc.)
+- Translation bridge methods map card localization to component translation interfaces
+- Removed direct dependencies: `lit/directives/repeat.js`, numerous `@hmip/schedule-core` utilities now consumed internally by schedule-ui
 
 ## [0.9.0] - 2026-02-07
 
