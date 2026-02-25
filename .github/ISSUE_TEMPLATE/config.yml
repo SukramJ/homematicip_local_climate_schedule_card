@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Feature Requests / Funktionswünsche
+    url: https://github.com/SukramJ/homematicip_local_climate_schedule_card/discussions
+    about: Please use Discussions for feature requests and general questions. / Bitte nutze die Diskussionen für Funktionswünsche und allgemeine Fragen.
+  - name: HomematicIP Local Integration Issues
+    url: https://github.com/sukramj/aiohomematic/issues
+    about: For issues with the HomematicIP Local integration itself (not the card), please report there. / Für Probleme mit der HomematicIP Local Integration (nicht der Card) bitte dort melden.
