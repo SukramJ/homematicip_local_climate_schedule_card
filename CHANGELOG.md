@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Updated dependencies:
+  - `eslint` 9.39.2 → 10.0.2
+  - `typescript-eslint` 8.54.0 → 8.56.1
+  - `rollup` 4.57.1 → 4.59.0
+
 ## [0.10.0] - 2026-02-24
 
 ### Added
