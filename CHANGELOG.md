@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed `ha-select` compatibility with Home Assistant 2026.3.0+ — migrated profile selector and entity selector from `ha-list-item` children to `.options` property API. Requires HA 2026.3.0+.
+- Fixed copy/paste schedule icons overflowing out of the weekday header box at narrow widths — reduced icon button sizes at mobile breakpoints and added overflow constraints
+
 ### Changed
 
 - Updated dependencies:
