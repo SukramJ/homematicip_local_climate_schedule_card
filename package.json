@@ -1,6 +1,6 @@
 {
   "name": "homematicip-local-climate-schedule-card",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Custom Lovelace card for HomematicIP Local thermostat schedules",
   "license": "MIT",
   "repository": {
