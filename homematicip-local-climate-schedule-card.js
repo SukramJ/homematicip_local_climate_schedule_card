@@ -285,8 +285,8 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   }
 
   .weekday-actions ha-icon-button {
-    --mdc-icon-button-size: 28px;
-    --mdc-icon-size: 16px;
+    --ha-icon-button-size: 28px;
+    --ha-icon-button-icon-size: 16px;
     color: var(--text-primary-color, #fff);
     opacity: 0.7;
     flex-shrink: 0;
@@ -479,8 +479,8 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
     }
 
     .weekday-actions ha-icon-button {
-      --mdc-icon-button-size: 24px;
-      --mdc-icon-size: 14px;
+      --ha-icon-button-size: 24px;
+      --ha-icon-button-icon-size: 14px;
     }
 
     .temperature {
@@ -526,8 +526,8 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
     }
 
     .weekday-actions ha-icon-button {
-      --mdc-icon-button-size: 20px;
-      --mdc-icon-size: 12px;
+      --ha-icon-button-size: 20px;
+      --ha-icon-button-icon-size: 12px;
     }
 
     .temperature {
@@ -645,8 +645,8 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
 
   /* Dialog styles */
   ha-dialog {
-    --mdc-dialog-max-width: 90vw;
-    --mdc-dialog-max-height: 90vh;
+    --ha-dialog-max-width: 90vw;
+    --ha-dialog-max-height: 90vh;
   }
 
   .dialog-content {
@@ -706,7 +706,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   }
 
   .dialog-editor .editor-footer {
-    display: none;
+    display: flex;
   }
 
   /* Editor Styles */
@@ -736,7 +736,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   }
 
   .editor-actions ha-icon-button {
-    --mdc-icon-button-size: 36px;
+    --ha-icon-button-size: 36px;
     color: var(--secondary-text-color);
   }
 
@@ -875,7 +875,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   }
 
   .slot-actions ha-button {
-    --mdc-typography-button-font-size: 12px;
+    font-size: 12px;
   }
 
   ha-button[disabled] {
@@ -914,7 +914,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   }
 
   .remove-btn {
-    --mdc-icon-button-size: 32px;
+    --ha-icon-button-size: 32px;
     color: var(--secondary-text-color);
   }
 
@@ -933,7 +933,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   .add-btn {
     margin: 12px 0;
     width: 100%;
-    --mdc-theme-primary: var(--primary-color);
+    --ha-button-color: var(--primary-color);
   }
 
   .editor-footer {
@@ -948,8 +948,8 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   /* Mobile Optimization */
   @media (max-width: 768px) {
     ha-dialog {
-      --mdc-dialog-max-width: 100vw;
-      --mdc-dialog-max-height: 100vh;
+      --ha-dialog-max-width: 100vw;
+      --ha-dialog-max-height: 100vh;
     }
 
     .dialog-content {
@@ -961,7 +961,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
     }
 
     .editor-actions ha-icon-button {
-      --mdc-icon-button-size: 44px;
+      --ha-icon-button-size: 44px;
     }
 
     .editor-content {
@@ -1026,13 +1026,11 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
       max-height: 200px;
     }
   }
-`;var Qt=function(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)r=Reflect.decorate(t,e,i,s);else for(var n=t.length-1;n>=0;n--)(a=t[n])&&(r=(o<3?a(r):o>3?a(e,i,r):a(e,i))||r);return o>3&&r&&Object.defineProperty(e,i,r),r};let Xt=class extends nt{constructor(){super(),this.open=!1,this.minTemp=5,this.maxTemp=30.5,this.tempStep=.5,this.temperatureUnit="°C",this.hourFormat="24",this._validationWarnings=[],this._historyStack=[],this._historyIndex=-1,this._keyDownHandler=this._handleKeyDown.bind(this)}connectedCallback(){super.connectedCallback(),window.addEventListener("keydown",this._keyDownHandler)}disconnectedCallback(){super.disconnectedCallback(),window.removeEventListener("keydown",this._keyDownHandler)}willUpdate(t){if(super.willUpdate(t),(t.has("open")||t.has("weekday"))&&this.open&&this.weekday){const e=t.get("open"),i=t.get("weekday");(!e&&this.open||this.open&&i!==this.weekday)&&this._initializeEditor(this.weekday)}}_initializeEditor(t){this._editingWeekday=t,this._editingBlocks=this._getParsedBlocks(t),this._editingSlotIndex=void 0,this._editingSlotData=void 0;const e=this.scheduleData?.[t];if(e){const{baseTemperature:t}=xt(e);this._editingBaseTemperature=t}else this._editingBaseTemperature=20;this._historyStack=[JSON.parse(JSON.stringify(this._editingBlocks))],this._historyIndex=0,this._updateValidationWarnings()}_getParsedBlocks(t){if(this.scheduleData){const e=this.scheduleData[t];if(!e)return[];const{blocks:i}=xt(e);return i}return[]}_getWeekdayLabel(t,e){return"long"===e?this.translations?.weekdayLongLabels[t]??t:this.translations?.weekdayShortLabels[t]??t.slice(0,2)}_formatTimeDisplay(t){return yt(t,this.hourFormat)}_formatValidationParams(t){if(!t)return{};const e={};for(const[i,s]of Object.entries(t))"weekday"===i&&ut.includes(s)?e.weekday=this._getWeekdayLabel(s,"long"):e[i]=s;return e}_translateValidationMessage(t){const e=this.translations?.validationMessages[t.key]||t.key,i=this._formatValidationParams(t.params);t.nested&&(i.details=this._translateValidationMessage(t.nested));let s=e;for(const[t,e]of Object.entries(i))s=s.replace(`{${t}}`,e);return s}_saveHistoryState(){if(!this._editingBlocks)return;const t=JSON.parse(JSON.stringify(this._editingBlocks));this._historyStack=this._historyStack.slice(0,this._historyIndex+1),this._historyStack.push(t),this._historyIndex++,this._historyStack.length>50&&(this._historyStack.shift(),this._historyIndex--)}_undo(){this._historyIndex<=0||(this._historyIndex--,this._editingBlocks=JSON.parse(JSON.stringify(this._historyStack[this._historyIndex])),this._updateValidationWarnings())}_redo(){this._historyIndex>=this._historyStack.length-1||(this._historyIndex++,this._editingBlocks=JSON.parse(JSON.stringify(this._historyStack[this._historyIndex])),this._updateValidationWarnings())}_canUndo(){return this._historyIndex>0}_canRedo(){return this._historyIndex<this._historyStack.length-1}_handleKeyDown(t){if(!this.open||!this._editingWeekday||!this._editingBlocks)return;const e=t.ctrlKey||t.metaKey;e&&"z"===t.key&&!t.shiftKey?(t.preventDefault(),this._undo()):e&&("y"===t.key||"z"===t.key&&t.shiftKey)&&(t.preventDefault(),this._redo())}_updateValidationWarnings(){this._validationWarnings=this._editingBlocks?function(t,e=5,i=30.5){const s=[];if(0===t.length)return s;for(let e=0;e<t.length-1;e++){const i=t[e];i.endMinutes<i.startMinutes&&s.push({key:"blockEndBeforeStart",params:{block:`${e+1}`}}),i.endMinutes===i.startMinutes&&s.push({key:"blockZeroDuration",params:{block:`${e+1}`}})}const a=t[t.length-1];return a.endMinutes<a.startMinutes&&s.push({key:"blockEndBeforeStart",params:{block:`${t.length}`}}),t.forEach((t,a)=>{(t.startMinutes<0||t.startMinutes>1440)&&s.push({key:"invalidStartTime",params:{block:`${a+1}`}}),(t.endMinutes<0||t.endMinutes>1440)&&s.push({key:"invalidEndTime",params:{block:`${a+1}`}}),(t.temperature<e||t.temperature>i)&&s.push({key:"temperatureOutOfRange",params:{block:`${a+1}`,min:`${e}`,max:`${i}`}})}),s}(this._editingBlocks,this.minTemp,this.maxTemp):[]}_startSlotEdit(t){if(!this._editingBlocks||t<0||t>=this._editingBlocks.length)return;const e=this._editingBlocks[t];this._editingSlotIndex=t,this._editingSlotData={startTime:e.startTime,endTime:e.endTime,temperature:e.temperature}}_startSlotEditFromDisplay(t,e){if(!this._editingBlocks)return;const i=e[t],s=this._editingBlocks.findIndex(t=>t.startMinutes===i.startMinutes&&t.endMinutes===i.endMinutes&&t.temperature===i.temperature);-1!==s&&this._startSlotEdit(s)}_cancelSlotEdit(){this._editingSlotIndex=void 0,this._editingSlotData=void 0}_saveSlotEdit(){if(void 0===this._editingSlotIndex||!this._editingSlotData||!this._editingBlocks||void 0===this._editingBaseTemperature)return;const t=this._editingSlotIndex,{startTime:e,endTime:i,temperature:s}=this._editingSlotData,a={startTime:e,startMinutes:ft(e),endTime:i,endMinutes:ft(i),temperature:s,slot:t+1},o=this._editingBlocks.filter((e,i)=>i!==t),r=function(t,e){const i=[],s=e.startMinutes,a=e.endMinutes,o=[...t].sort((t,e)=>t.startMinutes-e.startMinutes);for(const t of o){const e=t.startMinutes,o=t.endMinutes;o<=s||e>=a?i.push(t):(e<s&&i.push({...t,endTime:vt(s),endMinutes:s,slot:i.length+1}),o>a&&i.push({...t,startTime:vt(a),startMinutes:a,slot:i.length+1}))}i.push({...e,slot:i.length+1});const r=i.sort((t,e)=>t.startMinutes-e.startMinutes);return wt(r)}(o,a),n=wt(Et(r));this._saveHistoryState(),this._editingBlocks=n,this._editingSlotIndex=void 0,this._editingSlotData=void 0,this._updateValidationWarnings()}_addNewSlot(){if(!this._editingBlocks||void 0===this._editingBaseTemperature)return;if(this._editingBlocks.length>=12)return;let t=0,e=60;if(this._editingBlocks.length>0){const i=Et(this._editingBlocks),s=i[i.length-1];if(s.endMinutes<1440)t=s.endMinutes,e=Math.min(t+60,1440);else{let s=!1;for(let a=0;a<i.length;a++){const o=0===a?0:i[a-1].endMinutes;if(i[a].startMinutes>o){t=o,e=i[a].startMinutes,s=!0;break}}if(!s)return}}const i=Math.min(this._editingBaseTemperature+2,this.maxTemp),s={startTime:vt(t),startMinutes:t,endTime:vt(e),endMinutes:e,temperature:i,slot:this._editingBlocks.length+1};this._saveHistoryState();const a=Et([...this._editingBlocks,s]);this._editingBlocks=a;const o=a.findIndex(i=>i.startMinutes===t&&i.endMinutes===e);o>=0&&this._startSlotEdit(o),this._updateValidationWarnings()}_removeTimeBlockByIndex(t,e){if(!this._editingBlocks||void 0===this._editingBaseTemperature)return;const i=e[t],s=this._editingBlocks.findIndex(t=>t.startMinutes===i.startMinutes&&t.endMinutes===i.endMinutes&&t.temperature===i.temperature);if(-1===s)return;this._saveHistoryState();const a=this._editingBlocks.filter((t,e)=>e!==s);this._editingBlocks=wt(Et(a)),this._updateValidationWarnings()}_switchToWeekday(t){t!==this._editingWeekday&&this._initializeEditor(t)}_closeEditor(){this._editingWeekday=void 0,this._editingBlocks=void 0,this._editingBaseTemperature=void 0,this._editingSlotIndex=void 0,this._editingSlotData=void 0,this._historyStack=[],this._historyIndex=-1,this.dispatchEvent(new CustomEvent("editor-closed",{bubbles:!0,composed:!0}))}_saveSchedule(){if(!this._editingWeekday||!this._editingBlocks||void 0===this._editingBaseTemperature)return;const t=It($t(this._editingBlocks,this._editingBaseTemperature),this.minTemp,this.maxTemp);if(t){const e=this._translateValidationMessage(t);return void this.dispatchEvent(new CustomEvent("validation-failed",{detail:{error:e},bubbles:!0,composed:!0}))}this.dispatchEvent(new CustomEvent("save-schedule",{detail:{weekday:this._editingWeekday,blocks:this._editingBlocks,baseTemperature:this._editingBaseTemperature},bubbles:!0,composed:!0}))}_saveAndClose(){this._saveSchedule()}render(){return this.open&&this._editingWeekday?F`
+`;var Qt=function(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)r=Reflect.decorate(t,e,i,s);else for(var n=t.length-1;n>=0;n--)(a=t[n])&&(r=(o<3?a(r):o>3?a(e,i,r):a(e,i))||r);return o>3&&r&&Object.defineProperty(e,i,r),r};let Xt=class extends nt{constructor(){super(),this.open=!1,this.minTemp=5,this.maxTemp=30.5,this.tempStep=.5,this.temperatureUnit="°C",this.hourFormat="24",this._validationWarnings=[],this._historyStack=[],this._historyIndex=-1,this._keyDownHandler=this._handleKeyDown.bind(this)}connectedCallback(){super.connectedCallback(),window.addEventListener("keydown",this._keyDownHandler)}disconnectedCallback(){super.disconnectedCallback(),window.removeEventListener("keydown",this._keyDownHandler)}willUpdate(t){if(super.willUpdate(t),(t.has("open")||t.has("weekday"))&&this.open&&this.weekday){const e=t.get("open"),i=t.get("weekday");(!e&&this.open||this.open&&i!==this.weekday)&&this._initializeEditor(this.weekday)}}_initializeEditor(t){this._editingWeekday=t,this._editingBlocks=this._getParsedBlocks(t),this._editingSlotIndex=void 0,this._editingSlotData=void 0;const e=this.scheduleData?.[t];if(e){const{baseTemperature:t}=xt(e);this._editingBaseTemperature=t}else this._editingBaseTemperature=20;this._historyStack=[JSON.parse(JSON.stringify(this._editingBlocks))],this._historyIndex=0,this._updateValidationWarnings()}_getParsedBlocks(t){if(this.scheduleData){const e=this.scheduleData[t];if(!e)return[];const{blocks:i}=xt(e);return i}return[]}_getWeekdayLabel(t,e){return"long"===e?this.translations?.weekdayLongLabels[t]??t:this.translations?.weekdayShortLabels[t]??t.slice(0,2)}_formatTimeDisplay(t){return yt(t,this.hourFormat)}_formatValidationParams(t){if(!t)return{};const e={};for(const[i,s]of Object.entries(t))"weekday"===i&&ut.includes(s)?e.weekday=this._getWeekdayLabel(s,"long"):e[i]=s;return e}_translateValidationMessage(t){const e=this.translations?.validationMessages[t.key]||t.key,i=this._formatValidationParams(t.params);t.nested&&(i.details=this._translateValidationMessage(t.nested));let s=e;for(const[t,e]of Object.entries(i))s=s.replace(`{${t}}`,e);return s}_saveHistoryState(){if(!this._editingBlocks)return;const t=JSON.parse(JSON.stringify(this._editingBlocks));this._historyStack=this._historyStack.slice(0,this._historyIndex+1),this._historyStack.push(t),this._historyIndex++,this._historyStack.length>50&&(this._historyStack.shift(),this._historyIndex--)}_undo(){this._historyIndex<=0||(this._historyIndex--,this._editingBlocks=JSON.parse(JSON.stringify(this._historyStack[this._historyIndex])),this._updateValidationWarnings())}_redo(){this._historyIndex>=this._historyStack.length-1||(this._historyIndex++,this._editingBlocks=JSON.parse(JSON.stringify(this._historyStack[this._historyIndex])),this._updateValidationWarnings())}_canUndo(){return this._historyIndex>0}_canRedo(){return this._historyIndex<this._historyStack.length-1}_handleKeyDown(t){if(!this.open||!this._editingWeekday||!this._editingBlocks)return;const e=t.ctrlKey||t.metaKey;e&&"z"===t.key&&!t.shiftKey?(t.preventDefault(),this._undo()):e&&("y"===t.key||"z"===t.key&&t.shiftKey)&&(t.preventDefault(),this._redo())}_updateValidationWarnings(){this._validationWarnings=this._editingBlocks?function(t,e=5,i=30.5){const s=[];if(0===t.length)return s;for(let e=0;e<t.length-1;e++){const i=t[e];i.endMinutes<i.startMinutes&&s.push({key:"blockEndBeforeStart",params:{block:`${e+1}`}}),i.endMinutes===i.startMinutes&&s.push({key:"blockZeroDuration",params:{block:`${e+1}`}})}const a=t[t.length-1];return a.endMinutes<a.startMinutes&&s.push({key:"blockEndBeforeStart",params:{block:`${t.length}`}}),t.forEach((t,a)=>{(t.startMinutes<0||t.startMinutes>1440)&&s.push({key:"invalidStartTime",params:{block:`${a+1}`}}),(t.endMinutes<0||t.endMinutes>1440)&&s.push({key:"invalidEndTime",params:{block:`${a+1}`}}),(t.temperature<e||t.temperature>i)&&s.push({key:"temperatureOutOfRange",params:{block:`${a+1}`,min:`${e}`,max:`${i}`}})}),s}(this._editingBlocks,this.minTemp,this.maxTemp):[]}_startSlotEdit(t){if(!this._editingBlocks||t<0||t>=this._editingBlocks.length)return;const e=this._editingBlocks[t];this._editingSlotIndex=t,this._editingSlotData={startTime:e.startTime,endTime:e.endTime,temperature:e.temperature}}_startSlotEditFromDisplay(t,e){if(!this._editingBlocks)return;const i=e[t],s=this._editingBlocks.findIndex(t=>t.startMinutes===i.startMinutes&&t.endMinutes===i.endMinutes&&t.temperature===i.temperature);-1!==s&&this._startSlotEdit(s)}_cancelSlotEdit(){this._editingSlotIndex=void 0,this._editingSlotData=void 0}_saveSlotEdit(){if(void 0===this._editingSlotIndex||!this._editingSlotData||!this._editingBlocks||void 0===this._editingBaseTemperature)return;const t=this._editingSlotIndex,{startTime:e,endTime:i,temperature:s}=this._editingSlotData,a={startTime:e,startMinutes:ft(e),endTime:i,endMinutes:ft(i),temperature:s,slot:t+1},o=this._editingBlocks.filter((e,i)=>i!==t),r=function(t,e){const i=[],s=e.startMinutes,a=e.endMinutes,o=[...t].sort((t,e)=>t.startMinutes-e.startMinutes);for(const t of o){const e=t.startMinutes,o=t.endMinutes;o<=s||e>=a?i.push(t):(e<s&&i.push({...t,endTime:vt(s),endMinutes:s,slot:i.length+1}),o>a&&i.push({...t,startTime:vt(a),startMinutes:a,slot:i.length+1}))}i.push({...e,slot:i.length+1});const r=i.sort((t,e)=>t.startMinutes-e.startMinutes);return wt(r)}(o,a),n=wt(Et(r));this._saveHistoryState(),this._editingBlocks=n,this._editingSlotIndex=void 0,this._editingSlotData=void 0,this._updateValidationWarnings()}_addNewSlot(){if(!this._editingBlocks||void 0===this._editingBaseTemperature)return;if(this._editingBlocks.length>=12)return;let t=0,e=60;if(this._editingBlocks.length>0){const i=Et(this._editingBlocks),s=i[i.length-1];if(s.endMinutes<1440)t=s.endMinutes,e=Math.min(t+60,1440);else{let s=!1;for(let a=0;a<i.length;a++){const o=0===a?0:i[a-1].endMinutes;if(i[a].startMinutes>o){t=o,e=i[a].startMinutes,s=!0;break}}if(!s)return}}const i=Math.min(this._editingBaseTemperature+2,this.maxTemp),s={startTime:vt(t),startMinutes:t,endTime:vt(e),endMinutes:e,temperature:i,slot:this._editingBlocks.length+1};this._saveHistoryState();const a=Et([...this._editingBlocks,s]);this._editingBlocks=a;const o=a.findIndex(i=>i.startMinutes===t&&i.endMinutes===e);o>=0&&this._startSlotEdit(o),this._updateValidationWarnings()}_removeTimeBlockByIndex(t,e){if(!this._editingBlocks||void 0===this._editingBaseTemperature)return;const i=e[t],s=this._editingBlocks.findIndex(t=>t.startMinutes===i.startMinutes&&t.endMinutes===i.endMinutes&&t.temperature===i.temperature);if(-1===s)return;this._saveHistoryState();const a=this._editingBlocks.filter((t,e)=>e!==s);this._editingBlocks=wt(Et(a)),this._updateValidationWarnings()}_switchToWeekday(t){t!==this._editingWeekday&&this._initializeEditor(t)}_closeEditor(){this._editingWeekday=void 0,this._editingBlocks=void 0,this._editingBaseTemperature=void 0,this._editingSlotIndex=void 0,this._editingSlotData=void 0,this._historyStack=[],this._historyIndex=-1,this.dispatchEvent(new CustomEvent("editor-closed",{bubbles:!0,composed:!0}))}_saveSchedule(){if(!this._editingWeekday||!this._editingBlocks||void 0===this._editingBaseTemperature)return;const t=It($t(this._editingBlocks,this._editingBaseTemperature),this.minTemp,this.maxTemp);if(t){const e=this._translateValidationMessage(t);return void this.dispatchEvent(new CustomEvent("validation-failed",{detail:{error:e},bubbles:!0,composed:!0}))}this.dispatchEvent(new CustomEvent("save-schedule",{detail:{weekday:this._editingWeekday,blocks:this._editingBlocks,baseTemperature:this._editingBaseTemperature},bubbles:!0,composed:!0}))}render(){return this.open&&this._editingWeekday?F`
       <ha-dialog
         open
         @closed=${this._closeEditor}
         .heading=${this._formatEdit(this._editingWeekday)}
-        scrimClickAction="close"
-        escapeKeyAction="close"
       >
         <div class="dialog-content">
           <!-- Weekday selector tabs -->
@@ -1050,13 +1048,6 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
           <!-- Editor content in dialog -->
           <div class="dialog-editor">${this._renderEditor()}</div>
         </div>
-
-        <ha-button slot="primaryAction" @click=${this._saveAndClose} dialogAction="close">
-          ${this.translations?.save??"Save"}
-        </ha-button>
-        <ha-button slot="secondaryAction" @click=${this._closeEditor} dialogAction="close">
-          ${this.translations?.cancel??"Cancel"}
-        </ha-button>
       </ha-dialog>
     `:F``}_formatEdit(t){return(this.translations?.edit??"Edit {weekday}").replace("{weekday}",this._getWeekdayLabel(t,"long"))}_renderEditor(){if(!this._editingWeekday||!this._editingBlocks)return F``;const t=void 0!==this._editingBaseTemperature?St(this._editingBlocks,this._editingBaseTemperature):this._editingBlocks;return F`
       <div class="editor">
@@ -1227,7 +1218,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   }
 
   ha-button {
-    --mdc-theme-primary: var(--primary-color);
+    --ha-button-color: var(--primary-color);
   }
 
   .no-data {
@@ -1345,7 +1336,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
   }
 
   ha-icon-button {
-    --mdc-icon-button-size: 36px;
+    --ha-icon-button-size: 36px;
     color: var(--secondary-text-color);
   }
 
@@ -1474,7 +1465,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
 
   /* Dialog styles */
   ha-dialog {
-    --mdc-dialog-max-width: 500px;
+    --ha-dialog-max-width: 500px;
   }
 
   .editor-content {
@@ -1580,10 +1571,19 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
     margin: 4px 0;
   }
 
+  .editor-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid var(--divider-color);
+  }
+
   /* Mobile Optimization */
   @media (max-width: 768px) {
     ha-dialog {
-      --mdc-dialog-max-width: 100vw;
+      --ha-dialog-max-width: 100vw;
     }
   }
 `;var ae=function(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)r=Reflect.decorate(t,e,i,s);else for(var n=t.length-1;n>=0;n--)(a=t[n])&&(r=(o<3?a(r):o>3?a(e,i,r):a(e,i))||r);return o>3&&r&&Object.defineProperty(e,i,r),r};let oe=class extends nt{constructor(){super(...arguments),this.open=!1,this.isNewEvent=!1,this._validationErrors=[]}static{this.styles=se}willUpdate(t){(t.has("open")||t.has("entry"))&&(this.open&&this.entry?(this._editingEntry={...this.entry},this._validationErrors=[]):this.open||(this._editingEntry=void 0,this._validationErrors=[]))}_updateEditingEntry(t){this._editingEntry&&(this._editingEntry={...this._editingEntry,...t},this._validationErrors=[],this.requestUpdate())}_handleClose(){this.dispatchEvent(new CustomEvent("editor-closed",{bubbles:!0,composed:!0}))}_handleSave(){if(!this._editingEntry||void 0===this.groupNo)return;const t=function(t,e){const i=[];(function(t){try{return function(t){const e=t.split(":");if(2!==e.length)throw new Error(`Invalid time format: ${t}`);const i=parseInt(e[0],10),s=parseInt(e[1],10);if(isNaN(i)||isNaN(s)||i<0||i>23||s<0||s>59)throw new Error(`Invalid time values: ${t}`)}(t),!0}catch{return!1}})(t.time)||i.push({field:"time",message:"Time must be in HH:MM format (00:00-23:59)"}),t.weekdays&&0!==t.weekdays.length||i.push({field:"weekdays",message:"At least one weekday must be selected"});const s=e?gt[e]:void 0;return"binary"===s?.levelType?0!==t.level&&1!==t.level&&i.push({field:"level",message:"Level must be 0 or 1 for switch"}):(t.level<0||t.level>1)&&i.push({field:"level",message:"Level must be between 0.0 and 1.0"}),"cover"===e&&null!==t.level_2&&(t.level_2<0||t.level_2>1)&&i.push({field:"level_2",message:"Slat position must be between 0.0 and 1.0"}),At(t.condition)&&(t.astro_offset_minutes<-720||t.astro_offset_minutes>720)&&i.push({field:"astro_offset_minutes",message:"Astro offset must be between -720 and 720 minutes"}),null===t.duration||Pt(t.duration)||i.push({field:"duration",message:"Invalid duration format"}),null===t.ramp_time||Pt(t.ramp_time)||i.push({field:"ramp_time",message:"Invalid ramp time format"}),i}(this._editingEntry,this.domain);t.length>0?this._validationErrors=t.map(t=>`${t.field}: ${t.message}`):this.dispatchEvent(new CustomEvent("save-event",{bubbles:!0,composed:!0,detail:{entry:{...this._editingEntry},groupNo:this.groupNo}}))}render(){return this.open&&this._editingEntry?F`
@@ -1591,21 +1591,17 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
         open
         @closed=${this._handleClose}
         .heading=${this.isNewEvent?this.translations.addEvent:this.translations.editEvent}
-        scrimClickAction="close"
-        escapeKeyAction="close"
       >
         <div class="editor-content">
           ${this._renderTimeFields()} ${this._renderConditionFields()}
           ${this._renderWeekdayFields()} ${this._renderLevelFields()}
           ${this._renderDurationFields()} ${this._renderRampTimeFields()}
           ${this._renderChannelFields()} ${this._renderValidationErrors()}
+          <div class="editor-footer">
+            <ha-button @click=${this._handleClose}> ${this.translations.cancel} </ha-button>
+            <ha-button @click=${this._handleSave}> ${this.translations.save} </ha-button>
+          </div>
         </div>
-        <ha-button slot="primaryAction" @click=${this._handleSave}>
-          ${this.translations.save}
-        </ha-button>
-        <ha-button slot="secondaryAction" @click=${this._handleClose} dialogAction="close">
-          ${this.translations.cancel}
-        </ha-button>
       </ha-dialog>
     `:F``}_renderValidationErrors(){return 0===this._validationErrors.length?F``:F`
       <ha-alert alert-type="error">
@@ -1959,7 +1955,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
       }
 
       ha-circular-progress {
-        --mdc-theme-primary: var(--primary-color);
+        color: var(--primary-color);
       }
 
       /* Mobile Optimization */
