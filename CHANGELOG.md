@@ -7,12 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.12.0] - 2026-04-01
+## [0.12.0] - 2026-04-05
 
 ### Fixed
 
 - Fixed `ha-dialog`, `ha-icon-button`, `ha-button`, and `ha-circular-progress` compatibility with Home Assistant 2026.4.0+ — migrated deprecated `--mdc-*` CSS custom properties to native `--ha-*` equivalents
+- Fixed `ha-slider` compatibility with Home Assistant 2026.4.0+ — migrated from deprecated `@value-changed` event to native `@change` event for level and slat position sliders
 - Fixed editor footer not visible in dialog view — changed `display: none` to `display: flex`
+- Fixed editor footer layout on mobile — buttons now display full-width in reversed column layout for better touch usability
 - Moved Save/Cancel buttons from `ha-dialog` slot actions into the dialog content for compatibility with updated `ha-dialog` component
 
 ## [0.11.0] - 2026-03-06

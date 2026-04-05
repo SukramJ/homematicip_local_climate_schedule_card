@@ -1585,6 +1585,15 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
     ha-dialog {
       --ha-dialog-max-width: 100vw;
     }
+
+    .editor-footer {
+      flex-direction: column-reverse;
+      gap: 8px;
+    }
+
+    .editor-footer ha-button {
+      width: 100%;
+    }
   }
 `;var ae=function(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPropertyDescriptor(e,i):s;if("object"==typeof Reflect&&"function"==typeof Reflect.decorate)r=Reflect.decorate(t,e,i,s);else for(var n=t.length-1;n>=0;n--)(a=t[n])&&(r=(o<3?a(r):o>3?a(e,i,r):a(e,i))||r);return o>3&&r&&Object.defineProperty(e,i,r),r};let oe=class extends nt{constructor(){super(...arguments),this.open=!1,this.isNewEvent=!1,this._validationErrors=[]}static{this.styles=se}willUpdate(t){(t.has("open")||t.has("entry"))&&(this.open&&this.entry?(this._editingEntry={...this.entry},this._validationErrors=[]):this.open||(this._editingEntry=void 0,this._validationErrors=[]))}_updateEditingEntry(t){this._editingEntry&&(this._editingEntry={...this._editingEntry,...t},this._validationErrors=[],this.requestUpdate())}_handleClose(){this.dispatchEvent(new CustomEvent("editor-closed",{bubbles:!0,composed:!0}))}_handleSave(){if(!this._editingEntry||void 0===this.groupNo)return;const t=function(t,e){const i=[];(function(t){try{return function(t){const e=t.split(":");if(2!==e.length)throw new Error(`Invalid time format: ${t}`);const i=parseInt(e[0],10),s=parseInt(e[1],10);if(isNaN(i)||isNaN(s)||i<0||i>23||s<0||s>59)throw new Error(`Invalid time values: ${t}`)}(t),!0}catch{return!1}})(t.time)||i.push({field:"time",message:"Time must be in HH:MM format (00:00-23:59)"}),t.weekdays&&0!==t.weekdays.length||i.push({field:"weekdays",message:"At least one weekday must be selected"});const s=e?gt[e]:void 0;return"binary"===s?.levelType?0!==t.level&&1!==t.level&&i.push({field:"level",message:"Level must be 0 or 1 for switch"}):(t.level<0||t.level>1)&&i.push({field:"level",message:"Level must be between 0.0 and 1.0"}),"cover"===e&&null!==t.level_2&&(t.level_2<0||t.level_2>1)&&i.push({field:"level_2",message:"Slat position must be between 0.0 and 1.0"}),At(t.condition)&&(t.astro_offset_minutes<-720||t.astro_offset_minutes>720)&&i.push({field:"astro_offset_minutes",message:"Astro offset must be between -720 and 720 minutes"}),null===t.duration||Pt(t.duration)||i.push({field:"duration",message:"Invalid duration format"}),null===t.ramp_time||Pt(t.ramp_time)||i.push({field:"ramp_time",message:"Invalid ramp time format"}),i}(this._editingEntry,this.domain);t.length>0?this._validationErrors=t.map(t=>`${t.field}: ${t.message}`):this.dispatchEvent(new CustomEvent("save-event",{bubbles:!0,composed:!0,detail:{entry:{...this._editingEntry},groupNo:this.groupNo}}))}render(){return this.open&&this._editingEntry?F`
       <ha-dialog
@@ -1680,7 +1689,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
                   min="0"
                   max="100"
                   .value=${Math.round(100*this._editingEntry.level)}
-                  @value-changed=${t=>{t.stopPropagation(),this._updateEditingEntry({level:parseInt(t.detail.value,10)/100})}}
+                  @change=${t=>{const e=Number(t.target.value);this._updateEditingEntry({level:e/100})}}
                 ></ha-slider>
                 <span class="slider-value">${Math.round(100*this._editingEntry.level)}%</span>
               </div>
@@ -1694,7 +1703,7 @@ function t(t,e,i,s){var a,o=arguments.length,r=o<3?e:null===s?s=Object.getOwnPro
                   min="0"
                   max="100"
                   .value=${Math.round(100*(this._editingEntry.level_2||0))}
-                  @value-changed=${t=>{t.stopPropagation(),this._updateEditingEntry({level_2:parseInt(t.detail.value,10)/100})}}
+                  @change=${t=>{const e=Number(t.target.value);this._updateEditingEntry({level_2:e/100})}}
                 ></ha-slider>
                 <span class="slider-value"
                   >${Math.round(100*(this._editingEntry.level_2||0))}%</span
