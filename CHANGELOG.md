@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-04-08
+
+### Added
+
+- Insufficient permissions error handling — detects `unauthorized` errors from service calls (profile change, schedule save, schedule paste) and shows a dedicated localized error message instead of raw error details
+- Added `insufficientPermissions` translation key (EN + DE) for unauthorized service call errors
+
+### Fixed
+
+- Increased `ha-icon-button` sizes in schedule grid copy/paste actions for better touch usability (icon: 12/14px → 16/18px, button: 20/24px → 32/36px)
+
 ## [0.12.0] - 2026-04-05
 
 ### Fixed
@@ -589,7 +600,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Jest for testing
 - GitHub Actions for CI/CD
 
-[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.12.0...HEAD
+[Unreleased]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.13.0...HEAD
+[0.13.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.12.0...0.13.0
 [0.12.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.11.0...0.12.0
 [0.11.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.10.0...0.11.0
 [0.10.0]: https://github.com/SukramJ/homematicip_local_climate_schedule_card/compare/0.9.0...0.10.0
