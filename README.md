@@ -10,12 +10,16 @@ A custom Lovelace card for Home Assistant to display and edit Homematic thermost
 ## Features
 
 - 📅 **Visual Week Schedule Display**: See your entire week at a glance with color-coded temperature blocks
-- ✏️ **Interactive Editor**: Click any day to edit schedule with intuitive time and temperature controls
+- ✏️ **Interactive Editor**: Click any time slot to edit the schedule with intuitive time and temperature controls
 - 🎨 **Temperature Visualization**: Color-coded blocks aligned with Home Assistant climate state colors
 - 🔄 **Profile Switching**: Easy dropdown to switch between different schedule profiles for viewing/editing
 - ✅ **Active Profile Indicator**: See which profile is currently active on the device (marked with \*)
-- 📱 **Responsive Design**: Works perfectly on desktop and mobile devices
-- 🌍 **Integration Ready**: Seamlessly works with HomematicIP Local integration v2.0.0+
+- 📋 **Copy & Paste**: Copy a day's schedule and paste it to other weekdays
+- 📤 **Import/Export**: Backup and share schedules as JSON files
+- ↩️ **Undo/Redo**: Full undo/redo support with keyboard shortcuts (Ctrl+Z / Ctrl+Y)
+- 🔌 **Multi-API Support**: Auto-detects and supports both V1 and V2 API (HomematicIP Local >= 2.3.0)
+- 📱 **Responsive Design**: Works perfectly on desktop and mobile devices with touch-optimized controls
+- 🌍 **Localization**: English and German UI with automatic language detection
 - ⚙️ **Visual Configuration**: Configure the card directly in the UI - no YAML required
 
 ## Installation
@@ -42,9 +46,7 @@ A custom Lovelace card for Home Assistant to display and edit Homematic thermost
 
 ## Device Support
 
-This card supports all HomematicIP thermostats with schedule support
-Homematic device with schedule support and more than one profile.
-HM-CC-RT-DN is only supported over thermostat group.
+This card supports all HomematicIP thermostats and Homematic devices with schedule support and more than one profile. HM-CC-RT-DN is only supported via thermostat group.
 
 ## Configuration
 
@@ -139,7 +141,7 @@ Each entity in the `entities` array can be either a simple string or an object:
 
 ### Viewing Schedules
 
-The card displays your week schedule with color-coded temperature blocks aligned with Home Assistant 2025.12.x climate state colors:
+The card displays your week schedule with color-coded temperature blocks aligned with Home Assistant climate state colors:
 
 - 🔵 **Blue** (< 10°C): Cold (HA Cool Blue)
 - 💙 **Light Blue** (10-14°C): Cool
@@ -157,22 +159,32 @@ Hover over any block to see the exact time range and temperature.
 The card automatically detects which profile is currently active on your thermostat device and marks it with an asterisk (\*) in the profile selector dropdown. This helps you quickly identify which schedule is actually running on the device.
 
 - The active profile is read from the `preset_mode` attribute of the climate entity
-- The asterisk (*) appears before the profile name (e.g., `*P1`or`\*P1 - Comfort`)
+- The asterisk (\*) appears before the profile name (e.g., `*P1` or `*P1 - Comfort`)
 - The profile selector is used only for viewing/editing different profiles, not for activating them
 - If the device profile changes, the card updates the indicator automatically
 
 ### Editing Schedules
 
-1. Click on any day in the week view
+1. Click on any time slot in the week view
 2. The editor opens showing all time slots for that day
-3. Modify end times and temperatures as needed
+3. Modify times and temperatures as needed
 4. Add new time blocks with the "+ Add Time Block" button
 5. Remove unwanted blocks with the trash icon
-6. Click "Save" to apply changes to your thermostat
+6. Use undo/redo (Ctrl+Z / Ctrl+Y) to revert or re-apply changes
+7. Click "Save" to apply changes to your thermostat
+
+### Copy & Paste
+
+Click the copy icon on a weekday to copy its schedule, then paste it onto other weekdays. This is useful for applying the same schedule to multiple days.
+
+### Import & Export
+
+- **Export**: Download the current schedule as a JSON file for backup or sharing
+- **Import**: Load a previously exported schedule from a JSON file
 
 ### Profile Switching
 
-If your thermostat supports multiple profiles (P1, P2, P3, etc.), use the dropdown in the card header to switch between them.
+If your thermostat supports multiple profiles (P1, P2, P3, etc.), use the dropdown in the card header to switch between them. The profile selector is for viewing and editing only — it does not activate the profile on the device.
 
 ### Understanding the Schedule Format
 
@@ -210,21 +222,20 @@ Only temperature periods that **differ from the base temperature** are stored. T
 
 ## Requirements
 
-- Home Assistant 2023.1 or newer
-- [HomematicIP Local](https://github.com/sukramj/homematicip_local) integration installed and configured
-- HomematicIP thermostat device with schedule support (e.g., HmIP-eTRV, HmIP-BWTH)
+- Home Assistant 2026.4.0 or newer
+- [HomematicIP Local](https://github.com/sukramj/homematicip_local) integration v2.0.0+ installed and configured
+- HomematicIP or Homematic thermostat device with schedule support (e.g., HmIP-eTRV, HmIP-BWTH, HM-CC-RT-DN)
 
 ## Compatibility
 
 This card is specifically designed for the **HomematicIP Local** integration and requires:
 
-- Schedule entities exposed by the integration (with `schedule_data` attribute)
-- Service calls: `homematicip_local.set_schedule_simple_weekday` (v2.0.0+)
-- Service calls: `homematicip_local.set_schedule_active_profile`
+- Climate entities with `schedule_data` attribute
+- V2 API (integration >= 2.3.0): `homematicip_local.set_schedule_weekday` (device-based)
+- V1 API (integration >= 2.0.0): `homematicip_local.set_schedule_simple_weekday` (entity-based)
+- Profile management: `homematicip_local.set_schedule_active_profile`
 
-## Development
-
-Development of this card happens in the [homematicip-local-frontend](https://github.com/SukramJ/homematicip-local-frontend) monorepo. This repository is used for HACS distribution only.
+The card auto-detects the API version per entity and supports mixed V1/V2 setups.
 
 ## Troubleshooting
 
@@ -244,28 +255,22 @@ Development of this card happens in the [homematicip-local-frontend](https://git
 
 1. Check Home Assistant logs for service call errors
 2. Ensure your CCU/thermostat is reachable
-3. Verify you have proper permissions in the integration
+3. Verify you have proper permissions — the card shows a dedicated error message for insufficient permissions
 
-## Contributing
+### Sensor entity not supported
 
-Contributions are welcome! Please submit Pull Requests to the [homematicip-local-frontend](https://github.com/SukramJ/homematicip-local-frontend) monorepo where development happens.
+The card only works with climate entities that have `schedule_type: "climate"`. Sensor entities are not supported and will show an error message.
+
+## Development
+
+Development of this card happens in the [homematicip-local-frontend](https://github.com/SukramJ/homematicip-local-frontend) monorepo. This repository is used for HACS distribution only.
+
+Contributions are welcome! Please submit Pull Requests to the monorepo.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
-
-- Built with [Lit](https://lit.dev/)
-- Designed for [Home Assistant](https://www.home-assistant.io/)
-- Compatible with [HomematicIP Local](https://github.com/sukramj/homematicip_local) integration
-
 ## Support
-
-If you find this card useful, please consider:
-
-- Giving it a star on GitHub
-- Reporting issues or suggesting features
-- Contributing to the code
 
 For issues and questions, please use the [GitHub Issues](https://github.com/SukramJ/homematicip_local_climate_schedule_card/issues) page.
